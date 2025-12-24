@@ -1,6 +1,6 @@
-import { memo, useEffect, useRef } from "react";
+import { memo } from "react";
 
-import { useBox, useSphere } from "@react-three/cannon";
+import { useSphere } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
 
 import { Model as ModelKingMen } from "@/components/Models/King";
@@ -9,11 +9,11 @@ import { useGameStore } from "@/hooks/useGameStore";
 
 function EnemyBase({ args, position, rotation }) {
 
-    const debug = useGameStore.getState().debug
+    const debug = useGameStore((state) => state.debug);
 
     const [ref, api] = useSphere(() => ({
         mass: 0,
-        // type: 'Dynamic',
+        type: 'Kinematic',
         isTrigger: true,
         args: args,
         position: position,
@@ -26,47 +26,30 @@ function EnemyBase({ args, position, rotation }) {
         }
     }))
 
-    const playerModelRef = useRef()
-
-    useEffect(() => {
-
-        api.position.subscribe((p) => {
-
-            if (playerModelRef.current) {
-                playerModelRef.current.position.set(...p);
-            }
-
-        })
-
-    }, [api.position])
-
-    const moveSpeed = 0.001; // Change this value to adjust speed
+    const moveSpeed = 1.5; // Adjusted for seconds
     const amplitude = 15; // Max distance on X-axis
 
     // Oscillating position logic
-    useFrame(() => {
-        const time = performance.now();
+    useFrame((state) => {
+        const time = state.clock.getElapsedTime();
         const oscillation = Math.sin(time * moveSpeed) * amplitude;
         api.position.set(oscillation, position[1], position[2]);
     });
 
     return (
-        <group>
+        <group ref={ref}>
+            <ModelKingMen
+                scale={2}
+                action={"Walk"}
+                rotation={[0, degToRad(90), 0]}
+            />
 
-            <group ref={playerModelRef}>
-                <ModelKingMen
-                    scale={2}
-                    action={"Walk"}
-                    rotation={[0, degToRad(90), 0]}
-                />
-            </group>
-
-            <mesh ref={ref} castShadow>
-                {debug && <>
+            {debug && (
+                <mesh castShadow>
                     <sphereGeometry args={args} />
-                    <meshStandardMaterial color="red" />
-                </>}
-            </mesh>
+                    <meshStandardMaterial color="red" wireframe={true} opacity={0.5} transparent />
+                </mesh>
+            )}
         </group>
     )
 

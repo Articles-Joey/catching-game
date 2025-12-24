@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { Modal, Form } from "react-bootstrap"
 
 import ArticlesButton from "@/components/UI/Button";
+import { useModalNavigation } from "@/hooks/useModalNavigation";
 
 export default function FourFrogsSettingsModal({
     show,
@@ -14,6 +15,14 @@ export default function FourFrogsSettingsModal({
     const [lightboxData, setLightboxData] = useState(null)
 
     const [tab, setTab] = useState('Controls')
+
+    const elementsRef = useRef([]);
+    useModalNavigation(elementsRef, () => setShowModal(false));
+
+    // Reset refs when tab changes
+    useEffect(() => {
+        elementsRef.current = [];
+    }, [tab]);
 
     return (
         <>
@@ -52,11 +61,13 @@ export default function FourFrogsSettingsModal({
 
                     <div className='p-2'>
                         {[
+                            'Visuals',
                             'Controls',
                             'Audio',
                             'Chat'
-                        ].map(item =>
+                        ].map((item, i) =>
                             <ArticlesButton
+                                ref={el => elementsRef.current[i] = el}
                                 key={item}
                                 active={tab == item}
                                 onClick={() => { setTab(item) }}
@@ -69,6 +80,34 @@ export default function FourFrogsSettingsModal({
                     <hr className="my-0" />
 
                     <div className="p-2">
+                        {tab == 'Visuals' &&
+                            <>
+                                <div className="mb-3">
+                                    <div className="d-flex align-items-center">
+                                        <Form.Check
+                                            ref={el => elementsRef.current[4] = el}
+                                            type="switch"
+                                            id="dark-mode-switch"
+                                            label="Dark Mode"
+                                            // value={enabled}
+                                            checked={darkMode}
+                                            onChange={() => {
+                                                toggleDarkMode();
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="small mt-2">
+                                        {`Dark Mode changes the game's color scheme to be easier on the eyes in low light environments.`}
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                <div>
+                                    
+                                </div>
+                            </>
+                        }
                         {tab == 'Controls' &&
                             <div>
                                 {[
@@ -111,7 +150,7 @@ export default function FourFrogsSettingsModal({
                                         action: 'Rotate Right',
                                         defaultKeyboardKey: 'ArrowRight'
                                     }
-                                ].map(obj =>
+                                ].map((obj, i) =>
                                     <div key={obj.action}>
                                         <div className="flex-header border-bottom pb-1 mb-1">
 
@@ -124,7 +163,8 @@ export default function FourFrogsSettingsModal({
 
                                                 <div className="badge badge-hover bg-articles me-1">{obj.defaultKeyboardKey}</div>
 
-                                                <ArticlesButton 
+                                                <ArticlesButton
+                                                    ref={el => elementsRef.current[4 + i] = el}
                                                     className=""
                                                     small
                                                 >
@@ -140,24 +180,27 @@ export default function FourFrogsSettingsModal({
                         {tab == 'Audio' &&
                             <>
                                 <Form.Label className="mb-0">Game Volume</Form.Label>
-                                <Form.Range />
+                                <Form.Range ref={el => elementsRef.current[4] = el} />
                                 <Form.Label className="mb-0">Music Volume</Form.Label>
-                                <Form.Range />
+                                <Form.Range ref={el => elementsRef.current[5] = el} />
                             </>
                         }
                         {tab == 'Chat' &&
                             <>
                                 <Form.Check
+                                    ref={el => elementsRef.current[4] = el}
                                     type="switch"
                                     id="custom-switch"
                                     label="Game chat panel"
                                 />
                                 <Form.Check
+                                    ref={el => elementsRef.current[5] = el}
                                     type="switch"
                                     id="custom-switch"
                                     label="Censor chat"
                                 />
                                 <Form.Check
+                                    ref={el => elementsRef.current[6] = el}
                                     type="switch"
                                     id="custom-switch"
                                     label="Game chat speech bubbles"
@@ -176,15 +219,19 @@ export default function FourFrogsSettingsModal({
                     <div>
 
                         <ArticlesButton
+                            ref={el => elementsRef.current[100] = el}
                             variant="outline-dark"
                             onClick={() => {
                                 setShow(false)
                             }}
+                            className="d-flex align-items-center"
                         >
+                            <img src="/img/Xbox UI/B.svg" className="me-1" alt="Close" />
                             Close
                         </ArticlesButton>
 
                         <ArticlesButton
+                            ref={el => elementsRef.current[101] = el}
                             variant="outline-danger ms-3"
                             onClick={() => {
                                 setShow(false)

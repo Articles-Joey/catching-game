@@ -10,6 +10,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // import "./globals.css";
 import "@/styles/index.scss";
 import SocketLogicHandler from "@/components/SocketLogicHandler";
+import { Suspense } from 'react';
+import GlobalClientModals from '@/components/UI/GlobalClientModals';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -43,7 +45,10 @@ export default function RootLayout({ children }) {
       // className={`${geistSans.variable} ${geistMono.variable}`}
       >
 
-        <SocketLogicHandler />
+        <Suspense>
+          {/* <SocketLogicHandler /> */}
+          <GlobalClientModals />
+        </Suspense>
 
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>

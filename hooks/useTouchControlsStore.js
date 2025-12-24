@@ -6,7 +6,9 @@ export const useTouchControlsStore = create((set) => ({
     touchControls: {
         jump: false,
         left: false,
-        right: false
+        right: false,
+        up: false,
+        down: false,
     },
     setTouchControls: (newValue) => {
         set((prev) => ({

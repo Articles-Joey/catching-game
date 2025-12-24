@@ -23,8 +23,8 @@ import { ModelKennyNLNatureRockTallE } from "@/components/Models/rock_tallE";
 import { Enemy } from "./Enemy";
 import { useGameStore } from "@/hooks/useGameStore";
 
-const texture = new TextureLoader().load(`${process.env.NEXT_PUBLIC_CDN}games/Race Game/grass.jpg`)
-const textureOther = new TextureLoader().load(`${process.env.NEXT_PUBLIC_CDN}games/Race Game/grass.jpg`)
+const texture = new TextureLoader().load(`img/grass.webp`)
+const textureOther = new TextureLoader().load(`img/grass.webp`)
 
 // const GrassPlane = () => {
 
@@ -78,9 +78,6 @@ function GameCanvas(props) {
                 position={[0, 1.2, 0]}
             />
 
-            {/* <SpacesuitModel /> */}
-
-            {/* <GrassPlane /> */}
         </>
     )
 
@@ -98,7 +95,7 @@ function GameCanvas(props) {
     }
 
     return (
-        <Canvas shadows shadowMap camera={{ position: [0, 30, 30], fov: 50 }}>
+        <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
 
             <OrbitControls
             // autoRotate={gameState?.status == 'In Lobby'}

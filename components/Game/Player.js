@@ -7,11 +7,12 @@ import * as THREE from 'three';
 import { useKeyboard } from "@/hooks/useKeyboard"
 
 import { useControllerStore } from '@/hooks/useControllerStore';
-import { useControlsStore, useGameStore } from "@/hooks/useGameStore";
+import { useGameStore } from "@/hooks/useGameStore";
+// import { useTouchControlsStore } from "@/hooks/useTouchControlsStore";
 
 // import ClownfishModel from "./PlayerModels/Clownfish"
 // import BoneFishModel from "./PlayerModels/BoneFish"
-import { useLocalStorageNew } from "@/hooks/useLocalStorageNew"
+// import { useLocalStorageNew } from "@/hooks/useLocalStorageNew"
 
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
 import { degToRad } from "three/src/math/MathUtils"
@@ -44,29 +45,43 @@ function Player(props) {
         debug
     } = useGameStore()
 
-    const {
-        touchControls, setTouchControls
-    } = useControlsStore()
+    // const {
+    //     touchControls, setTouchControls
+    // } = useTouchControlsStore()
+
+    const touchControls = {
+        jump: false,
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+    }
+
+    const setTouchControls = (newValue) => {
+        // useTouchControlsStore.setState({
+        //     touchControls: newValue
+        // })
+    }
 
     const { controllerState, setControllerState } = useControllerStore()
 
-    const [character, setCharacter] = useLocalStorageNew("game:ocean-rings:character", {
-        model: 'Clownfish',
-        color: '#000000'
-    })
+    // const [character, setCharacter] = useLocalStorageNew("game:ocean-rings:character", {
+    //     model: 'Clownfish',
+    //     color: '#000000'
+    // })
 
     // Attach event listeners when the component mounts
     useEffect(() => {
 
-        if (controllerState.axes && Math.abs(controllerState?.axes[0]) > 0.3) {
+        // if (controllerState.axes && Math.abs(controllerState?.axes[0]) > 0.3) {
 
-            if (controllerState?.axes[0] > 0) {
-                api.position.set([-1, 5, 0]);
-            } else {
-                api.position.set([1, 5, 0]);
-            }
+        //     if (controllerState?.axes[0] > 0) {
+        //         api.position.set([-1, 5, 0]);
+        //     } else {
+        //         api.position.set([1, 5, 0]);
+        //     }
 
-        }
+        // }
 
     }, [controllerState]);
 
@@ -85,35 +100,85 @@ function Player(props) {
     const { moveBackward, moveForward, moveRight, moveLeft, jump, shift: isShifting, crouch } = useKeyboard()
     const [action, setAction] = useState("Idle")
     const [lastMove, setLastMove] = useState(0);
+
+    // Controller Logic
+    const [controllerInput, setControllerInput] = useState({
+        forward: false,
+        backward: false,
+        left: false,
+        right: false,
+        jump: false
+    });
+
+    useFrame(() => {
+        const gamepads = navigator.getGamepads();
+        const gp = gamepads[0];
+
+        if (gp) {
+            const axes = gp.axes;
+            const buttons = gp.buttons;
+            const threshold = 0.5;
+
+            let forward = false;
+            let backward = false;
+            let left = false;
+            let right = false;
+            let jump = buttons[0].pressed; // A button
+
+            // D-Pad
+            if (buttons[12].pressed) forward = true; // Up
+            if (buttons[13].pressed) backward = true; // Down
+            if (buttons[14].pressed) left = true; // Left
+            if (buttons[15].pressed) right = true; // Right
+
+            // Left Stick
+            if (axes[1] < -threshold) forward = true;
+            if (axes[1] > threshold) backward = true;
+            if (axes[0] < -threshold) left = true;
+            if (axes[0] > threshold) right = true;
+
+            setControllerInput({ forward, backward, left, right, jump });
+        }
+    });
+
     useEffect(() => {
 
-        if (moveLeft || moveRight || moveBackward || moveForward) {
+        const isMoving = moveLeft || moveRight || moveBackward || moveForward || 
+                         controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward;
+
+        if (isMoving) {
             setAction("Walk");
         }
 
-        if (moveForward && moveRight) {
+        // Combine inputs
+        const fwd = moveForward || controllerInput.forward;
+        const bwd = moveBackward || controllerInput.backward;
+        const lft = moveLeft || controllerInput.left;
+        const rgt = moveRight || controllerInput.right;
+
+        if (fwd && rgt) {
             setLastMove(135); // Forward + Right
-        } else if (moveForward && moveLeft) {
+        } else if (fwd && lft) {
             setLastMove(225); // Forward + Left
-        } else if (moveBackward && moveRight) {
+        } else if (bwd && rgt) {
             setLastMove(45); // Backward + Right
-        } else if (moveBackward && moveLeft) {
+        } else if (bwd && lft) {
             setLastMove(-45); // Backward + Left
-        } else if (moveRight) {
+        } else if (rgt) {
             setLastMove(90); // Right
-        } else if (moveLeft) {
+        } else if (lft) {
             setLastMove(-90); // Left
-        } else if (moveForward) {
+        } else if (fwd) {
             setLastMove(180); // Forward
-        } else if (moveBackward) {
+        } else if (bwd) {
             setLastMove(0); // Backward
         }
 
-        if (!moveLeft && !moveRight && !moveBackward && !moveForward) {
+        if (!isMoving) {
             setAction("Idle");
         }
 
-    }, [moveBackward, moveForward, moveRight, moveLeft])
+    }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput])
 
     const { camera } = useThree()
 
@@ -217,11 +282,11 @@ function Player(props) {
         const frontVector = new Vector3(
             0,
             0,
-            (moveForward || touchControls.up ? -1 : 0) - (moveBackward || touchControls.down ? -1 : 0),
+            (moveForward || touchControls.up || controllerInput.forward ? -1 : 0) - (moveBackward || touchControls.down || controllerInput.backward ? -1 : 0),
         )
 
         const sideVector = new Vector3(
-            (moveLeft || touchControls.left ? 1 : 0) - (moveRight || touchControls.right ? 1 : 0),
+            (moveLeft || touchControls.left || controllerInput.left ? 1 : 0) - (moveRight || touchControls.right || controllerInput.right ? 1 : 0),
             0,
             0,
         )
@@ -234,7 +299,7 @@ function Player(props) {
 
         api.velocity.set(direction.x, 0, direction.z)
 
-        if ((jump || touchControls.jump) && Math.abs(vel.current[1]) < 0.05) {
+        if ((jump || touchControls.jump || controllerInput.jump) && Math.abs(vel.current[1]) < 0.05) {
 
             console.log("Jump understood")
 

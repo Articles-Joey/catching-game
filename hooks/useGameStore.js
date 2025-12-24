@@ -3,6 +3,39 @@ import { createWithEqualityFn as create } from 'zustand/traditional'
 
 export const useGameStore = create((set) => ({
 
+    darkMode: false,
+    toggleDarkMode: () => {
+        set((prev) => ({
+            darkMode: !prev.darkMode
+        }))
+    },
+    setDarkMode: (newValue) => {
+        set((prev) => ({
+            darkMode: newValue
+        }))
+    },
+
+    showSettingsModal: false,
+    setShowSettingsModal: (newValue) => {
+        set((prev) => ({
+            showSettingsModal: newValue
+        }))
+    },
+
+    showInfoModal: false,
+    setShowInfoModal: (newValue) => {
+        set((prev) => ({
+            showInfoModal: newValue
+        }))
+    },
+
+    showCreditsModal: false,
+    setShowCreditsModal: (newValue) => {
+        set((prev) => ({
+            showCreditsModal: newValue
+        }))
+    },
+
     cameraMode: 'Player',
     setCameraMode: (newValue) => {
         set((prev) => ({
@@ -88,21 +121,5 @@ export const useGameStore = create((set) => ({
             gameState: newValue
         }))
     },
-}))
-
-export const useControlsStore = create((set) => ({
-
-    touchControls: {
-        jump: false,
-        left: false,
-        right: false,
-        up: false,
-        down: false
-    },
-    setTouchControls: (newValue) => {
-        set((prev) => ({
-            touchControls: newValue
-        }))
-    }
 
 }))
