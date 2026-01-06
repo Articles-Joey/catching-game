@@ -57,5 +57,6 @@ const ArticlesButton = forwardRef((props, ref) => {
         </button>
     )
 });
+ArticlesButton.displayName = 'ArticlesButton';
 
 export default ArticlesButton;

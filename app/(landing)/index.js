@@ -37,6 +37,8 @@ const assets_src = 'games/Cannon/'
 const game_key = 'catching-game'
 const game_name = 'Catching Game'
 
+// import helloWorld from 'articles-dev-box';
+
 export default function LobbyPage() {
 
     const searchParams = useSearchParams()
@@ -111,7 +113,9 @@ export default function LobbyPage() {
 
     useEffect(() => {
 
-
+        // console.log(
+        //     helloWorld()
+        // );
 
     }, [])
 
