@@ -12,6 +12,7 @@ import "@/styles/index.scss";
 import SocketLogicHandler from "@/components/SocketLogicHandler";
 import { Suspense } from 'react';
 import GlobalClientModals from '@/components/UI/GlobalClientModals';
+import DarkModeHandler from '@/components/UI/DarkModeHandler';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -24,7 +25,7 @@ import GlobalClientModals from '@/components/UI/GlobalClientModals';
 // });
 
 export const metadata = {
-  title: "Cannon Game",
+  title: "Catching Game",
   description: "",
 };
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
         <Suspense>
           {/* <SocketLogicHandler /> */}
           <GlobalClientModals />
+          <DarkModeHandler />
         </Suspense>
 
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>

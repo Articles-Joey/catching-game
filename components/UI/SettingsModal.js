@@ -4,17 +4,21 @@ import { Modal, Form } from "react-bootstrap"
 
 import ArticlesButton from "@/components/UI/Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
+import { useStore } from "@/hooks/useStore";
 
 export default function FourFrogsSettingsModal({
     show,
     setShow,
 }) {
 
+    const darkMode = useStore((state) => state.darkMode)
+    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
+
     const [showModal, setShowModal] = useState(true)
 
     const [lightboxData, setLightboxData] = useState(null)
 
-    const [tab, setTab] = useState('Controls')
+    const [tab, setTab] = useState('Graphics')
 
     const elementsRef = useRef([]);
     useModalNavigation(elementsRef, () => setShowModal(false));
@@ -61,7 +65,7 @@ export default function FourFrogsSettingsModal({
 
                     <div className='p-2'>
                         {[
-                            'Visuals',
+                            'Graphics',
                             'Controls',
                             'Audio',
                             'Chat'
@@ -80,12 +84,12 @@ export default function FourFrogsSettingsModal({
                     <hr className="my-0" />
 
                     <div className="p-2">
-                        {tab == 'Visuals' &&
+                        {tab == 'Graphics' &&
                             <>
                                 <div className="mb-3">
                                     <div className="d-flex align-items-center">
                                         <Form.Check
-                                            ref={el => elementsRef.current[4] = el}
+                                            // ref={el => elementsRef.current[4] = el}
                                             type="switch"
                                             id="dark-mode-switch"
                                             label="Dark Mode"
@@ -104,8 +108,23 @@ export default function FourFrogsSettingsModal({
                                 <hr />
 
                                 <div>
-                                    
+                                    <div className="mb-2">Quality</div>
+                                    {[
+                                        'Low',
+                                        'Medium',
+                                        'High',
+                                    ].map((option, i) =>
+                                        <ArticlesButton
+                                            // ref={el => elementsRef.current[5 + i] = el}
+                                            key={option}
+                                            className=""
+                                        >
+                                            {option}
+                                        </ArticlesButton>
+                                    )
+                                    }
                                 </div>
+
                             </>
                         }
                         {tab == 'Controls' &&
@@ -127,41 +146,18 @@ export default function FourFrogsSettingsModal({
                                         action: 'Move Right',
                                         defaultKeyboardKey: 'D'
                                     },
-                                    {
-                                        action: 'Drop Insect',
-                                        defaultKeyboardKey: 'Space'
-                                    },
-                                    {
-                                        action: 'Stop Powerup',
-                                        defaultKeyboardKey: 'ArrowDown'
-                                    },
-                                    {
-                                        emote: true,
-                                        action: 'Stick out Tongue',
-                                        defaultKeyboardKey: 'ArrowDown'
-                                    },
-                                    {
-                                        emote: true,
-                                        action: 'Rotate Left',
-                                        defaultKeyboardKey: 'ArrowLeft'
-                                    },
-                                    {
-                                        emote: true,
-                                        action: 'Rotate Right',
-                                        defaultKeyboardKey: 'ArrowRight'
-                                    }
                                 ].map((obj, i) =>
                                     <div key={obj.action}>
                                         <div className="flex-header border-bottom pb-1 mb-1">
 
                                             <div>
                                                 <div>{obj.action}</div>
-                                                {obj.emote && <div className="span badge bg-dark">Emote</div>}
+                                                {obj.emote && <div className="span badge bg-dark border">Emote</div>}
                                             </div>
 
                                             <div>
 
-                                                <div className="badge badge-hover bg-articles me-1">{obj.defaultKeyboardKey}</div>
+                                                <div className="badge badge-hover border bg-black me-1">{obj.defaultKeyboardKey}</div>
 
                                                 <ArticlesButton
                                                     ref={el => elementsRef.current[4 + i] = el}
@@ -216,7 +212,7 @@ export default function FourFrogsSettingsModal({
                     {/* <div></div> */}
 
 
-                    <div>
+                    <div className="d-flex">
 
                         <ArticlesButton
                             ref={el => elementsRef.current[100] = el}
@@ -237,6 +233,7 @@ export default function FourFrogsSettingsModal({
                                 setShow(false)
                             }}
                         >
+                            <i className="fad fa-redo me-2"></i>
                             Reset
                         </ArticlesButton>
 

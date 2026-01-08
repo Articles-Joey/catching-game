@@ -3,6 +3,13 @@ import { createWithEqualityFn as create } from 'zustand/traditional'
 
 export const useGameStore = create((set) => ({
 
+    nickname: '',
+    setNickname: (newValue) => {
+        set((prev) => ({
+            nickname: newValue
+        }))
+    },
+
     darkMode: false,
     toggleDarkMode: () => {
         set((prev) => ({

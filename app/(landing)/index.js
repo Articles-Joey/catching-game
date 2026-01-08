@@ -37,7 +37,13 @@ const assets_src = 'games/Cannon/'
 const game_key = 'catching-game'
 const game_name = 'Catching Game'
 
-// import helloWorld from 'articles-dev-box';
+import {
+    Ad,
+    GameScoreboard, 
+    ReturnToLauncherButton,
+} from '@articles-media/articles-dev-box';
+
+import { useStore } from '@/hooks/useStore';
 
 export default function LobbyPage() {
 
@@ -59,7 +65,10 @@ export default function LobbyPage() {
     // const userReduxState = useSelector((state) => state.auth.user_details)
     const userReduxState = false
 
-    const [nickname, setNickname] = useLocalStorageNew("game:nickname", userReduxState.display_name)
+    const darkMode = useStore((state) => state.darkMode)
+    const nickname = useStore((state) => state.nickname)
+    const setNickname = useStore((state) => state.setNickname)
+    // const [nickname, setNickname] = useLocalStorageNew("game:nickname", userReduxState.display_name)
 
     // const [showInfoModal, setShowInfoModal] = useState(false)
     // const [showSettingsModal, setShowSettingsModal] = useState(false)
@@ -319,7 +328,7 @@ export default function LobbyPage() {
                                     className={`w-100`}
                                     small
                                     onClick={() => {
-                                        
+
                                     }}
                                 >
                                     <i className="fab fa-github"></i>
@@ -343,7 +352,9 @@ export default function LobbyPage() {
 
                     </div>
 
-                    {launcher_mode &&
+                    <ReturnToLauncherButton />
+
+                    {/* {launcher_mode &&
                         <ArticlesButton
                             ref={el => elementsRef.current[6] = el}
                             className={`w-100`}
@@ -359,12 +370,22 @@ export default function LobbyPage() {
                             <i className="fad fa-gamepad"></i>
                             Return to Games
                         </ArticlesButton>
-                    }
+                    } */}
+
                 </div>
 
-                {/* <GameScoreboard game="Death Race" /> */}
+                <GameScoreboard
+                    game="Catching Game"
+                    style="Default"
+                    darkMode={darkMode ? true : false}
+                />
 
-                {/* <Ad section={"Games"} section_id={game_name} /> */}
+                <Ad
+                    style="Default"
+                    section={"Games"}
+                    section_id={game_name}
+                    darkMode={darkMode ? true : false}
+                />
 
             </div>
         </div>

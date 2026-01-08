@@ -56,7 +56,7 @@ export default function CreditsModal({
                 <Modal.Body className="flex-column p-3">
 
                     <h6 className="mb-2">
-                        Developer: Articles-Joey
+                        Developer: Articles Joey
                     </h6>
 
                     <Link href="https://github.com/articles-joey/catching-game" target="_blank" rel="noopener noreferrer">
@@ -71,7 +71,7 @@ export default function CreditsModal({
                     </Link>
 
                     <h6 className="mb-2">
-                        Publisher: Articles-Joey
+                        Publisher: Articles Media
                     </h6>
 
                     <Link href="https://github.com/Articles-Media" target="_blank" rel="noopener noreferrer">

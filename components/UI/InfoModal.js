@@ -20,22 +20,6 @@ const games = []
 import ArticlesButton from "./Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 
-// const registeredGames = [
-//     'Four Frogs',
-//     'Race Game',
-//     'Eager Eagle',
-//     'Plinko',
-//     'Battle Trap',
-//     'Blackjack',
-//     'Ping Pong',
-//     'Tower Blocks',
-//     'Assets Gallery',
-//     'Tic Tac Toe',
-//     'Ocean Rings',
-//     'Maze',
-//     'School Run'
-// ]
-
 export default function InfoModal({
     show,
     setShow,
@@ -88,17 +72,7 @@ export default function InfoModal({
 
                 <Modal.Body className="flex-column p-0">
 
-                    <div className="p-3">
-
-                        <div className="fw-bold mb-2">
-                            {show.game || 'No game property provided'}
-                        </div>
-
-                        <div className="">
-                            {show?.item?.short_description}
-                        </div>
-
-                    </div>
+                    <div>123</div>
 
                 </Modal.Body>
 

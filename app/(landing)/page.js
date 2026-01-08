@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import LobbyPage from "."
 
 export const metadata = {
@@ -7,7 +8,7 @@ export const metadata = {
 export default function Home() {
 
   return (
-    <LobbyPage />
+    <Suspense><LobbyPage /></Suspense>
   )
 
 }
