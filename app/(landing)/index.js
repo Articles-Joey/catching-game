@@ -40,10 +40,20 @@ const game_name = 'Catching Game'
 import {
     Ad,
     GameScoreboard, 
-    ReturnToLauncherButton,
+    // ReturnToLauncherButton,
 } from '@articles-media/articles-dev-box';
 
+// const ReturnToLauncherButton = dynamic(
+//   () => import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
+//   { ssr: false } // This is the key
+// );
+const ReturnToLauncherButton = dynamic(() =>
+  import('@articles-media/articles-dev-box').then((mod) => mod.ReturnToLauncherButton),
+  { loading: () => <p>Loading...</p> }
+);
+
 import { useStore } from '@/hooks/useStore';
+import dynamic from 'next/dynamic';
 
 export default function LobbyPage() {
 

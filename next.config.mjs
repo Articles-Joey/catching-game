@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactCompiler: true,
+    // reactCompiler: true,
     poweredByHeader: false,
+    experimental: {
+        reactCompiler: true,
+    },
     images: {
         // domains: ['cdn.articles.media', 'articles-website.s3.amazonaws.com', 'd3bzp9rk94ifwy.cloudfront.net'],
         remotePatterns: [
