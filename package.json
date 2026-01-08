@@ -1,6 +1,6 @@
 {
   "name": "catching-game",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://catching-game.articles.media",
   "private": false,
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@articles-media/articles-dev-box": "^1.0.3",
+    "@articles-media/articles-dev-box": "^1.0.4",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.6",

@@ -37,19 +37,18 @@ const assets_src = 'games/Cannon/'
 const game_key = 'catching-game'
 const game_name = 'Catching Game'
 
-import {
-    Ad,
-    GameScoreboard, 
-    // ReturnToLauncherButton,
-} from '@articles-media/articles-dev-box';
+// import {
+//     Ad,
+//     GameScoreboard, 
+//     // ReturnToLauncherButton,
+// } from '@articles-media/articles-dev-box';
 
-// const ReturnToLauncherButton = dynamic(
-//   () => import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
-//   { ssr: false } // This is the key
-// );
+import GameScoreboard from '@articles-media/articles-dev-box/GameScoreboard';
+import Ad from '@articles-media/articles-dev-box/Ad';
+
 const ReturnToLauncherButton = dynamic(() =>
-  import('@articles-media/articles-dev-box').then((mod) => mod.ReturnToLauncherButton),
-  { loading: () => <p>Loading...</p> }
+  import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
+  { ssr: false }
 );
 
 import { useStore } from '@/hooks/useStore';

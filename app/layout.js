@@ -9,6 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 // import "./globals.css";
 import "@/styles/index.scss";
+
+import "@articles-media/articles-dev-box/dist/style.css";
+
 import SocketLogicHandler from "@/components/SocketLogicHandler";
 import { Suspense } from 'react';
 import GlobalClientModals from '@/components/UI/GlobalClientModals';
