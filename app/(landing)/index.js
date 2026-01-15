@@ -46,6 +46,9 @@ const game_name = 'Catching Game'
 import GameScoreboard from '@articles-media/articles-dev-box/GameScoreboard';
 import Ad from '@articles-media/articles-dev-box/Ad';
 
+import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
+import useUserToken from '@articles-media/articles-dev-box/useUserToken';
+
 const ReturnToLauncherButton = dynamic(() =>
   import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
   { ssr: false }
@@ -135,13 +138,29 @@ export default function LobbyPage() {
         //     helloWorld()
         // );
 
-    }, [])
+    }, [])    
+
+    const {
+        data: userToken,
+        error: userTokenError,
+        isLoading: userTokenLoading,
+        mutate: userTokenMutate
+    } = useUserToken(
+        "3030"
+    );
+
+    const {
+        data: userDetails,
+        error: userDetailsError,
+        isLoading: userDetailsLoading,
+        mutate: userDetailsMutate
+    } = useUserDetails({
+        token: userToken
+    });
 
     return (
 
         <div className="catching-game-landing-page">
-
-
 
             {/* {showPrivateGameModal &&
                 <PrivateGameModal
@@ -394,6 +413,9 @@ export default function LobbyPage() {
                     section={"Games"}
                     section_id={game_name}
                     darkMode={darkMode ? true : false}
+                    user_ad_token={userToken}
+                    userDetails={userDetails}
+                    userDetailsLoading={userDetailsLoading}
                 />
 
             </div>

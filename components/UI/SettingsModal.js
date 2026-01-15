@@ -6,7 +6,7 @@ import ArticlesButton from "@/components/UI/Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 import { useStore } from "@/hooks/useStore";
 
-export default function FourFrogsSettingsModal({
+export default function SettingsModal({
     show,
     setShow,
 }) {
