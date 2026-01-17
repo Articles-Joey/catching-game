@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useContext, useState, useRef } from 'react';
+import { useEffect, useContext, useState, useRef, Suspense } from 'react';
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,8 +25,6 @@ import { useGameStore } from '@/hooks/useGameStore';
 //     ssr: false,
 // });
 
-
-
 // const PrivateGameModal = dynamic(
 //     () => import('app/(site)/community/games/four-frogs/components/PrivateGameModal'),
 //     { ssr: false }
@@ -50,12 +48,13 @@ import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
 import useUserToken from '@articles-media/articles-dev-box/useUserToken';
 
 const ReturnToLauncherButton = dynamic(() =>
-  import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
-  { ssr: false }
+    import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
+    { ssr: false }
 );
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
+import { PieMenu } from '@articles-media/articles-gamepad-helper';
 
 export default function LobbyPage() {
 
@@ -138,7 +137,7 @@ export default function LobbyPage() {
         //     helloWorld()
         // );
 
-    }, [])    
+    }, [])
 
     const {
         data: userToken,
@@ -146,7 +145,7 @@ export default function LobbyPage() {
         isLoading: userTokenLoading,
         mutate: userTokenMutate
     } = useUserToken(
-        "3030"
+        "3042"
     );
 
     const {
@@ -161,6 +160,47 @@ export default function LobbyPage() {
     return (
 
         <div className="catching-game-landing-page">
+
+            <Suspense>
+                <PieMenu
+                    options={[
+                        {
+                            label: 'Settings',
+                            icon: 'fad fa-cog',
+                            callback: () => {
+                                setShowSettingsModal(prev => !prev)
+                            }
+                        },
+                        {
+                            label: 'Go Back',
+                            icon: 'fad fa-cog',
+                            callback: () => {
+                                window.history.back()
+                            }
+                        },
+                        {
+                            label: 'Credits',
+                            icon: 'fad fa-cog',
+                            callback: () => {
+                                setShowCreditsModal(true)
+                            }
+                        },
+                        {
+                            label: 'Game Launcher',
+                            icon: 'fad fa-cog',
+                            callback: () => {
+                                window.location.href = 'https://games.articles.media';
+                            }
+                        }
+                    ]}
+                    onFinish={(event) => {
+                        console.log("Event", event)
+                        if (event.callback) {
+                            event.callback()
+                        }
+                    }}
+                />
+            </Suspense>
 
             {/* {showPrivateGameModal &&
                 <PrivateGameModal

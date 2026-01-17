@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '@/hooks/useGameStore';
 
+import { usePieMenuStore } from '@articles-media/articles-gamepad-helper';
+
 export const useLandingNavigation = (elementsRef) => {
+
+    const visible = usePieMenuStore((state) => state.visible);
 
     const showInfoModal = useGameStore((state) => state.showInfoModal)
     const showSettingsModal = useGameStore((state) => state.showSettingsModal)
@@ -11,7 +15,8 @@ export const useLandingNavigation = (elementsRef) => {
     const currentFocusIndex = useRef(-1);
 
     useEffect(() => {
-        if (showInfoModal || showSettingsModal || showCreditsModal) return;
+
+        if (showInfoModal || showSettingsModal || showCreditsModal || visible) return;
 
         let animationFrameId;
 
@@ -121,5 +126,5 @@ export const useLandingNavigation = (elementsRef) => {
         animationFrameId = requestAnimationFrame(loop);
 
         return () => cancelAnimationFrame(animationFrameId);
-    }, [elementsRef, showInfoModal, showSettingsModal, showCreditsModal]);
+    }, [elementsRef, showInfoModal, showSettingsModal, showCreditsModal, visible]);
 };
