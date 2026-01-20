@@ -1,5 +1,6 @@
 "use client";
 import { useGameStore } from '@/hooks/useGameStore';
+import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic'
 
 const InfoModal = dynamic(
@@ -17,6 +18,14 @@ const CreditsModal = dynamic(
     { ssr: false }
 )
 
+const FriendsList = dynamic(
+    () => import('@articles-media/articles-dev-box/FriendsList'),
+    { ssr: false }
+)
+
+import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
+import useUserToken from '@articles-media/articles-dev-box/useUserToken';
+
 export default function GlobalClientModals() {
 
     const showInfoModal = useGameStore((state) => state.showInfoModal)
@@ -27,6 +36,27 @@ export default function GlobalClientModals() {
 
     const showCreditsModal = useGameStore((state) => state.showCreditsModal)
     const setShowCreditsModal = useGameStore((state) => state.setShowCreditsModal)
+
+    const friendsModal = useStore((state) => state.friendsModal)
+    const setFriendsModal = useStore((state) => state.setFriendsModal)
+
+    const {
+        data: userToken,
+        error: userTokenError,
+        isLoading: userTokenLoading,
+        mutate: userTokenMutate
+    } = useUserToken(
+        "3030"
+    );
+
+    const {
+        data: userDetails,
+        error: userDetailsError,
+        isLoading: userDetailsLoading,
+        mutate: userDetailsMutate
+    } = useUserDetails({
+        token: userToken
+    });
 
     return (
         <>
@@ -48,6 +78,25 @@ export default function GlobalClientModals() {
                 <CreditsModal
                     show={showCreditsModal}
                     setShow={setShowCreditsModal}
+                />
+            }
+
+            {friendsModal &&
+                <FriendsList
+                    componentType="modal"
+                    show={friendsModal}
+                    setShow={setFriendsModal}
+                    user_id={
+                        userDetails ? userDetails.user_id : null
+                    }
+                    user_token={
+                        userToken ? userToken : null
+                    }
+                    // className="123"
+                    // style={{
+                    //     backgroundColor: 'pink'
+                    // }}
+                    // id="456"
                 />
             }
         </>

@@ -54,7 +54,7 @@ const ReturnToLauncherButton = dynamic(() =>
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
-import { PieMenu } from '@articles-media/articles-gamepad-helper';
+import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
 
 export default function LobbyPage() {
 
@@ -77,8 +77,14 @@ export default function LobbyPage() {
     const userReduxState = false
 
     const darkMode = useStore((state) => state.darkMode)
+    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
+
+    const friendsModal = useStore((state) => state.friendsModal)
+    const setFriendsModal = useStore((state) => state.setFriendsModal)
+
     const nickname = useStore((state) => state.nickname)
     const setNickname = useStore((state) => state.setNickname)
+    const nicknameKeyboard = useStore((state) => state.nicknameKeyboard)
     // const [nickname, setNickname] = useLocalStorageNew("game:nickname", userReduxState.display_name)
 
     // const [showInfoModal, setShowInfoModal] = useState(false)
@@ -145,7 +151,7 @@ export default function LobbyPage() {
         isLoading: userTokenLoading,
         mutate: userTokenMutate
     } = useUserToken(
-        "3042"
+        "3030"
     );
 
     const {
@@ -162,6 +168,20 @@ export default function LobbyPage() {
         <div className="catching-game-landing-page">
 
             <Suspense>
+                <GamepadKeyboard
+                    disableToggle={true}
+                    active={nicknameKeyboard}
+                    onFinish={(text) => {
+                        console.log("FINISH KEYBOARD", text)
+                        useStore.getState().setNickname(text);
+                        useStore.getState().setNicknameKeyboard(false);
+                    }}
+                    onCancel={(text) => {
+                        console.log("CANCEL KEYBOARD", text)
+                        // useStore.getState().setNickname(text);
+                        useStore.getState().setNicknameKeyboard(false);
+                    }}
+                />
                 <PieMenu
                     options={[
                         {
@@ -173,23 +193,30 @@ export default function LobbyPage() {
                         },
                         {
                             label: 'Go Back',
-                            icon: 'fad fa-cog',
+                            icon: 'fad fa-arrow-left',
                             callback: () => {
                                 window.history.back()
                             }
                         },
                         {
                             label: 'Credits',
-                            icon: 'fad fa-cog',
+                            icon: 'fad fa-info-circle',
                             callback: () => {
                                 setShowCreditsModal(true)
                             }
                         },
                         {
                             label: 'Game Launcher',
-                            icon: 'fad fa-cog',
+                            icon: 'fad fa-gamepad',
                             callback: () => {
                                 window.location.href = 'https://games.articles.media';
+                            }
+                        },
+                        {
+                            label: `${darkMode ? "Light" : "Dark"} Mode`,
+                            icon: 'fad fa-palette',
+                            callback: () => {
+                                toggleDarkMode()
                             }
                         }
                     ]}
@@ -366,17 +393,29 @@ export default function LobbyPage() {
 
                         <div className="card-footer d-flex flex-wrap justify-content-center">
 
-                            <ArticlesButton
-                                ref={el => elementsRef.current[2] = el}
-                                className={`w-50`}
-                                small
-                                onClick={() => {
-                                    setShowSettingsModal(true)
-                                }}
-                            >
-                                <i className="fad fa-cog"></i>
-                                Settings
-                            </ArticlesButton>
+                            <div className='w-50 d-flex'>
+                                <ArticlesButton
+                                    ref={el => elementsRef.current[2] = el}
+                                    className={`w-100`}
+                                    small
+                                    onClick={() => {
+                                        setShowSettingsModal(true)
+                                    }}
+                                >
+                                    <i className="fad fa-cog"></i>
+                                    Settings
+                                </ArticlesButton>
+                                <ArticlesButton
+                                    // ref={el => elementsRef.current[2] = el}
+                                    className={``}
+                                    small
+                                    onClick={() => {
+                                        toggleDarkMode()
+                                    }}
+                                >
+                                    {darkMode ? <i className="fad fa-sun"></i> : <i className="fad fa-moon"></i>}
+                                </ArticlesButton>
+                            </div>
 
                             <ArticlesButton
                                 ref={el => elementsRef.current[3] = el}
@@ -416,6 +455,24 @@ export default function LobbyPage() {
                                 Credits
                             </ArticlesButton>
 
+                            {userDetails &&
+                                <ArticlesButton
+                                    // ref={el => elementsRef.current[5] = el}
+                                    className={`w-50`}
+                                    active={
+                                        friendsModal
+                                    }
+                                    small
+                                    onClick={() => {
+                                        // setShowCreditsModal(true)
+                                        setFriendsModal(true);
+                                    }}
+                                >
+                                    <i className="fad fa-users"></i>
+                                    Friends
+                                </ArticlesButton>
+                            }
+
                         </div>
 
                     </div>
@@ -443,7 +500,7 @@ export default function LobbyPage() {
                 </div>
 
                 <GameScoreboard
-                    game="Catching Game"
+                    game={game_name}
                     style="Default"
                     darkMode={darkMode ? true : false}
                 />

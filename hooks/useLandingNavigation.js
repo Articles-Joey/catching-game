@@ -1,9 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '@/hooks/useGameStore';
 
-import { usePieMenuStore } from '@articles-media/articles-gamepad-helper';
+import { useGameControllerKeyboardStore, usePieMenuStore } from '@articles-media/articles-gamepad-helper';
+import { useStore } from './useStore';
 
 export const useLandingNavigation = (elementsRef) => {
+
+    const nicknameKeyboard = useStore((state) => state.nicknameKeyboard);
+    const setNicknameKeyboard = useStore((state) => state.setNicknameKeyboard);
+
+    const lastClosedTime = useGameControllerKeyboardStore((state) => state.lastClosedTime);
+    const setStoreVisible = useGameControllerKeyboardStore((state) => state.setVisible);
 
     const visible = usePieMenuStore((state) => state.visible);
 
@@ -16,7 +23,7 @@ export const useLandingNavigation = (elementsRef) => {
 
     useEffect(() => {
 
-        if (showInfoModal || showSettingsModal || showCreditsModal || visible) return;
+        if (showInfoModal || showSettingsModal || showCreditsModal || visible || nicknameKeyboard) return;
 
         let animationFrameId;
 
@@ -33,6 +40,23 @@ export const useLandingNavigation = (elementsRef) => {
                     const axes = gp.axes;
                     const buttons = gp.buttons;
                     const threshold = 0.5;
+
+                    const activeElement = document.activeElement;
+                    if (activeElement && activeElement.tagName === 'INPUT') {
+                        for (let i = 0; i < buttons.length; i++) {
+                            if (buttons[i].pressed) {
+                                console.log(activeElement.id);
+
+                                if (activeElement.id == "nickname") {
+                                    if (now - lastClosedTime < 1000) break;
+                                    console.log("SHOW KEYBOARD");
+                                    setNicknameKeyboard(true);
+                                    setStoreVisible(true);
+                                }
+                                break;
+                            }
+                        }
+                    }
 
                     let dx = 0;
                     let dy = 0;
@@ -126,5 +150,5 @@ export const useLandingNavigation = (elementsRef) => {
         animationFrameId = requestAnimationFrame(loop);
 
         return () => cancelAnimationFrame(animationFrameId);
-    }, [elementsRef, showInfoModal, showSettingsModal, showCreditsModal, visible]);
+    }, [elementsRef, showInfoModal, showSettingsModal, showCreditsModal, visible, nicknameKeyboard, lastClosedTime]);
 };

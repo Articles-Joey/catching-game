@@ -14,6 +14,9 @@ export default function SettingsModal({
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
+    const graphicsQuality = useStore((state) => state.graphicsQuality)
+    const setGraphicsQuality = useStore((state) => state.setGraphicsQuality)
+
     const [showModal, setShowModal] = useState(true)
 
     const [lightboxData, setLightboxData] = useState(null)
@@ -118,6 +121,10 @@ export default function SettingsModal({
                                             // ref={el => elementsRef.current[5 + i] = el}
                                             key={option}
                                             className=""
+                                            active={graphicsQuality == option}
+                                            onClick={() => {
+                                                setGraphicsQuality(option);
+                                            }}
                                         >
                                             {option}
                                         </ArticlesButton>

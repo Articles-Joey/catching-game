@@ -5,11 +5,15 @@ import dynamic from 'next/dynamic'
 
 // import { useSelector } from 'react-redux'
 
-import { Modal } from "react-bootstrap"
+import { Modal } from "react-bootstrap";
 
 import ArticlesButton from "./Button";
 import Link from "next/link";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
+
+// import { B } from "@articles-media/articles-gamepad-helper/XboxIcons";
+import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
+// import B from "@articles-media/articles-gamepad-helper/public/img/Xbox UI/B.svg";
 
 export default function CreditsModal({
     show,
@@ -114,7 +118,7 @@ export default function CreditsModal({
                         }}
                         className="d-flex align-items-center"
                     >
-                        <img src="/img/Xbox UI/B.svg" className="me-1" alt="Close" />
+                        <img src={B.src} className="me-1" alt="Close" />
                         Close
                     </ArticlesButton>
 
