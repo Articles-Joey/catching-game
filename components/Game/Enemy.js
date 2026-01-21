@@ -72,6 +72,7 @@ function EnemyBase({ args, position, rotation }) {
                 scale={2}
                 action={"Walk"}
                 rotation={[0, degToRad(90), 0]}
+                position={[0, -0.5, 0]}
             />
 
             {debug && (

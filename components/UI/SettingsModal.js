@@ -6,6 +6,8 @@ import ArticlesButton from "@/components/UI/Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 import { useStore } from "@/hooks/useStore";
 
+import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
+
 export default function SettingsModal({
     show,
     setShow,
@@ -219,7 +221,7 @@ export default function SettingsModal({
                     {/* <div></div> */}
 
 
-                    <div className="d-flex">
+                    <div className="d-flex justify-content-between w-100">
 
                         <ArticlesButton
                             ref={el => elementsRef.current[100] = el}
@@ -229,7 +231,7 @@ export default function SettingsModal({
                             }}
                             className="d-flex align-items-center"
                         >
-                            <img src="/img/Xbox UI/B.svg" className="me-1" alt="Close" />
+                            <img src={B.src} className="me-1" alt="Close" />
                             Close
                         </ArticlesButton>
 

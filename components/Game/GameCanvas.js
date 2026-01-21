@@ -1,5 +1,5 @@
 "use client"
-import { memo, useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei";
@@ -22,6 +22,7 @@ import { ModelKennyNLNatureRockTallE } from "@/components/Models/rock_tallE";
 
 import { Enemy } from "./Enemy";
 import { useGameStore } from "@/hooks/useGameStore";
+import { useStore } from "@/hooks/useStore";
 
 const texture = new TextureLoader().load(`img/grass.webp`)
 const textureOther = new TextureLoader().load(`img/grass.webp`)
@@ -48,11 +49,10 @@ const textureOther = new TextureLoader().load(`img/grass.webp`)
 
 function GameCanvas(props) {
 
-    const {
-        debug,
-    } = useGameStore(state => ({
-        debug: state.debug,
-    }));
+    const debug = useGameStore((state) => state.debug);
+
+    const darkMode = useStore((state) => state.darkMode)
+    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
     let gameContent = (
         <>
@@ -103,19 +103,31 @@ function GameCanvas(props) {
 
             {/* a */}
 
-            {/* <ambientLight intensity={1} /> */}
+            <ambientLight intensity={0.2} />
 
             {/* <spotLight distance={500} castShadow intensity={10000} position={[0, 100, 0]} angle={1} penumbra={1} /> */}
 
-            <directionalLight
-                castShadow
-                position={[0, 100, 0]}
-                intensity={10}
-                shadow-camera-left={-20}
-                shadow-camera-right={20}
-                shadow-camera-top={20}
-                shadow-camera-bottom={-20}
-            />
+            {darkMode ?
+                <directionalLight
+                    castShadow
+                    position={[0, 10, -100]}
+                    intensity={2}
+                    // shadow-camera-left={-20}
+                    // shadow-camera-right={20}
+                    // shadow-camera-top={20}
+                    // shadow-camera-bottom={-20}
+                />
+                :
+                <directionalLight
+                    castShadow
+                    position={[0, 100, 0]}
+                    intensity={10}
+                    shadow-camera-left={-20}
+                    shadow-camera-right={20}
+                    shadow-camera-top={20}
+                    shadow-camera-bottom={-20}
+                />
+            }
 
             <WaterPlane
                 position={[0, 0, 0]}
@@ -186,6 +198,12 @@ function GameCanvas(props) {
             <Grass
                 position={[120, 0, 0]}
                 args={[200, 200]}
+            />
+
+            <SquareOfTrees
+                count={20}
+                areaSize={100}
+                position={[0, 0, -100]}
             />
 
             <Physics>
@@ -289,7 +307,7 @@ function Grass({ args, position }) {
     textureOther.magFilter = NearestFilter;
     textureOther.wrapS = RepeatWrapping
     textureOther.wrapT = RepeatWrapping
-    textureOther.repeat.set(10, 10)
+    textureOther.repeat.set(20, 20)
 
     return (
         <mesh position={position} rotation={[-Math.PI / 2, 0, 0]}>
@@ -301,4 +319,34 @@ function Grass({ args, position }) {
         </mesh>
     )
 
+}
+
+function SquareOfTrees({ count = 10, areaSize = 50, position = [0, 0, 0] }) {
+
+    const trees = useMemo(() => {
+        const _trees = [];
+        for (let i = 0; i < count; i++) {
+            const x = position[0] + generateRandomInteger(-areaSize / 2, areaSize / 2);
+            const z = position[2] + generateRandomInteger(-areaSize / 2, areaSize / 2);
+            const scale = generateRandomInteger(10, 30) / 10; // 1 to 3
+
+            _trees.push({
+                position: [x, position[1], z],
+                scale: [scale, scale, scale]
+            })
+        }
+        return _trees;
+    }, [count, areaSize, position]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return (
+        <group>
+            {trees.map((tree, i) => (
+                <Tree
+                    key={i}
+                    position={tree.position}
+                    scale={tree.scale}
+                />
+            ))}
+        </group>
+    )
 }

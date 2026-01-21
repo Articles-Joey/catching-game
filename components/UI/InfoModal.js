@@ -20,6 +20,8 @@ const games = []
 import ArticlesButton from "./Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 
+import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
+
 export default function InfoModal({
     show,
     setShow,
@@ -88,7 +90,7 @@ export default function InfoModal({
                         }}
                         className="d-flex align-items-center"
                     >
-                        <img src="/img/Xbox UI/B.svg" className="me-1" alt="Close" />
+                        <img src={B.src} className="me-1" alt="Close" />
                         Close
                     </ArticlesButton>
 

@@ -18,6 +18,7 @@ import { useControllerStore } from '@/hooks/useControllerStore';
 import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
 import LeftPanelContent from '@/components/Game/LeftPanel';
 import { useSocketStore } from '@/hooks/useSocketStore';
+import { useStore } from '@/hooks/useStore';
 
 const GameCanvas = dynamic(() => import('@/components/Game/GameCanvas'), {
     ssr: false,
@@ -30,6 +31,8 @@ export default function GamePage() {
     } = useSocketStore(state => ({
         socket: state.socket
     }));
+
+    const sidebar = useStore((state) => state.showSidebar)
 
     const router = useRouter()
     const pathname = usePathname()
@@ -63,6 +66,14 @@ export default function GamePage() {
 
     const [showMenu, setShowMenu] = useState(false)
 
+    useEffect(() => {
+
+        if (sidebar == true) {
+            setShowMenu(false)
+        }
+
+    }, [sidebar])
+
     const [touchControlsEnabled, setTouchControlsEnabled] = useLocalStorageNew("game:touchControlsEnabled", false)
 
     const [sceneKey, setSceneKey] = useState(0);
@@ -95,14 +106,13 @@ export default function GamePage() {
     return (
 
         <div
-            className={`${game_key}-game-page ${isFullscreen && 'fullscreen'}`}
+            className={`${game_key}-game-page ${isFullscreen && 'fullscreen'} ${sidebar && 'show-sidebar'}`}
             id={`${game_key}-game-page`}
         >
 
-            <div className="menu-bar card card-articles p-1 justify-content-center">
+            <div className="menu-bar card card-articles ">
 
-                <div className='flex-header align-items-center'>
-
+                <div className="d-flex justify-content-center align-items-center h-100">
                     <ArticlesButton
                         small
                         active={showMenu}
@@ -113,30 +123,34 @@ export default function GamePage() {
                         <i className="fad fa-bars"></i>
                         <span>Menu</span>
                     </ArticlesButton>
-
-                    <div>
-                        {/* Y: {(playerLocation?.y || 0)} */}
-                    </div>
-
                 </div>
 
             </div>
 
             <div className={`mobile-menu ${showMenu && 'show'}`}>
-                <LeftPanelContent
-                    {...panelProps}
-                />
+                <div
+                    style={{
+                        maxWidth: '300px'
+                    }}
+                    className='mx-auto'
+                >
+                    <LeftPanelContent
+                        {...panelProps}
+                    />
+                </div>
             </div>
 
             {/* <TouchControls
                 touchControlsEnabled={touchControlsEnabled}
             /> */}
 
-            <div className='panel-left card rounded-0 d-none d-lg-flex'>
+            <div className='panel-left'>
 
-                <LeftPanelContent
-                    {...panelProps}
-                />
+                <div className='card rounded-0'>
+                    <LeftPanelContent
+                        {...panelProps}
+                    />
+                </div>
 
             </div>
 

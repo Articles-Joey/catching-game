@@ -10,6 +10,18 @@
         }
     }
 
+    &.show-sidebar {
+        .panel-left {
+            display: flex;
+        }
+
+        .menu-bar {
+            @include media-breakpoint-up(lg) {
+                display: none;
+            }
+        }
+    }
+
     .background {
         position: fixed;
         top: 0;
@@ -40,7 +52,11 @@
         height: 160px;
         z-index: 3;
 
-        .fire-button, .up-button, .down-button, .left-button, .right-button {
+        .fire-button,
+        .up-button,
+        .down-button,
+        .left-button,
+        .right-button {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -75,10 +91,6 @@
         width: 100%;
         height: 50px;
         z-index: 3;
-
-        @include media-breakpoint-up(lg) {
-            display: none;
-        }
     }
 
     .mobile-menu {
@@ -86,7 +98,7 @@
         bottom: 50px;
         left: 0;
         width: 100%;
-        top: 50px;
+        top: 0px;
         // height: calc(100vh - 50px);
         z-index: 2;
         background-color: rgba(0, 0, 0, 0.75);
@@ -169,10 +181,18 @@
         // padding: 1rem;
     }
 
-    .panel-left, .panel-right {        
+    .panel-left,
+    .panel-right {
         width: 300px;
         height: calc(100vh - 0px);
         flex-shrink: 0;
+    }
+
+    .panel-left {
+        display: none;
+        // display: flex;
+        // justify-content: center;
+        // align-items: center;
     }
 
     .panel-right {

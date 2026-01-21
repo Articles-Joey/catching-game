@@ -1,6 +1,6 @@
 # Catching Game
 
-![Game Preview](/public/img/game-preview.webp)
+![Preview](/public/img/preview.webp)
 
 Catch all the falling treasures while avoiding the enemies walking across the game.
 
@@ -19,6 +19,10 @@ npm run dev
 ✅ ReturnToLauncherButton (@articles-media/articles-dev-box)
 ✅ Scoreboard (@articles-media/articles-dev-box)
 ✅ Ads (@articles-media/articles-dev-box)
+
+## TODO
+
+...
 
 ## Multiplayer
 

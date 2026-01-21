@@ -47,6 +47,8 @@ import Ad from '@articles-media/articles-dev-box/Ad';
 import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
 import useUserToken from '@articles-media/articles-dev-box/useUserToken';
 
+import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
+
 const ReturnToLauncherButton = dynamic(() =>
     import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
     { ssr: false }
@@ -54,7 +56,6 @@ const ReturnToLauncherButton = dynamic(() =>
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
-import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
 
 export default function LobbyPage() {
 
@@ -237,12 +238,21 @@ export default function LobbyPage() {
             } */}
 
             <div className='background-wrap'>
-                <Image
-                    src={`${process.env.NEXT_PUBLIC_CDN}games/Catching Game/catching-game-toontown-thumbnail.webp`}
-                    alt=""
-                    fill
-                    style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
-                />
+                {darkMode ?
+                    <Image
+                        src={`/img/dark-preview.webp`}
+                        alt=""
+                        fill
+                        style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
+                    />
+                    :
+                    <Image
+                        src={`/img/preview.webp`}
+                        alt=""
+                        fill
+                        style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
+                    />
+                }
             </div>
 
             <div className="container d-flex flex-column-reverse flex-lg-row justify-content-center align-items-center">
@@ -456,22 +466,25 @@ export default function LobbyPage() {
                             </ArticlesButton>
 
                             {userDetails &&
-                                <ArticlesButton
-                                    // ref={el => elementsRef.current[5] = el}
-                                    className={`w-50`}
-                                    active={
-                                        friendsModal
-                                    }
-                                    small
-                                    onClick={() => {
-                                        // setShowCreditsModal(true)
-                                        setFriendsModal(true);
-                                    }}
-                                >
-                                    <i className="fad fa-users"></i>
-                                    Friends
-                                </ArticlesButton>
+                                <div className='w-100 mt-3 d-flex justify-content-center'>
+                                    <ArticlesButton
+                                        // ref={el => elementsRef.current[5] = el}
+                                        className={`w-50`}
+                                        active={
+                                            friendsModal
+                                        }
+                                        small
+                                        onClick={() => {
+                                            // setShowCreditsModal(true)
+                                            setFriendsModal(true);
+                                        }}
+                                    >
+                                        <i className="fad fa-user-friends"></i>
+                                        My Friends
+                                    </ArticlesButton>
+                                </div>
                             }
+
 
                         </div>
 

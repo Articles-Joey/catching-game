@@ -34,16 +34,29 @@ function Player(props) {
 
     // const { setPlayerData, teleportPlayer, setTeleportPlayer } = props;
 
-    const {
-        cameraMode, setCameraMode,
-        teleport, setTeleport,
-        setPlayerLocation,
-        maxHeight, setMaxHeight,
-        shift, setShift,
-        addDistance,
-        score, setScore,
-        debug
-    } = useGameStore()
+    // const {
+    //     cameraMode, setCameraMode,
+    //     teleport, setTeleport,
+    //     setPlayerLocation,
+    //     maxHeight, setMaxHeight,
+    //     shift, setShift,
+    //     addDistance,
+    //     score, setScore,
+    //     debug
+    // } = useGameStore()
+    // const cameraMode = useGameStore((state) => state.cameraMode)
+    // const setCameraMode = useGameStore((state) => state.setCameraMode)
+    const teleport = useGameStore((state) => state.teleport)
+    const setTeleport = useGameStore((state) => state.setTeleport)
+    const setPlayerLocation = useGameStore((state) => state.setPlayerLocation)
+    const maxHeight = useGameStore((state) => state.maxHeight)
+    const setMaxHeight = useGameStore((state) => state.setMaxHeight)
+    const shift = useGameStore((state) => state.shift)
+    const setShift = useGameStore((state) => state.setShift)
+    const addDistance = useGameStore((state) => state.addDistance)
+    // const score = useGameStore((state) => state.score)
+    const setScore = useGameStore((state) => state.setScore)
+    const debug = useGameStore((state) => state.debug)
 
     // const {
     //     touchControls, setTouchControls
@@ -333,6 +346,7 @@ function Player(props) {
                     scale={2}
                     action={action}
                     rotation={[0, degToRad(lastMove), 0]}
+                    position={[0, -0.5, 0]}
                 />
             </group>
 

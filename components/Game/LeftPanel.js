@@ -9,6 +9,7 @@ import ArticlesButton from "@/components/UI/Button";
 import { useSocketStore } from "@/hooks/useSocketStore";
 import { useGameStore } from "@/hooks/useGameStore";
 import { Dropdown, DropdownButton } from "react-bootstrap";
+import { useStore } from "@/hooks/useStore";
 
 function LeftPanelContent(props) {
 
@@ -19,23 +20,35 @@ function LeftPanelContent(props) {
         reloadScene
     } = props;
 
-    const {
-        socket,
-    } = useSocketStore(state => ({
-        socket: state.socket,
-    }));
+    // const {
+    //     socket,
+    // } = useSocketStore(state => ({
+    //     socket: state.socket,
+    // }));
 
-    const {
-        score,
-        playerLocation,
-        debug,
-        setDebug
-    } = useGameStore(state => ({
-        score: state.score,
-        playerLocation: state.playerLocation,
-        debug: state.debug,
-        setDebug: state.setDebug
-    }));
+    // const {
+    //     score,
+    //     playerLocation,
+    //     debug,
+    //     setDebug
+    // } = useGameStore(state => ({
+    //     score: state.score,
+    //     playerLocation: state.playerLocation,
+    //     debug: state.debug,
+    //     setDebug: state.setDebug
+    // }));
+    const score = useGameStore((state) => state.score)
+    // const playerLocation = useGameStore((state) => state.playerLocation)
+    const debug = useGameStore((state) => state.debug)
+    const setDebug = useGameStore((state) => state.setDebug)
+
+    const setShowSettingsModal = useGameStore((state) => state.setShowSettingsModal)
+
+    const darkMode = useStore((state) => state.darkMode)
+    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
+
+    const showSidebar = useStore((state) => state.showSidebar)
+    const setShowSidebar = useStore((state) => state.setShowSidebar)
 
     return (
         <div className='w-100'>
@@ -121,6 +134,43 @@ function LeftPanelContent(props) {
                         </DropdownButton>
                     </div>
 
+                    <div className='w-50 d-flex'>
+                        <ArticlesButton
+                            // ref={el => elementsRef.current[2] = el}
+                            className={`w-100`}
+                            small
+                            onClick={() => {
+                                setShowSettingsModal(true)
+                            }}
+                        >
+                            <i className="fad fa-cog"></i>
+                            Settings
+                        </ArticlesButton>
+                        <ArticlesButton
+                            // ref={el => elementsRef.current[2] = el}
+                            className={``}
+                            small
+                            onClick={() => {
+                                toggleDarkMode()
+                            }}
+                        >
+                            {darkMode ? <i className="fad fa-sun"></i> : <i className="fad fa-moon"></i>}
+                        </ArticlesButton>
+                    </div>
+
+                    <ArticlesButton
+                            // ref={el => elementsRef.current[2] = el}
+                            className={`w-50`}
+                            small
+                            active={showSidebar}
+                            onClick={() => {
+                                setShowSidebar(!showSidebar)
+                            }}
+                        >
+                            <i className="fad fa-cog"></i>
+                            Sidebar
+                        </ArticlesButton>
+
                 </div>
 
             </div>
@@ -133,7 +183,7 @@ function LeftPanelContent(props) {
 
                     <div className="small text-muted">Debug Controls</div>
 
-                    <div className="small border p-2">
+                    {/* <div className="small border p-2">
                         <div>Score: {score}</div>
                         <div>
                             <span>Position: </span>
@@ -145,7 +195,7 @@ function LeftPanelContent(props) {
                                 {playerLocation[2]?.toFixed(2)}
                             </span>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* <div className='d-flex flex-column'>
             

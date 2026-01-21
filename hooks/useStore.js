@@ -45,6 +45,18 @@ export const useStore = create()(
                 }))
             },
 
+            showSidebar: true,
+            setShowSidebar: (newValue) => {
+                set((prev) => ({
+                    showSidebar: newValue
+                }))
+            },
+            toggleShowSidebar: () => {
+                set((prev) => ({
+                    showSidebar: !prev.showSidebar
+                }))
+            },
+
             touchControls: {
                 jump: false,
                 left: false,
