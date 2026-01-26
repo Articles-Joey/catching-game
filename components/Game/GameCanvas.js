@@ -23,6 +23,10 @@ import { ModelKennyNLNatureRockTallE } from "@/components/Models/rock_tallE";
 import { Enemy } from "./Enemy";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useStore } from "@/hooks/useStore";
+import TimeHandler from "./TimeHandler";
+import SquareOfTrees from "./SquareOfTrees";
+import CameraManager from "./CameraManager";
+import NPC from "./NPC";
 
 const texture = new TextureLoader().load(`img/grass.webp`)
 const textureOther = new TextureLoader().load(`img/grass.webp`)
@@ -54,6 +58,10 @@ function GameCanvas(props) {
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
+    const graphicsQuality = useStore((state) => state.graphicsQuality)
+
+    const timer = useGameStore((state) => state.timer)
+
     let gameContent = (
         <>
             <Player />
@@ -78,6 +86,36 @@ function GameCanvas(props) {
                 position={[0, 1.2, 0]}
             />
 
+            {timer <= 40 &&
+                <Enemy
+
+                    // Sphere
+                    args={[1, 6, 6]}
+
+                    // Box
+                    // args={[2, 2, 2]}
+
+                    position={[0, 1.2, 0]}
+                />
+            }
+
+            {timer <= 20 &&
+                <Enemy
+
+                    // Sphere
+                    args={[1, 6, 6]}
+
+                    // Box
+                    // args={[2, 2, 2]}
+
+                    position={[0, 1.2, 0]}
+                />
+            }
+
+            
+            {timer <= 40 && <NPC />}
+            {timer <= 20 && <NPC />}
+
         </>
     )
 
@@ -95,11 +133,15 @@ function GameCanvas(props) {
     }
 
     return (
-        <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
+        <Canvas shadows camera={{ position: [10, 10, 30], fov: 50 }}>
 
             <OrbitControls
             // autoRotate={gameState?.status == 'In Lobby'}
             />
+
+            <CameraManager />
+
+            <TimeHandler />
 
             {/* a */}
 
@@ -112,10 +154,10 @@ function GameCanvas(props) {
                     castShadow
                     position={[0, 10, -100]}
                     intensity={2}
-                    // shadow-camera-left={-20}
-                    // shadow-camera-right={20}
-                    // shadow-camera-top={20}
-                    // shadow-camera-bottom={-20}
+                // shadow-camera-left={-20}
+                // shadow-camera-right={20}
+                // shadow-camera-top={20}
+                // shadow-camera-bottom={-20}
                 />
                 :
                 <directionalLight
@@ -133,37 +175,41 @@ function GameCanvas(props) {
                 position={[0, 0, 0]}
             />
 
-            <ModelQuaterniusAnimalsDeer
-                position={[5, 0, -25]}
-                scale={[1, 1, 1]}
-                rotation={[0, degToRad(45), 0]}
-                action={"Eating"}
-            />
+            {graphicsQuality !== "Low" &&
+                <>
+                    <ModelQuaterniusAnimalsDeer
+                        position={[5, 0, -25]}
+                        scale={[1, 1, 1]}
+                        rotation={[0, degToRad(45), 0]}
+                        action={"Eating"}
+                    />
 
-            <ModelQuaterniusAnimalsDeer
-                position={[5, 0, -28]}
-                scale={1.2}
-                rotation={[0, degToRad(45), 0]}
-                action={"Idle"}
-            />
+                    <ModelQuaterniusAnimalsDeer
+                        position={[5, 0, -28]}
+                        scale={1.2}
+                        rotation={[0, degToRad(45), 0]}
+                        action={"Idle"}
+                    />
 
-            <ModelJToastieGrassPlatform
-                scale={50}
-                position={[-35, 10, -25]}
-                rotation={[degToRad(180), 0, 0]}
-            />
+                    <ModelJToastieGrassPlatform
+                        scale={50}
+                        position={[-35, 10, -25]}
+                        rotation={[degToRad(180), 0, 0]}
+                    />
 
-            <ModelKennyNLNatureRockTallE
-                scale={20}
-                position={[30, 0, -25]}
-            />
+                    <ModelKennyNLNatureRockTallE
+                        scale={20}
+                        position={[30, 0, -25]}
+                    />
 
-            <ModelQuaterniusAnimalsCow
-                position={[-23, 5, -23]}
-                scale={1.2}
-                rotation={[0, degToRad(20), 0]}
-                action={"Attack_Headbutt"}
-            />
+                    <ModelQuaterniusAnimalsCow
+                        position={[-23, 5, -23]}
+                        scale={1.2}
+                        rotation={[0, degToRad(20), 0]}
+                        action={"Attack_Headbutt"}
+                    />
+                </>
+            }
 
             <Tree
                 position={[-15, 0, -25]}
@@ -204,6 +250,7 @@ function GameCanvas(props) {
                 count={20}
                 areaSize={100}
                 position={[0, 0, -100]}
+                seed={42}
             />
 
             <Physics>
@@ -321,32 +368,3 @@ function Grass({ args, position }) {
 
 }
 
-function SquareOfTrees({ count = 10, areaSize = 50, position = [0, 0, 0] }) {
-
-    const trees = useMemo(() => {
-        const _trees = [];
-        for (let i = 0; i < count; i++) {
-            const x = position[0] + generateRandomInteger(-areaSize / 2, areaSize / 2);
-            const z = position[2] + generateRandomInteger(-areaSize / 2, areaSize / 2);
-            const scale = generateRandomInteger(10, 30) / 10; // 1 to 3
-
-            _trees.push({
-                position: [x, position[1], z],
-                scale: [scale, scale, scale]
-            })
-        }
-        return _trees;
-    }, [count, areaSize, position]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    return (
-        <group>
-            {trees.map((tree, i) => (
-                <Tree
-                    key={i}
-                    position={tree.position}
-                    scale={tree.scale}
-                />
-            ))}
-        </group>
-    )
-}

@@ -8,6 +8,7 @@ import React, { useEffect } from 'react'
 import { useGraph } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
+import * as THREE from 'three'
 
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Assets/Quaternius/men/Spacesuit-transformed.glb`
 
@@ -25,8 +26,25 @@ export function Model(props) {
     console.log("Actions", actions)
     Object.values(actions).forEach((a) => a.stop());
 
-    if (props.action) {
-      actions[props.action].play();
+    if (props.action && actions[props.action]) {
+      const action = actions[props.action];
+      action.reset().fadeIn(0.1);
+      
+      if (props.action === "Walk") {
+        action.setEffectiveTimeScale(1.5);
+      } else {
+        action.setEffectiveTimeScale(1);
+      }
+
+      if (props.action === "Death") {
+        action.setLoop(THREE.LoopOnce);
+        action.clampWhenFinished = true;
+      } else {
+        action.setLoop(THREE.LoopRepeat);
+        action.clampWhenFinished = false;
+      }
+
+      action.play();
     } else {
       actions[`Idle`].play();
     }

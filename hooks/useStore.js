@@ -82,6 +82,18 @@ export const useStore = create()(
                 }))
             },
 
+            audioSettings: {
+                enabled: true,
+                game_volume: 50,
+                music_volume: 50,
+                sfx_volume: 50
+            },
+            setAudioSettings: (newValue) => {
+                set((prev) => ({
+                    audioSettings: newValue
+                }))
+            },
+
         }),
         {
             name: 'catching-game-store', // name of the item in the storage (must be unique)

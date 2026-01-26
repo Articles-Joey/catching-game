@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useContext, useState, useRef, useMemo } from 'react';
+import { useEffect, useContext, useState, useRef, useMemo, Suspense } from 'react';
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 // import Link from 'next/link';
@@ -16,9 +16,11 @@ import useFullscreen from '@/hooks/useFullScreen';
 import { useControllerStore } from '@/hooks/useControllerStore';
 
 import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
-import LeftPanelContent from '@/components/Game/LeftPanel';
+import LeftPanelContent from '@/components/UI/LeftPanel';
 import { useSocketStore } from '@/hooks/useSocketStore';
 import { useStore } from '@/hooks/useStore';
+import { useGameStore } from '@/hooks/useGameStore';
+import AudioHandler from '@/components/Game/AudioHandler';
 
 const GameCanvas = dynamic(() => import('@/components/Game/GameCanvas'), {
     ssr: false,
@@ -33,6 +35,14 @@ export default function GamePage() {
     }));
 
     const sidebar = useStore((state) => state.showSidebar)
+
+    const score = useGameStore((state) => state.score)
+    const health = useGameStore((state) => state.health)
+    // const timer = useGameStore((state) => state.timer)
+    const setScore = useGameStore((state) => state.setScore)
+    const setHealth = useGameStore((state) => state.setHealth)
+    const timer = useGameStore((state) => state.timer)
+    const setTimer = useGameStore((state) => state.setTimer)
 
     const router = useRouter()
     const pathname = usePathname()
@@ -83,6 +93,9 @@ export default function GamePage() {
     // Function to handle scene reload
     const reloadScene = () => {
         setSceneKey((prevKey) => prevKey + 1);
+        setHealth(5);
+        setScore(0);
+        setTimer(60);
     };
 
     const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
@@ -110,18 +123,23 @@ export default function GamePage() {
             id={`${game_key}-game-page`}
         >
 
+            <Suspense>
+                <AudioHandler />
+            </Suspense>
+
             <div className="menu-bar card card-articles ">
 
-                <div className="d-flex justify-content-center align-items-center h-100">
+                <div className="d-flex justify-content-center align-items-center h-100 w-100">
                     <ArticlesButton
                         small
+                        className="w-100 h-100"
                         active={showMenu}
                         onClick={() => {
                             setShowMenu(prev => !prev)
                         }}
                     >
                         <i className="fad fa-bars"></i>
-                        <span>Menu</span>
+                        {/* <span>Menu</span> */}
                     </ArticlesButton>
                 </div>
 
@@ -165,6 +183,24 @@ export default function GamePage() {
             </div> */}
 
             <div className='canvas-wrap'>
+
+                <div className='game-ui-overlay'>
+
+                    <div className='score'>
+                        Timer: {timer} - Score: {score}
+                    </div>
+
+                    <div>
+                        {[...Array(health)].map((_, index) =>
+                            <img
+                                key={index}
+                                src={"/img/heart.png"}
+                                width={50}
+                            ></img>
+                        )}
+                    </div>
+
+                </div>
 
                 <GameCanvas
                     key={sceneKey}

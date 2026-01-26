@@ -2,12 +2,16 @@ import * as THREE from 'three'
 import { useRef, useMemo } from 'react'
 import { extend, useThree, useLoader, useFrame } from '@react-three/fiber'
 import { Water } from 'three-stdlib'
+import { useStore } from '@/hooks/useStore'
 
 extend({ Water })
 
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Race Game/waternormals.jpeg`
 
 export default function WaterPlane(props) {
+
+    const graphicsQuality = useStore((state) => state.graphicsQuality)
+    
     const ref = useRef()
     const gl = useThree((state) => state.gl)
 
@@ -29,6 +33,20 @@ export default function WaterPlane(props) {
         }),
         [waterNormals]
     )
-    useFrame((state, delta) => (ref.current.material.uniforms.time.value += delta))
+    useFrame((state, delta) => {
+        if (ref.current && ref.current.material.uniforms) {
+            ref.current.material.uniforms.time.value += delta
+        }
+    })
+
+    if (graphicsQuality === 'Low') {
+        return (
+            <mesh {...props} rotation-x={-Math.PI / 2}>
+                <planeGeometry args={[250, 250]} />
+                <meshStandardMaterial color="#001e0f" />
+            </mesh>
+        )
+    }
+
     return <water ref={ref} args={[geom, config]} {...props} rotation-x={-Math.PI / 2} />
 }

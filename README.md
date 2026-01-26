@@ -36,4 +36,5 @@ Inspired by the catching game trolley game from Toontown Online
 
 ## Attributions
 
-[Site Icon](https://www.freepik.com/icon/hands_1943034)
+[Site Icon](https://www.freepik.com/icon/hands_1943034)  
+[Heart Icon](https://www.freepik.com/free-vector/heart-cartoon-style_362088535.htm#fromView=keyword&page=1&position=0&uuid=83ad7565-10e4-4bfe-95a2-73d7c45d629b&query=Cartoon+heart)  

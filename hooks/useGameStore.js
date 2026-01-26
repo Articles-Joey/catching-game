@@ -1,4 +1,5 @@
 // import { create } from 'zustand'
+import { subtract } from 'lodash'
 import { createWithEqualityFn as create } from 'zustand/traditional'
 
 export const useGameStore = create((set) => ({
@@ -64,10 +65,29 @@ export const useGameStore = create((set) => ({
         }))
     },
 
+    timer: 60,
+    setTimer: (newValue) => {
+        set((prev) => ({
+            timer: newValue
+        }))
+    },
+
     debug: 0,
     setDebug: (newValue) => {
         set((prev) => ({
             debug: newValue
+        }))
+    },
+
+    health: 5,
+    subtractHealth: (amount) => {
+        set((prev) => ({
+            health: Math.max(0, prev.health - amount)
+        }))
+    },
+    setHealth: (newValue) => {
+        set((prev) => ({
+            health: newValue
         }))
     },
 

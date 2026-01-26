@@ -49,6 +49,7 @@ function Player(props) {
     const teleport = useGameStore((state) => state.teleport)
     const setTeleport = useGameStore((state) => state.setTeleport)
     const setPlayerLocation = useGameStore((state) => state.setPlayerLocation)
+    const health = useGameStore((state) => state.health)
     const maxHeight = useGameStore((state) => state.maxHeight)
     const setMaxHeight = useGameStore((state) => state.setMaxHeight)
     const shift = useGameStore((state) => state.shift)
@@ -57,6 +58,7 @@ function Player(props) {
     // const score = useGameStore((state) => state.score)
     const setScore = useGameStore((state) => state.setScore)
     const debug = useGameStore((state) => state.debug)
+    const subtractHealth = useGameStore((state) => state.subtractHealth)
 
     // const {
     //     touchControls, setTouchControls
@@ -69,6 +71,17 @@ function Player(props) {
         up: false,
         down: false,
     }
+
+    useEffect(() => {
+        if (health <= 0) {
+            console.log("Player is dead")
+            setIsDead(true);
+            setAction("Death");
+
+            const audio = new Audio("/audio/Toontown_sad.ogg")
+            audio.play()
+        }
+    }, [health]);
 
     const setTouchControls = (newValue) => {
         // useTouchControlsStore.setState({
@@ -113,6 +126,12 @@ function Player(props) {
     const { moveBackward, moveForward, moveRight, moveLeft, jump, shift: isShifting, crouch } = useKeyboard()
     const [action, setAction] = useState("Idle")
     const [lastMove, setLastMove] = useState(0);
+    const [isDead, setIsDead] = useState(false);
+    const isDeadRef = useRef(false);
+
+    useEffect(() => {
+        isDeadRef.current = isDead;
+    }, [isDead]);
 
     // Controller Logic
     const [controllerInput, setControllerInput] = useState({
@@ -156,8 +175,10 @@ function Player(props) {
 
     useEffect(() => {
 
-        const isMoving = moveLeft || moveRight || moveBackward || moveForward || 
-                         controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward;
+        if (isDead) return;
+
+        const isMoving = moveLeft || moveRight || moveBackward || moveForward ||
+            controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward;
 
         if (isMoving) {
             setAction("Walk");
@@ -191,20 +212,41 @@ function Player(props) {
             setAction("Idle");
         }
 
-    }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput])
+    }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput, isDead])
 
     const { camera } = useThree()
 
+    const [startPosition] = useState(() => [
+        (Math.random() * 29) - 14.5,
+        1,
+        (Math.random() * 29) - 14.5
+    ])
+
     const [ref, api] = useSphere(() => ({
-        mass: 1,
+        mass: 10,
         args: [1],
-        position: [0, 2, 0],
+        position: startPosition,
         onCollide: (e) => {
             console.log("Player Collide", e)
 
             if (e.body.userData.isEnemy) {
-                const currentScore = useGameStore.getState().score
-                setScore(currentScore - 1)
+                if (!isDeadRef.current) {
+
+                    // const currentScore = useGameStore.getState().score
+                    // setScore(currentScore - 1)
+
+                    subtractHealth(1)
+
+                    setIsDead(true);
+                    setAction("Death");
+                    setTimeout(() => {
+                        setIsDead(false);
+                    }, 1000);
+
+                    const audio = new Audio("/audio/surprise.mp3")
+                    audio.play()
+
+                }
             }
 
             if (e.body.userData.isPositiveObject) {
@@ -233,7 +275,7 @@ function Player(props) {
 
             pos.current = p
 
-            setPlayerLocation(p)
+            // setPlayerLocation(p)
 
             if (playerModelRef.current) {
                 playerModelRef.current.position.set(...p);
@@ -275,7 +317,7 @@ function Player(props) {
 
         // console.log(posX)
 
-        let newLocation = new Vector3(posX, posY, posZ)
+        let newLocation = [posX, posY, posZ]
 
         if (JSON.stringify(lastLocation) !== JSON.stringify(newLocation)) {
             // console.log(newLocation, lastLocation)
@@ -283,6 +325,11 @@ function Player(props) {
             lastLocation = newLocation
         }
         // else {
+        if (isDeadRef.current) {
+            api.velocity.set(0, 0, 0);
+            return;
+        }
+
         //     console.log("location unchanged")
         // }
 
@@ -311,6 +358,16 @@ function Player(props) {
         // .applyEuler(camera.rotation)
 
         api.velocity.set(direction.x, 0, direction.z)
+
+        // Limit player movement to -15, -15 to 15, 15
+        const LIMIT = 14.5
+        if (Math.abs(pos.current[0]) > LIMIT || Math.abs(pos.current[2]) > LIMIT) {
+            api.position.set(
+                Math.max(-LIMIT, Math.min(LIMIT, pos.current[0])),
+                pos.current[1],
+                Math.max(-LIMIT, Math.min(LIMIT, pos.current[2]))
+            )
+        }
 
         if ((jump || touchControls.jump || controllerInput.jump) && Math.abs(vel.current[1]) < 0.05) {
 

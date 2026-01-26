@@ -19,6 +19,9 @@ export default function SettingsModal({
     const graphicsQuality = useStore((state) => state.graphicsQuality)
     const setGraphicsQuality = useStore((state) => state.setGraphicsQuality)
 
+    const audioSettings = useStore((state) => state.audioSettings)
+    const setAudioSettings = useStore((state) => state.setAudioSettings)
+
     const [showModal, setShowModal] = useState(true)
 
     const [lightboxData, setLightboxData] = useState(null)
@@ -184,6 +187,32 @@ export default function SettingsModal({
                         }
                         {tab == 'Audio' &&
                             <>
+                                <div className="mb-3">
+                                    <ArticlesButton
+                                    active={audioSettings?.enabled}
+                                        onClick={() => {
+                                            setAudioSettings({
+                                                ...audioSettings,
+                                                enabled: true
+                                            });
+                                        }}
+                                    >
+                                        Enabled
+                                    </ArticlesButton>
+                                    <ArticlesButton
+                                    active={!audioSettings?.enabled}
+                                        className=""
+                                        onClick={() => {
+                                            setAudioSettings({
+                                                ...audioSettings,
+                                                enabled: false
+                                            });
+                                        }}
+                                    >
+                                        Disabled
+                                    </ArticlesButton>
+                                </div>
+
                                 <Form.Label className="mb-0">Game Volume</Form.Label>
                                 <Form.Range ref={el => elementsRef.current[4] = el} />
                                 <Form.Label className="mb-0">Music Volume</Form.Label>

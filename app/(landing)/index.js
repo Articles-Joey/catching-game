@@ -56,6 +56,7 @@ const ReturnToLauncherButton = dynamic(() =>
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
+import RotatingMascot from '@/components/UI/RotatingMascot';
 
 export default function LobbyPage() {
 
@@ -255,7 +256,7 @@ export default function LobbyPage() {
                 }
             </div>
 
-            <div className="container d-flex flex-column-reverse flex-lg-row justify-content-center align-items-center">
+            <div className="container d-flex flex-column flex-lg-row justify-content-center align-items-center">
 
                 <div
                     style={{ "width": "20rem" }}
@@ -516,6 +517,19 @@ export default function LobbyPage() {
                     game={game_name}
                     style="Default"
                     darkMode={darkMode ? true : false}
+                    prepend={
+                        <div
+                            style={{
+                                width: '100%',
+                                height: '200px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <RotatingMascot />
+                        </div>
+                    }
                 />
 
                 <Ad
