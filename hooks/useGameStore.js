@@ -124,21 +124,17 @@ export const useGameStore = create((set) => ({
         }))
     },
 
-    touchControls: {
-        jump: false,
-        left: false,
-        right: false
-    },
-    setTouchControls: (newValue) => {
-        set((prev) => ({
-            touchControls: newValue
-        }))
-    },
-
     teleport: false,
     setTeleport: (newValue) => {
         set((prev) => ({
             teleport: newValue
+        }))
+    },
+
+    targetLocation: null,
+    setTargetLocation: (newValue) => {
+        set((prev) => ({
+            targetLocation: newValue
         }))
     },
 

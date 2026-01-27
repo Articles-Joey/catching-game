@@ -16,6 +16,9 @@ export default function SettingsModal({
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
+    const touchControlsEnabled = useStore((state) => state.touchControlsEnabled)
+    const setTouchControlsEnabled = useStore((state) => state.setTouchControlsEnabled)
+
     const graphicsQuality = useStore((state) => state.graphicsQuality)
     const setGraphicsQuality = useStore((state) => state.setGraphicsQuality)
 
@@ -135,6 +138,36 @@ export default function SettingsModal({
                                         </ArticlesButton>
                                     )
                                     }
+                                </div>
+
+                                <hr />
+
+                                <div>
+                                    <div className="mb-2">Touch Controls</div>
+                                    <div>
+                                        <ArticlesButton
+                                            // ref={el => elementsRef.current[5 + i] = el}
+                                            // key={option}
+                                            className=""
+                                            active={!touchControlsEnabled}
+                                            onClick={() => {
+                                                setTouchControlsEnabled(false);
+                                            }}
+                                        >
+                                            Disabled
+                                        </ArticlesButton>
+                                        <ArticlesButton
+                                            // ref={el => elementsRef.current[5 + i] = el}
+                                            // key={option}
+                                            className=""
+                                            active={touchControlsEnabled}
+                                            onClick={() => {
+                                                setTouchControlsEnabled(true);
+                                            }}
+                                        >
+                                            Enabled
+                                        </ArticlesButton>
+                                    </div>
                                 </div>
 
                             </>

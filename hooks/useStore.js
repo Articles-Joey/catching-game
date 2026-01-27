@@ -60,11 +60,24 @@ export const useStore = create()(
             touchControls: {
                 jump: false,
                 left: false,
-                right: false
+                right: false,
+                up: false,
+                down: false,
             },
             setTouchControls: (newValue) => {
                 set((prev) => ({
                     touchControls: newValue
+                }))
+            },
+            touchControlsEnabled: false,
+            toggleTouchControlsEnabled: () => {
+                set((prev) => ({
+                    touchControlsEnabled: !prev.touchControlsEnabled
+                }))
+            },
+            setTouchControlsEnabled: (newValue) => {
+                set((prev) => ({
+                    touchControlsEnabled: newValue
                 }))
             },
 
@@ -104,7 +117,7 @@ export const useStore = create()(
             partialize: (state) =>
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => ![
-                        'friendsModal',                    
+                        'friendsModal',
                         // Exclude list of keys to not persist
                         // 'infoModal',
                         // 'settingsModal',

@@ -60,7 +60,12 @@ function EnemyBase({ args, position, rotation }) {
             targetRef.current.set(targetX, position[1], targetZ);
         } else {
             // Move towards target
-            direction.normalize().multiplyScalar(moveSpeed * delta);
+            direction.normalize()
+
+            const angle = Math.atan2(direction.x, direction.z);
+            api.rotation.set(0, angle - (Math.PI / 2), 0);
+
+            direction.multiplyScalar(moveSpeed * delta);
             positionRef.current.add(direction);
             api.position.set(positionRef.current.x, positionRef.current.y, positionRef.current.z);
         }

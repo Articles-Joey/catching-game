@@ -27,8 +27,8 @@ import TimeHandler from "./TimeHandler";
 import SquareOfTrees from "./SquareOfTrees";
 import CameraManager from "./CameraManager";
 import NPC from "./NPC";
+import Ground from "./Ground";
 
-const texture = new TextureLoader().load(`img/grass.webp`)
 const textureOther = new TextureLoader().load(`img/grass.webp`)
 
 // const GrassPlane = () => {
@@ -112,7 +112,7 @@ function GameCanvas(props) {
                 />
             }
 
-            
+            <NPC />
             {timer <= 40 && <NPC />}
             {timer <= 20 && <NPC />}
 
@@ -315,35 +315,6 @@ function FallingObject({ args, position, rotation }) {
         <mesh ref={ref} castShadow>
             <sphereGeometry args={args} />
             <meshStandardMaterial color="green" />
-        </mesh>
-    )
-
-}
-
-function Ground({ args }) {
-
-    const [ref, api] = usePlane(() => ({
-        // mass: 0,
-        type: 'Static',
-        args: args,
-        position: [0, 0, 0],
-        rotation: [-Math.PI / 2, 0, 0]
-    }))
-
-    texture.magFilter = NearestFilter;
-    texture.wrapS = RepeatWrapping
-    texture.wrapT = RepeatWrapping
-    texture.repeat.set(1, 1)
-
-    return (
-        <mesh ref={ref} castShadow receiveShadow>
-
-            <boxGeometry args={args} />
-
-            {/* <meshStandardMaterial color="#08e8de" /> */}
-
-            <meshStandardMaterial attach="material" map={texture} />
-
         </mesh>
     )
 

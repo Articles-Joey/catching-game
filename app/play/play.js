@@ -15,12 +15,17 @@ import ArticlesButton from '@/components/UI/Button';
 import useFullscreen from '@/hooks/useFullScreen';
 import { useControllerStore } from '@/hooks/useControllerStore';
 
-import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
+// import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
 import LeftPanelContent from '@/components/UI/LeftPanel';
 import { useSocketStore } from '@/hooks/useSocketStore';
 import { useStore } from '@/hooks/useStore';
 import { useGameStore } from '@/hooks/useGameStore';
 import AudioHandler from '@/components/Game/AudioHandler';
+import ArticlesModal from '@/components/UI/ArticlesModal';
+
+const TouchControls = dynamic(() => import('@/components/UI/TouchControls'), {
+    ssr: false,
+});
 
 const GameCanvas = dynamic(() => import('@/components/Game/GameCanvas'), {
     ssr: false,
@@ -84,7 +89,7 @@ export default function GamePage() {
 
     }, [sidebar])
 
-    const [touchControlsEnabled, setTouchControlsEnabled] = useLocalStorageNew("game:touchControlsEnabled", false)
+    // const [touchControlsEnabled, setTouchControlsEnabled] = useLocalStorageNew("game:touchControlsEnabled", false)
 
     const [sceneKey, setSceneKey] = useState(0);
 
@@ -103,8 +108,8 @@ export default function GamePage() {
     let panelProps = {
         server,
         players,
-        touchControlsEnabled,
-        setTouchControlsEnabled,
+        // touchControlsEnabled,
+        // setTouchControlsEnabled,
         reloadScene,
         // controllerState,
         isFullscreen,
@@ -124,7 +129,34 @@ export default function GamePage() {
         >
 
             <Suspense>
-                <AudioHandler />
+
+                {timer > 0 && <AudioHandler />}
+
+                {timer == 0 &&
+                    <ArticlesModal
+                        show={true}
+                        disableClose={true}
+                        modalClassName="game-over-modal"
+                        title={"Game Over!"}
+                        action={() => (
+                            reloadScene()
+                        )}
+                        actionText={"Play Again?"}
+                    >
+                        <div className='text-center'>
+                            <h2>{`Time's Up!`}</h2>
+                            <p className='mb-0'>Your final score is: <strong>{score}</strong></p>
+                            {/* <ArticlesButton
+                                onClick={() => {
+                                    reloadScene();
+                                }}
+                            >
+                                Play Again?
+                            </ArticlesButton> */}
+                        </div>
+                    </ArticlesModal>
+                }
+
             </Suspense>
 
             <div className="menu-bar card card-articles ">
@@ -158,9 +190,9 @@ export default function GamePage() {
                 </div>
             </div>
 
-            {/* <TouchControls
-                touchControlsEnabled={touchControlsEnabled}
-            /> */}
+            <TouchControls
+                // touchControlsEnabled={touchControlsEnabled}
+            />
 
             <div className='panel-left'>
 

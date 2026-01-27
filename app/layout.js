@@ -19,7 +19,7 @@ import { Suspense } from 'react';
 import GlobalClientModals from '@/components/UI/GlobalClientModals';
 import DarkModeHandler from '@/components/UI/DarkModeHandler';
 import LayoutClient from './layout-client';
-import AudioHandler from '@/components/Game/AudioHandler';
+// import AudioHandler from '@/components/Game/AudioHandler';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",

@@ -5,8 +5,6 @@ import { useEffect } from "react";
 
 export default function AudioHandler() {
 
-
-
     const audioSettings = useStore((state) => state?.audioSettings);
     const setAudioSettings = useStore((state) => state?.setAudioSettings);
 

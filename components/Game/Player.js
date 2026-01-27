@@ -16,6 +16,7 @@ import { useGameStore } from "@/hooks/useGameStore";
 
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
 import { degToRad } from "three/src/math/MathUtils"
+import { useStore } from "@/hooks/useStore"
 
 const JUMP_FORCE = 0;
 const SPEED = 12;
@@ -60,17 +61,10 @@ function Player(props) {
     const debug = useGameStore((state) => state.debug)
     const subtractHealth = useGameStore((state) => state.subtractHealth)
 
-    // const {
-    //     touchControls, setTouchControls
-    // } = useTouchControlsStore()
-
-    const touchControls = {
-        jump: false,
-        left: false,
-        right: false,
-        up: false,
-        down: false,
-    }
+    const touchControls = useStore((state) => state.touchControls)
+    const setTouchControls = useStore((state) => state.setTouchControls)
+    const targetLocation = useGameStore((state) => state.targetLocation)
+    const setTargetLocation = useGameStore((state) => state.setTargetLocation)
 
     useEffect(() => {
         if (health <= 0) {
@@ -82,12 +76,6 @@ function Player(props) {
             audio.play()
         }
     }, [health]);
-
-    const setTouchControls = (newValue) => {
-        // useTouchControlsStore.setState({
-        //     touchControls: newValue
-        // })
-    }
 
     const { controllerState, setControllerState } = useControllerStore()
 
@@ -178,17 +166,18 @@ function Player(props) {
         if (isDead) return;
 
         const isMoving = moveLeft || moveRight || moveBackward || moveForward ||
-            controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward;
+            controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward ||
+            touchControls.left || touchControls.right || touchControls.down || touchControls.up;
 
         if (isMoving) {
             setAction("Walk");
         }
 
         // Combine inputs
-        const fwd = moveForward || controllerInput.forward;
-        const bwd = moveBackward || controllerInput.backward;
-        const lft = moveLeft || controllerInput.left;
-        const rgt = moveRight || controllerInput.right;
+        const fwd = moveForward || controllerInput.forward || touchControls.up;
+        const bwd = moveBackward || controllerInput.backward || touchControls.down;
+        const lft = moveLeft || controllerInput.left || touchControls.left;
+        const rgt = moveRight || controllerInput.right || touchControls.right;
 
         if (fwd && rgt) {
             setLastMove(135); // Forward + Right
@@ -212,7 +201,7 @@ function Player(props) {
             setAction("Idle");
         }
 
-    }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput, isDead])
+    }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput, isDead, touchControls])
 
     const { camera } = useThree()
 
@@ -240,7 +229,9 @@ function Player(props) {
                     setIsDead(true);
                     setAction("Death");
                     setTimeout(() => {
-                        setIsDead(false);
+                        if (useGameStore.getState().health > 0) {
+                            setIsDead(false);
+                        }
                     }, 1000);
 
                     const audio = new Audio("/audio/surprise.mp3")
@@ -357,6 +348,28 @@ function Player(props) {
             .multiplyScalar(SPEED * (shift ? 2 : 1))
         // .applyEuler(camera.rotation)
 
+        if ((frontVector.z !== 0 || sideVector.x !== 0) && targetLocation) {
+            setTargetLocation(null);
+        }
+
+        if (targetLocation) {
+            const dx = targetLocation[0] - pos.current[0];
+            const dz = targetLocation[2] - pos.current[2];
+            const dist = Math.sqrt(dx * dx + dz * dz);
+
+            if (dist < 0.5) {
+                setTargetLocation(null);
+                setAction("Idle");
+            } else {
+                const targetDir = new Vector3(dx, 0, dz).normalize();
+                direction.copy(targetDir).multiplyScalar(SPEED * (shift ? 2 : 1));
+                
+                const angle = Math.atan2(direction.x, direction.z);
+                setLastMove(THREE.MathUtils.radToDeg(angle));
+                setAction("Walk");
+            }
+        }
+
         api.velocity.set(direction.x, 0, direction.z)
 
         // Limit player movement to -15, -15 to 15, 15
@@ -425,6 +438,13 @@ function Player(props) {
                 </Text> */}
 
             </mesh>
+
+            {targetLocation && (
+                <mesh position={targetLocation}>
+                    <sphereGeometry args={[0.5, 32, 32]} />
+                    <meshBasicMaterial color="green" opacity={1} transparent />
+                </mesh>
+            )}
 
         </group>
     )

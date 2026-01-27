@@ -69,25 +69,23 @@ export default function ArticlesModal({
 
                     {!action && <div></div>}
 
-                    <div>
-                        {(!disableClose || closeAction) &&
-                            <ArticlesButton
-                                variant="outline-dark"
-                                onClick={() => {
+                    {(!disableClose || closeAction) && <div>
+                        <ArticlesButton
+                            variant="outline-dark"
+                            onClick={() => {
 
-                                    if (closeAction) {
-                                        closeAction()
-                                    } else {
-                                        setShowModal(false)
-                                    }
-                                    
-                                }}
-                            >
-                                {/* Close */}
-                                {closeText || 'Close'}
-                            </ArticlesButton>
-                        }
-                    </div>
+                                if (closeAction) {
+                                    closeAction()
+                                } else {
+                                    setShowModal(false)
+                                }
+
+                            }}
+                        >
+                            {/* Close */}
+                            {closeText || 'Close'}
+                        </ArticlesButton>
+                    </div>}
 
                     {action &&
                         <ArticlesButton

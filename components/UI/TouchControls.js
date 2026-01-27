@@ -1,213 +1,139 @@
-import { memo, useEffect, useState } from "react";
-
-import ArticlesButton from "@/components/UI/Button"
-import { useControlsStore, useGameStore } from "@/hooks/useGameStore"
+"use client";
+import { memo, useEffect, useRef } from "react";
+import nipplejs from 'nipplejs';
+import ArticlesButton from "@/components/UI/Button";
+import { useGameStore } from "@/hooks/useGameStore";
+import { useStore } from "@/hooks/useStore";
 
 const arePropsEqual = (prevProps, nextProps) => {
-    // Compare all props for equality
     return JSON.stringify(prevProps) === JSON.stringify(nextProps);
 };
 
 function JumpButtonBase() {
 
-    const {
-        touchControls, setTouchControls
-    } = useControlsStore()
+    const setTouchControls = useStore((state) => state.setTouchControls);
+    const touchControls = useStore((state) => state.touchControls);
 
     return (
         <ArticlesButton
             onClick={() => {
-                console.log("Jump!")
                 setTouchControls({
                     ...touchControls,
                     jump: true
                 })
             }}
+            style={{ padding: '20px 40px', fontSize: '1.2rem', opacity: 0.8 }}
         >
             Jump
         </ArticlesButton>
     )
 }
 
-const JumpButton = memo(JumpButtonBase, arePropsEqual);
+const JumpButton = memo(JumpButtonBase);
 
-function TouchControlsBase(props) {
+function TouchControlsBase({  }) {
 
-    const {
-        touchControlsEnabled,
-    } = props;
-
-    const [nippleCreated, setNippleCreated] = useState(false)
-
-    const [nStart, setnStart] = useState(false)
-    const [nDirection, setnDirection] = useState(false)
-
-    const {
-        touchControls, setTouchControls
-    } = useControlsStore()
-
-    function startNipple() {
-
-        // console.log("n", nipplejs)
-
-        // return
-
-        var options = {
-            zone: document.getElementById('zone_joystick'),
-            // threshold: 0.5
-            // lockX: true,
-        };
-
-        // var manager = nipplejs.create(options);
-        var manager = require('nipplejs').create(options);
-
-        setNippleCreated(true)
-
-        let dragDistance
-        let dragDirection
-
-        manager.on('start end', function (evt, data) {
-            // dump(evt.type);
-            // debug(data);
-            console.log("1", evt.type)
-
-            if (evt.type == 'start') {
-                setnStart(true)
-            } else if (evt.type == 'end') {
-                setnStart(false)
-                setnDirection(false)
-                dragDistance = 0
-                dragDirection = false
-                setTouchControls({
-                    ...touchControls,
-                    left: false,
-                    right: false
-                })
-            }
-
-        })
-        .on('move', function (evt, data) {
-
-            // debug(data);
-            dragDistance = data.distance
-            console.log("2", dragDistance)
-
-            if (dragDistance > 15 && dragDirection) {
-
-                if (dragDirection == 'left') setTouchControls({
-                    ...touchControls,
-                    left: true,
-                    right: false
-                })
-
-                if (dragDirection == 'right') setTouchControls({
-                    ...touchControls,
-                    left: false,
-                    right: true
-                })
-
-            } else {
-                setTouchControls({
-                    ...touchControls,
-                    left: false,
-                    right: false
-                })
-            }
-
-        })
-        .on(' ' +
-            'dir:up plain:up dir:left plain:left dir:down ' +
-            'plain:down dir:right plain:right',
-            function (evt, data) {
-
-                if (evt.type == 'move') {
-                    dragDistance = data.distance
-                }  
-                
-                // dump(evt.type);
-                console.log("3", evt.type, dragDistance)
-
-              
-
-                if (evt.type == 'dir:left') {
-                    dragDirection = 'left'
-                    // setnDirection('left')
-                    // setTouchControls({
-                    //     ...touchControls,
-                    //     left: true,
-                    //     right: false
-                    // })
-                }
-
-                if (evt.type == 'dir:right') {
-                    dragDirection = 'right'
-                    // setnDirection('right')
-                    // setTouchControls({
-                    //     ...touchControls,
-                    //     left: false,
-                    //     right: true
-                    // })
-                }
-
-            }
-        )
-        .on('pressure', function (evt, data) {
-            // debug({
-            //   pressure: data
-            // });
-        });
-    }
+    const setTouchControls = useStore((state) => state.setTouchControls);
+    const managerRef = useRef(null);
 
     useEffect(() => {
+        const zone = document.getElementById('zone_joystick');
+        if (!zone) return;
 
-        if (!nippleCreated) {
-            console.log("Load nipple")
-            startNipple()
-        }
+        // Clean up previous instance
+        if (managerRef.current) managerRef.current.destroy();
+
+        const options = {
+            zone: zone,
+            mode: 'static',
+            position: { left: '50%', top: '50%' },
+            color: 'white',
+            size: 100
+        };
+
+        const manager = nipplejs.create(options);
+        managerRef.current = manager;
+
+        manager.on('move', (evt, data) => {
+            if (data.direction) {
+                const angle = data.angle.degree;
+                // nipplejs angles: right=0, up=90, left=180, down=270
+                
+                let up = false;
+                let down = false;
+                let left = false;
+                let right = false;
+
+                // Overlapping ranges for 8-way movement
+                // Up: 30 to 150
+                if (angle >= 30 && angle <= 150) up = true;
+                // Down: 210 to 330
+                if (angle >= 210 && angle <= 330) down = true;
+                // Left: 120 to 240
+                if (angle >= 120 && angle <= 240) left = true;
+                // Right: 300 to 360 or 0 to 60
+                if (angle >= 300 || angle <= 60) right = true;
+
+                const currentControls = useStore.getState().touchControls;
+                
+                // Only update if changed
+                if (currentControls.up !== up || currentControls.down !== down || currentControls.left !== left || currentControls.right !== right) {
+                    setTouchControls({
+                        ...currentControls,
+                        up, down, left, right
+                    });
+                }
+            }
+        });
+
+        manager.on('end', () => {
+             const currentControls = useStore.getState().touchControls;
+             setTouchControls({
+                 ...currentControls,
+                 up: false, down: false, left: false, right: false
+             });
+        });
+
+        return () => {
+            if (managerRef.current) managerRef.current.destroy();
+        };
 
     }, []);
 
+    const touchControlsEnabled = useStore((state) => state.touchControlsEnabled);
+
     return (
-        <div className={`touch-controls-area ${!touchControlsEnabled && 'd-none'}`}>
-
-            <div className='d-flex'>
-
-                <div>
-                    {/* <ArticlesButton
-                    onClick={() => {
-                        setTouchControls({
-                            left: true
-                        })
-                    }}
-                >
-                    Left
-                </ArticlesButton>
-                <ArticlesButton
-                    onClick={() => {
-                        setTouchControls({
-                            right: true
-                        })
-                    }}
-                >
-                    Right
-                </ArticlesButton> */}
-                    <div style={{
-                        position: 'relative',
-                        width: '100px',
-                        height: '100px',
-                        backgroundColor: 'black'
-                    }} id="zone_joystick"></div>
-                </div>
-
-                <div className='ms-2 d-none d-lg-block'>
-                    <div>Active: {nStart ? 'True' : 'False'}</div>
-                    <div>Direction: {nDirection ? nDirection : 'None'}</div>
-                    <div>Touch: {JSON.stringify(touchControls)}</div>
-                </div>
-
+        <div className={`touch-controls-area ${!touchControlsEnabled ? 'd-none' : ''}`} style={{
+            // position: 'absolute',
+            // top: 0,
+            // left: 0,
+            // width: '100vw',
+            // height: '100vh',
+            // pointerEvents: 'none', // Allow clicking through empty areas
+            // zIndex: 100
+        }}>
+             
+             {/* Joystick Container - Pointer events enabled here */}
+             <div style={{
+                position: 'absolute', 
+                bottom: '0px', 
+                left: '0px', 
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'auto',
+                touchAction: 'none' // Prevent scrolling
+            }} id="zone_joystick">
             </div>
-
-            <JumpButton />
+            
+            {/* Jump Button Container */}
+            {/* <div style={{
+                position: 'absolute', 
+                bottom: '60px', 
+                right: '40px', 
+                pointerEvents: 'auto'
+            }}>
+                 <JumpButton />
+            </div> */}
 
         </div>
     )
