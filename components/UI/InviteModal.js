@@ -185,22 +185,33 @@ function InviteModal({
                                                             ])
                                                             return
 
-                                                            axios.post('/api/user/messages/send', {
-                                                                // conversation_id: conversation._id,
-                                                                // message: message,
-                                                                // socket_id: articlesSocket.id
+                                                            fetch('/api/user/messages/send', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    // conversation_id: conversation._id,
+                                                                    // message: message,
+                                                                    // socket_id: articlesSocket.id
+                                                                })
                                                             })
-                                                                .then(function (response) {
-                                                                    console.log(response.data);
-
+                                                                .then(async (response) => {
+                                                                    if (!response.ok) {
+                                                                        const errorData = await response.json().catch(() => ({}));
+                                                                        throw new Error(errorData?.message || 'Failed to send message');
+                                                                    }
+                                                                    return response.json();
+                                                                })
+                                                                .then((data) => {
+                                                                    console.log(data);
                                                                     // setSentMessages(prev => [
                                                                     //     ...prev,
                                                                     //     conversation._id
                                                                     // ])
-
                                                                 })
-                                                                .catch(function (error) {
-                                                                    alert(error.response.data)
+                                                                .catch((error) => {
+                                                                    alert(error.message);
                                                                     console.log(error);
                                                                 });
                                                         }}
