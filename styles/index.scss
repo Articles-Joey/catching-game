@@ -24,3 +24,11 @@ i {
         justify-content: center!important;
     }
 }
+
+.stats-overlay {
+    position: fixed;
+    top: 0;
+    right: 0 !important;
+    left: initial !important;
+    z-index: 4;
+}

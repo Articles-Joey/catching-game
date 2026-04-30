@@ -11,15 +11,21 @@ import { useGameStore } from "@/hooks/useGameStore";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { useStore } from "@/hooks/useStore";
 import DebugCard from "./DebugCard";
+import useFullscreen from '@articles-media/articles-dev-box/useFullscreen';
+import GameDetailsPanel from "./GameDetailsPanel";
 
 function LeftPanelContent(props) {
 
     const {
-        isFullscreen,
-        requestFullscreen,
-        exitFullscreen,
-        reloadScene
+        // isFullscreen,
+        // requestFullscreen,
+        // exitFullscreen,
+        // reloadScene
     } = props;
+
+    const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
+
+    const reloadScene = useStore((state) => state.reloadScene)
 
     // const {
     //     socket,
@@ -39,16 +45,16 @@ function LeftPanelContent(props) {
     //     setDebug: state.setDebug
     // }));
 
-    const debug = useGameStore((state) => state.debug)
-    const setDebug = useGameStore((state) => state.setDebug)
+    const debug = useStore((state) => state.debug);
+    const setDebug = useStore((state) => state.setDebug)
 
-    const setShowSettingsModal = useGameStore((state) => state.setShowSettingsModal)
+    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
 
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
-    const showSidebar = useStore((state) => state.showSidebar)
-    const setShowSidebar = useStore((state) => state.setShowSidebar)
+    const sidebar = useStore((state) => state.sidebar)
+    const setSidebar = useStore((state) => state.setSidebar)
 
     return (
         <div className='w-100'>
@@ -78,7 +84,7 @@ function LeftPanelContent(props) {
                             if (isFullscreen) {
                                 exitFullscreen()
                             } else {
-                                requestFullscreen('catching-game-game-page')
+                                requestFullscreen()
                             }
                         }}
                     >
@@ -159,24 +165,26 @@ function LeftPanelContent(props) {
                     </div>
 
                     <ArticlesButton
-                            // ref={el => elementsRef.current[2] = el}
-                            className={`w-50`}
-                            small
-                            active={showSidebar}
-                            onClick={() => {
-                                setShowSidebar(!showSidebar)
-                            }}
-                        >
-                            <i className="fad fa-cog"></i>
-                            Sidebar
-                        </ArticlesButton>
+                        // ref={el => elementsRef.current[2] = el}
+                        className={`w-50`}
+                        small
+                        active={sidebar}
+                        onClick={() => {
+                            setSidebar(!sidebar)
+                        }}
+                    >
+                        <i className="fad fa-cog"></i>
+                        Sidebar
+                    </ArticlesButton>
 
                 </div>
 
             </div>
 
+            <GameDetailsPanel />
+
             {/* Debug Controls */}
-            <DebugCard 
+            <DebugCard
                 reloadScene={reloadScene}
             />
 

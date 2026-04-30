@@ -9,12 +9,12 @@ const InfoModal = dynamic(
 )
 
 const SettingsModal = dynamic(
-    () => import('@/components/UI/SettingsModal'),
+    () => import('@articles-media/articles-dev-box/SettingsModal'),
     { ssr: false }
 )
 
 const CreditsModal = dynamic(
-    () => import('@/components/UI/CreditsModal'),
+    () => import('@articles-media/articles-dev-box/CreditsModal'),
     { ssr: false }
 )
 
@@ -25,17 +25,20 @@ const FriendsList = dynamic(
 
 import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
 import useUserToken from '@articles-media/articles-dev-box/useUserToken';
+import { useAudioStore } from '@/hooks/useAudioStore';
+import useTouchControlsStore from '@/hooks/useTouchControlsStore';
+import { useSocketStore } from '@/hooks/useSocketStore';
 
 export default function GlobalClientModals() {
 
-    const showInfoModal = useGameStore((state) => state.showInfoModal)
-    const setShowInfoModal = useGameStore((state) => state.setShowInfoModal)
+    const showInfoModal = useStore((state) => state.showInfoModal)
+    const setShowInfoModal = useStore((state) => state.setShowInfoModal)
 
-    const showSettingsModal = useGameStore((state) => state.showSettingsModal)
-    const setShowSettingsModal = useGameStore((state) => state.setShowSettingsModal)
+    const showSettingsModal = useStore((state) => state.showSettingsModal)
+    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
 
-    const showCreditsModal = useGameStore((state) => state.showCreditsModal)
-    const setShowCreditsModal = useGameStore((state) => state.setShowCreditsModal)
+    const showCreditsModal = useStore((state) => state.showCreditsModal)
+    const setShowCreditsModal = useStore((state) => state.setShowCreditsModal)
 
     const friendsModal = useStore((state) => state.friendsModal)
     const setFriendsModal = useStore((state) => state.setFriendsModal)
@@ -67,10 +70,48 @@ export default function GlobalClientModals() {
                 />
             }
 
-            {showSettingsModal &&
+             {showSettingsModal &&
                 <SettingsModal
                     show={showSettingsModal}
                     setShow={setShowSettingsModal}
+                    store={useStore}
+                    useAudioStore={useAudioStore}
+                    useTouchControlsStore={useTouchControlsStore}
+                    useSocketStore={useSocketStore}
+                    config={{
+                        tabs: {
+                            'Graphics': {
+                                darkMode: true,
+                                landingAnimation: true
+                            },
+                            'Audio': {
+                                sliders: [
+                                    {
+                                        key: "gameVolume",
+                                        label: "Game Volume"
+                                    },
+                                    {
+                                        key: "musicVolume",
+                                        label: "Music Volume"
+                                    }
+                                ]
+                            },
+                            'Controls': {
+                                // defaultKeyBindings: {
+                                //     // moveUp: "W",
+                                //     // moveDown: "S",
+                                //     // moveLeft: "A",
+                                //     // moveRight: "D",
+                                // }
+                            },
+                            'Multiplayer': {
+                                serverUrl: true,
+                            },
+                            'Other': {
+                                toontownMode: true,
+                            }
+                        }
+                    }}
                 />
             }
 
@@ -78,6 +119,8 @@ export default function GlobalClientModals() {
                 <CreditsModal
                     show={showCreditsModal}
                     setShow={setShowCreditsModal}
+                    owner="Articles-Joey"
+                    repo="catching-game"
                 />
             }
 
@@ -92,11 +135,11 @@ export default function GlobalClientModals() {
                     user_token={
                         userToken ? userToken : null
                     }
-                    // className="123"
-                    // style={{
-                    //     backgroundColor: 'pink'
-                    // }}
-                    // id="456"
+                // className="123"
+                // style={{
+                //     backgroundColor: 'pink'
+                // }}
+                // id="456"
                 />
             }
         </>

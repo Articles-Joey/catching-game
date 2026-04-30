@@ -9,6 +9,7 @@ import { useGraph } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import skinColor from './skinColor'
+import * as THREE from 'three'
 
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Assets/Quaternius/men/King-transformed.glb`
 
@@ -21,25 +22,35 @@ export function Model(props) {
 
   const { previewConfig, action } = props
 
-  useEffect(() => {
-
-    console.log("Actions", actions)
-
-    // actions[`Idle`].play();
-
-    if (!actions || !action) return
-
-    // Object.values(actions).forEach((a) => a?.stop());
-
-    actions[action]?.stop();
-
-    if (action) {
-      actions[action]?.play();
+    useEffect(() => {
+    // 1. Determine which action we want to play (fallback to Idle)
+    const name = props.action && actions[props.action] ? props.action : "Idle";
+    const action = actions[name];
+  
+    // 2. Configure the specific action behavior
+    if (name === "Walk") {
+      action.setEffectiveTimeScale(1.5);
     } else {
-      actions[`Idle`]?.play();
+      action.setEffectiveTimeScale(1);
     }
-
-  }, [actions, action]);
+  
+    if (name === "Death") {
+      action.setLoop(THREE.LoopOnce, 1);
+      action.clampWhenFinished = true;
+    } else {
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.clampWhenFinished = false;
+    }
+  
+    // 3. The "Magic" fix: reset, fadeIn, and play. 
+    // .play() will automatically handle crossfading if other actions are fading out.
+    action.reset().fadeIn(0.2).play();
+  
+    // 4. Cleanup: Fade out THIS action when it's replaced by the next one
+    return () => {
+      action.fadeOut(0.2);
+    };
+  }, [actions, props.action]);
 
   return (
     <group ref={group} {...props} dispose={null}>

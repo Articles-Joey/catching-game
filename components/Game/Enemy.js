@@ -8,10 +8,11 @@ import { Model as ModelKingMen } from "@/components/Models/King";
 import { degToRad } from "three/src/math/MathUtils";
 import { useGameStore } from "@/hooks/useGameStore";
 import generateRandomInteger from "@/util/generateRandomInteger";
+import { useStore } from "@/hooks/useStore";
 
 function EnemyBase({ args, position, rotation }) {
 
-    const debug = useGameStore((state) => state.debug);
+    const debug = useStore((state) => state.debug);
 
     const [ref, api] = useSphere(() => ({
         mass: 0,

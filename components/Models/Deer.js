@@ -18,15 +18,20 @@ export function ModelQuaterniusAnimalsDeer(props) {
   const { nodes, materials } = useGraph(clone)
   const { actions } = useAnimations(animations, group)
 
-  useEffect(() => {
+   useEffect(() => {
+      // Determine the action to play
+      const actionName = props.action;
+      
+      if (actions && actionName && actions[actionName]) {
+        const activeAction = actions[actionName];
+        
+        // Smoothly transition in
+        activeAction.reset().fadeIn(0.2).play();
   
-      console.log("Actions deer", actions)
-
-      if (props.action) {
-        actions[props.action].play();
+        // Clean up: Smoothly transition out when action changes
+        return () => activeAction.fadeOut(0.2);
       }
-  
-  }, [actions]);
+    }, [props.action, actions]);
   
   return (
     <group ref={group} {...props} dispose={null}>

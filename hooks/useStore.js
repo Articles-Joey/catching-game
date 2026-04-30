@@ -2,60 +2,15 @@
 import { createWithEqualityFn as create } from 'zustand/traditional'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
+import typicalZustandStoreExcludes from '@articles-media/articles-dev-box/typicalZustandStoreExcludes';
+import typicalZustandStoreStateSlice from '@articles-media/articles-dev-box/typicalZustandStoreStateSlice';
+import generateRandomNickname from '@/util/generateRandomNickname';
+
 export const useStore = create()(
     persist(
         (set, get) => ({
 
-            _hasHydrated: false,
-            setHasHydrated: (state) => {
-                set({
-                    _hasHydrated: state
-                });
-            },
-
-            nickname: '',
-            setNickname: (newValue) => {
-                set((prev) => ({
-                    nickname: newValue
-                }))
-            },
-            nicknameKeyboard: false,
-            setNicknameKeyboard: (newValue) => {
-                set((prev) => ({
-                    nicknameKeyboard: newValue
-                }))
-            },
-
-            darkMode: false,
-            toggleDarkMode: () => {
-                set((prev) => ({
-                    darkMode: !prev.darkMode
-                }))
-            },
-            setDarkMode: (newValue) => {
-                set((prev) => ({
-                    darkMode: newValue
-                }))
-            },
-
-            debug: 0,
-            setDebug: (newValue) => {
-                set((prev) => ({
-                    debug: newValue
-                }))
-            },
-
-            showSidebar: true,
-            setShowSidebar: (newValue) => {
-                set((prev) => ({
-                    showSidebar: newValue
-                }))
-            },
-            toggleShowSidebar: () => {
-                set((prev) => ({
-                    showSidebar: !prev.showSidebar
-                }))
-            },
+            ...typicalZustandStoreStateSlice(set, get, generateRandomNickname),
 
             touchControls: {
                 jump: false,
@@ -78,13 +33,6 @@ export const useStore = create()(
             setTouchControlsEnabled: (newValue) => {
                 set((prev) => ({
                     touchControlsEnabled: newValue
-                }))
-            },
-
-            graphicsQuality: 'High',
-            setGraphicsQuality: (newValue) => {
-                set((prev) => ({
-                    graphicsQuality: newValue
                 }))
             },
 
@@ -117,6 +65,7 @@ export const useStore = create()(
             partialize: (state) =>
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => ![
+                        ...typicalZustandStoreExcludes,
                         'friendsModal',
                         // Exclude list of keys to not persist
                         // 'infoModal',

@@ -19,14 +19,19 @@ export function ModelQuaterniusAnimalsCow(props) {
   const { actions } = useAnimations(animations, group)
 
   useEffect(() => {
+    // Determine the action to play
+    const actionName = props.action;
     
-        console.log("Actions cow", actions)
-  
-        if (props.action) {
-          actions[props.action].play();
-        }
-    
-    }, [actions]);
+    if (actions && actionName && actions[actionName]) {
+      const activeAction = actions[actionName];
+      
+      // Smoothly transition in
+      activeAction.reset().fadeIn(0.2).play();
+
+      // Clean up: Smoothly transition out when action changes
+      return () => activeAction.fadeOut(0.2);
+    }
+  }, [props.action, actions]);
 
   return (
     <group ref={group} {...props} dispose={null}>

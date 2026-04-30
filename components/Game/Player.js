@@ -17,6 +17,9 @@ import { useGameStore } from "@/hooks/useGameStore";
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
 import { degToRad } from "three/src/math/MathUtils"
 import { useStore } from "@/hooks/useStore"
+import { useAudioStore } from "@/hooks/useAudioStore"
+import { useSocketStore } from "@/hooks/useSocketStore"
+import { useSearchParams } from "next/navigation"
 
 const JUMP_FORCE = 0;
 const SPEED = 12;
@@ -32,6 +35,10 @@ function myToFixed(i, digits) {
 function Player(props) {
 
     const playerModelRef = useRef()
+
+    const searchParams = useSearchParams()
+    const params = Object.fromEntries(searchParams.entries());
+    const { server } = params
 
     // const { setPlayerData, teleportPlayer, setTeleportPlayer } = props;
 
@@ -58,7 +65,7 @@ function Player(props) {
     const addDistance = useGameStore((state) => state.addDistance)
     // const score = useGameStore((state) => state.score)
     const setScore = useGameStore((state) => state.setScore)
-    const debug = useGameStore((state) => state.debug)
+    const debug = useStore((state) => state.debug);
     const subtractHealth = useGameStore((state) => state.subtractHealth)
 
     const touchControls = useStore((state) => state.touchControls)
@@ -66,16 +73,23 @@ function Player(props) {
     const targetLocation = useGameStore((state) => state.targetLocation)
     const setTargetLocation = useGameStore((state) => state.setTargetLocation)
 
+    // const audioSettings = useAudioStore((state) => state?.audioSettings);
+
     useEffect(() => {
         if (health <= 0) {
             console.log("Player is dead")
             setIsDead(true);
             setAction("Death");
 
-            const audio = new Audio("/audio/Toontown_sad.ogg")
-            audio.play()
+            if (useAudioStore?.getState()?.audioSettings?.enabled) {
+                const audio = new Audio("/audio/Toontown_sad.ogg")
+                audio.play()
+            }
+
         }
     }, [health]);
+
+    const { socket } = useSocketStore()
 
     const { controllerState, setControllerState } = useControllerStore()
 
@@ -216,6 +230,7 @@ function Player(props) {
         args: [1],
         position: startPosition,
         onCollide: (e) => {
+            
             console.log("Player Collide", e)
 
             if (e.body.userData.isEnemy) {
@@ -234,8 +249,10 @@ function Player(props) {
                         }
                     }, 1000);
 
-                    const audio = new Audio("/audio/surprise.mp3")
-                    audio.play()
+                    if (useAudioStore?.getState()?.audioSettings?.enabled) {
+                        const audio = new Audio("/audio/surprise.mp3")
+                        audio.play()
+                    }
 
                 }
             }
@@ -250,7 +267,7 @@ function Player(props) {
 
     const material = new THREE.MeshPhysicalMaterial({
         color: 'blue',
-        opacity: debug ? 1 : 0,
+        opacity: debug ? 0.5 : 0,
         transparent: true
     });
 
@@ -308,11 +325,23 @@ function Player(props) {
 
         // console.log(posX)
 
-        let newLocation = [posX, posY, posZ]
+        let newLocation = new Vector3(posX, posY, posZ)
 
         if (JSON.stringify(lastLocation) !== JSON.stringify(newLocation)) {
             // console.log(newLocation, lastLocation)
             setPlayerLocation(newLocation)
+
+            if (socket) {
+                socket.emit('game:catching-game:move', {
+                    server: server,
+                    x: newLocation.x,
+                    // y: newLocation.y,
+                    z: newLocation.z,
+                    action: action,
+                    rotation: [0, degToRad(lastMove), 0]
+                })
+            }
+
             lastLocation = newLocation
         }
         // else {
@@ -363,7 +392,7 @@ function Player(props) {
             } else {
                 const targetDir = new Vector3(dx, 0, dz).normalize();
                 direction.copy(targetDir).multiplyScalar(SPEED * (shift ? 2 : 1));
-                
+
                 const angle = Math.atan2(direction.x, direction.z);
                 setLastMove(THREE.MathUtils.radToDeg(angle));
                 setAction("Walk");

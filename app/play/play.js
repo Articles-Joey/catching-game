@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic'
 
 import ArticlesButton from '@/components/UI/Button';
 
-import useFullscreen from '@/hooks/useFullScreen';
+import useFullscreen from '@articles-media/articles-dev-box/useFullscreen';
 import { useControllerStore } from '@/hooks/useControllerStore';
 
 // import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
@@ -34,12 +34,15 @@ const GameCanvas = dynamic(() => import('@/components/Game/GameCanvas'), {
 export default function GamePage() {
 
     const {
-        socket
+        socket,
+        startGame
     } = useSocketStore(state => ({
-        socket: state.socket
+        socket: state.socket,
+        startGame: state.startGame
     }));
 
-    const sidebar = useStore((state) => state.showSidebar)
+    const sidebar = useStore((state) => state.sidebar)
+    const nickname = useStore((state) => state.nickname)
 
     const score = useGameStore((state) => state.score)
     const health = useGameStore((state) => state.health)
@@ -55,31 +58,16 @@ export default function GamePage() {
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
 
-    const { controllerState, setControllerState } = useControllerStore()
-    const [showControllerState, setShowControllerState] = useState(false)
+    // const { controllerState, setControllerState } = useControllerStore()
+    // const [showControllerState, setShowControllerState] = useState(false)
 
     // const [ cameraMode, setCameraMode ] = useState('Player')
 
     const [players, setPlayers] = useState([])
 
-    useEffect(() => {
-
-        if (server && socket.connected) {
-            socket.emit('join-room', `game:cannon-room-${server}`, {
-                game_id: server,
-                nickname: JSON.parse(localStorage.getItem('game:nickname')),
-                client_version: '1',
-
-            });
-        }
-
-        // return function cleanup() {
-        //     socket.emit('leave-room', 'game:glass-ceiling-landing')
-        // };
-
-    }, [server, socket.connected]);
-
-    const [showMenu, setShowMenu] = useState(false)
+    const showMenu = useStore((state) => state.showMenu)
+    const setShowMenu = useStore((state) => state.setShowMenu)
+    // const [showMenu, setShowMenu] = useState(false)
 
     useEffect(() => {
 
@@ -89,37 +77,52 @@ export default function GamePage() {
 
     }, [sidebar])
 
-    // const [touchControlsEnabled, setTouchControlsEnabled] = useLocalStorageNew("game:touchControlsEnabled", false)
+    useEffect(() => {
 
-    const [sceneKey, setSceneKey] = useState(0);
+        if (server && socket.connected) {
+            const roomName = `game:${game_key}-room-${server}`;
+            socket.emit('join-room', roomName, {
+                game_id: server,
+                nickname: nickname,
+                client_version: '1',
 
-    const [gameState, setGameState] = useState(false)
+            });
 
-    // Function to handle scene reload
-    const reloadScene = () => {
-        setSceneKey((prevKey) => prevKey + 1);
+            return function cleanup() {
+                socket.emit('leave-room', roomName)
+            };
+        }
+
+    }, [server, socket.connected, nickname]);
+
+    const sceneKey = useStore((state) => state.sceneKey)
+    const setSceneKey = useStore((state) => state.setSceneKey)
+
+    useEffect(() => {
         setHealth(5);
         setScore(0);
         setTimer(60);
-    };
+    }, [sceneKey])
 
     const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
 
     let panelProps = {
-        server,
-        players,
+        // server,
+        // players,
         // touchControlsEnabled,
         // setTouchControlsEnabled,
-        reloadScene,
+        // reloadScene,
         // controllerState,
-        isFullscreen,
-        requestFullscreen,
-        exitFullscreen,
-        setShowMenu
+        // isFullscreen,
+        // requestFullscreen,
+        // exitFullscreen,
+        // setShowMenu
     }
 
     const game_name = 'Catching Game'
     const game_key = 'catching-game'
+
+    const status = useGameStore(state => state.gameState.status)
 
     return (
 
@@ -130,16 +133,17 @@ export default function GamePage() {
 
             <Suspense>
 
-                {timer > 0 && <AudioHandler />}
+                {/* <AudioHandler /> */}
 
-                {timer == 0 &&
+                {status == "Game Over" ?
                     <ArticlesModal
                         show={true}
                         disableClose={true}
                         modalClassName="game-over-modal"
                         title={"Game Over!"}
                         action={() => (
-                            reloadScene()
+                            // reloadScene()
+                            startGame(server)
                         )}
                         actionText={"Play Again?"}
                     >
@@ -155,6 +159,8 @@ export default function GamePage() {
                             </ArticlesButton> */}
                         </div>
                     </ArticlesModal>
+                    :
+                    ''
                 }
 
             </Suspense>
@@ -191,7 +197,7 @@ export default function GamePage() {
             </div>
 
             <TouchControls
-                // touchControlsEnabled={touchControlsEnabled}
+            // touchControlsEnabled={touchControlsEnabled}
             />
 
             <div className='panel-left'>

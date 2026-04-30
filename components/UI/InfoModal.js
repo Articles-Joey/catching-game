@@ -21,6 +21,7 @@ import ArticlesButton from "./Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 
 import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
+import { useStore } from "@/hooks/useStore";
 
 export default function InfoModal({
     show,
@@ -30,26 +31,10 @@ export default function InfoModal({
 
     const [showModal, setShowModal] = useState(true)
 
-    const [lightboxData, setLightboxData] = useState(null)
-
-    // const userReduxState = useSelector((state) => state.auth.user_details);
-    const userReduxState = false
-
-    const [showVideo, setShowVideo] = useState()
+    const darkMode = useStore(state => state.darkMode)
 
     const elementsRef = useRef([]);
     useModalNavigation(elementsRef, () => setShowModal(false));
-
-    useEffect(() => {
-
-        if (!show.item) {
-            setShow({
-                ...show,
-                item: games.find(game_obj => game_obj.name == show.game)
-            })
-        }
-
-    }, [])
 
     return (
         <>
@@ -69,12 +54,22 @@ export default function InfoModal({
             >
 
                 <Modal.Header closeButton>
-                    <Modal.Title>Game Info</Modal.Title>
+                    <Modal.Title>Catching Game Info</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body className="flex-column p-0">
 
-                    <div>123</div>
+                    <div className="ratio ratio-16x9">
+                        {darkMode ?
+                            <img src={"img/dark-preview.webp"}></img>
+                            :
+                            <img src={"img/preview.webp"}></img>
+                        }
+                    </div>
+
+                    <div className="p-3">
+                        Catch the falling food and avoid the falling anvils. Enemies will also walk around trying to get in your way.
+                    </div>
 
                 </Modal.Body>
 
@@ -82,15 +77,15 @@ export default function InfoModal({
 
                     <div></div>
 
-                    <ArticlesButton 
+                    <ArticlesButton
                         ref={el => elementsRef.current[0] = el}
-                        variant="outline-dark" 
+                        variant="outline-dark"
                         onClick={() => {
                             setShow(false)
                         }}
                         className="d-flex align-items-center"
                     >
-                        <img src={B.src} className="me-1" alt="Close" />
+                        <img src={B.src} className="controller-only me-1" alt="Close" />
                         Close
                     </ArticlesButton>
 

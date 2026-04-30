@@ -2,7 +2,7 @@
 import { memo, useEffect, useMemo } from "react";
 
 import { Canvas } from "@react-three/fiber"
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Stats } from "@react-three/drei";
 
 import { NearestFilter, RepeatWrapping, TextureLoader, Vector3 } from "three";
 
@@ -28,6 +28,8 @@ import SquareOfTrees from "./SquareOfTrees";
 import CameraManager from "./CameraManager";
 import NPC from "./NPC";
 import Ground from "./Ground";
+import SocketPlayers from "./SocketPlayers";
+import FallingItems from "./FallingItems";
 
 const textureOther = new TextureLoader().load(`img/grass.webp`)
 
@@ -53,7 +55,7 @@ const textureOther = new TextureLoader().load(`img/grass.webp`)
 
 function GameCanvas(props) {
 
-    const debug = useGameStore((state) => state.debug);
+    const debug = useStore((state) => state.debug);
 
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
@@ -66,14 +68,19 @@ function GameCanvas(props) {
         <>
             <Player />
 
+            <SocketPlayers />
+
+            <FallingItems />
+
             <Ground
                 args={[30, 30]}
             // args={[30, 0.5, 30]}
             />
 
-            <FallingObjects
+            {/* Old Single player */}
+            {/* <FallingObjects
 
-            />
+            /> */}
 
             <Enemy
 
@@ -113,6 +120,7 @@ function GameCanvas(props) {
             }
 
             <NPC />
+            
             {timer <= 40 && <NPC />}
             {timer <= 20 && <NPC />}
 
@@ -133,7 +141,14 @@ function GameCanvas(props) {
     }
 
     return (
-        <Canvas shadows camera={{ position: [10, 10, 30], fov: 50 }}>
+        <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
+
+            {process.env.NODE_ENV === 'development' &&
+                <>
+                    {/* <axesHelper args={[5]} /> */}
+                    <Stats className="stats-overlay" />
+                </>
+            }
 
             <OrbitControls
             // autoRotate={gameState?.status == 'In Lobby'}
@@ -142,8 +157,6 @@ function GameCanvas(props) {
             <CameraManager />
 
             <TimeHandler />
-
-            {/* a */}
 
             <ambientLight intensity={0.2} />
 

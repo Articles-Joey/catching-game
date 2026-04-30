@@ -1,12 +1,13 @@
 "use client";
 
+import { useAudioStore } from "@/hooks/useAudioStore";
 import { useStore } from "@/hooks/useStore";
 import { useEffect } from "react";
 
 export default function AudioHandler() {
 
-    const audioSettings = useStore((state) => state?.audioSettings);
-    const setAudioSettings = useStore((state) => state?.setAudioSettings);
+    const audioSettings = useAudioStore((state) => state?.audioSettings);
+    const setAudioSettings = useAudioStore((state) => state?.setAudioSettings);
 
     let music
 

@@ -22,34 +22,34 @@ export function Model(props) {
   const { previewConfig } = props
 
   useEffect(() => {
+  // 1. Determine which action we want to play (fallback to Idle)
+  const name = props.action && actions[props.action] ? props.action : "Idle";
+  const action = actions[name];
 
-    console.log("Actions", actions)
-    Object.values(actions).forEach((a) => a.stop());
+  // 2. Configure the specific action behavior
+  if (name === "Walk") {
+    action.setEffectiveTimeScale(1.5);
+  } else {
+    action.setEffectiveTimeScale(1);
+  }
 
-    if (props.action && actions[props.action]) {
-      const action = actions[props.action];
-      action.reset().fadeIn(0.1);
-      
-      if (props.action === "Walk") {
-        action.setEffectiveTimeScale(1.5);
-      } else {
-        action.setEffectiveTimeScale(1);
-      }
+  if (name === "Death") {
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+  } else {
+    action.setLoop(THREE.LoopRepeat, Infinity);
+    action.clampWhenFinished = false;
+  }
 
-      if (props.action === "Death") {
-        action.setLoop(THREE.LoopOnce);
-        action.clampWhenFinished = true;
-      } else {
-        action.setLoop(THREE.LoopRepeat);
-        action.clampWhenFinished = false;
-      }
+  // 3. The "Magic" fix: reset, fadeIn, and play. 
+  // .play() will automatically handle crossfading if other actions are fading out.
+  action.reset().fadeIn(0.2).play();
 
-      action.play();
-    } else {
-      actions[`Idle`].play();
-    }
-
-  }, [actions, props.action]);
+  // 4. Cleanup: Fade out THIS action when it's replaced by the next one
+  return () => {
+    action.fadeOut(0.2);
+  };
+}, [actions, props.action]);
 
   return (
     <group ref={group} {...props} dispose={null}>

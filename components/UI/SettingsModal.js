@@ -7,6 +7,7 @@ import { useModalNavigation } from "@/hooks/useModalNavigation";
 import { useStore } from "@/hooks/useStore";
 
 import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
+import { useAudioStore } from "@/hooks/useAudioStore";
 
 export default function SettingsModal({
     show,
@@ -22,12 +23,12 @@ export default function SettingsModal({
     const graphicsQuality = useStore((state) => state.graphicsQuality)
     const setGraphicsQuality = useStore((state) => state.setGraphicsQuality)
 
-    const audioSettings = useStore((state) => state.audioSettings)
-    const setAudioSettings = useStore((state) => state.setAudioSettings)
+    const audioSettings = useAudioStore((state) => state.audioSettings)
+    const setAudioSettings = useAudioStore((state) => state.setAudioSettings)
 
     const [showModal, setShowModal] = useState(true)
 
-    const [lightboxData, setLightboxData] = useState(null)
+    // const [lightboxData, setLightboxData] = useState(null)
 
     const [tab, setTab] = useState('Graphics')
 

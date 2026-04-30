@@ -2,6 +2,8 @@
 import { createWithEqualityFn as create } from 'zustand/traditional'
 import { io } from "socket.io-client";
 
+const game_name_key = "catching-game"
+
 export const useSocketStore = create((set) => ({
     // socket: null,
     socket: io({
@@ -16,6 +18,9 @@ export const useSocketStore = create((set) => ({
             reconnection: true,
             reconnectionDelay: 5000,
             reconnectionDelayMax: 10000,
+            query: {
+                client: "catching-game",
+            }
         });
         newSocket.connect();
         set({ socket: newSocket });
@@ -27,6 +32,12 @@ export const useSocketStore = create((set) => ({
         // Disconnect but do not dump socket store or socket.on and socket.connected will be undefined if not careful
         // return { socket: null };
     }),
+    startGame: (gameId) => {
+        set((state) => {
+            state.socket.emit(`game:${game_name_key}:start`, { game_id: gameId });
+            return {}
+        })
+    },
     totalUsers: 0,
     setTotalUsers: (total) => set({ totalUsers: total }),
     connected: false,

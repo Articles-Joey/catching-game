@@ -87,54 +87,54 @@ export default function LobbyPage() {
     const nickname = useStore((state) => state.nickname)
     const setNickname = useStore((state) => state.setNickname)
     const nicknameKeyboard = useStore((state) => state.nicknameKeyboard)
+    const randomNickname = useStore((state) => state.randomNickname)
+    const _hasHydrated = useStore((state) => state._hasHydrated)
     // const [nickname, setNickname] = useLocalStorageNew("game:nickname", userReduxState.display_name)
 
     // const [showInfoModal, setShowInfoModal] = useState(false)
     // const [showSettingsModal, setShowSettingsModal] = useState(false)
     // const [showPrivateGameModal, setShowPrivateGameModal] = useState(false)
 
-    const setShowInfoModal = useGameStore((state) => state.setShowInfoModal)
-    const setShowSettingsModal = useGameStore((state) => state.setShowSettingsModal)
-    const setShowCreditsModal = useGameStore((state) => state.setShowCreditsModal)
+    const setShowInfoModal = useStore((state) => state.setShowInfoModal)
+    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
+    const setShowCreditsModal = useStore((state) => state.setShowCreditsModal)
 
-    const [lobbyDetails, setLobbyDetails] = useState({
-        players: [],
-        games: [],
-    })
+    const lobbyDetails = useStore((state) => state.lobbyDetails)
+    const setLobbyDetails = useStore((state) => state.setLobbyDetails)
 
     const elementsRef = useRef([]);
     useLandingNavigation(elementsRef);
 
     useEffect(() => {
 
-        setShowInfoModal(localStorage.getItem('game:four-frogs:rulesAnControls') === 'true' ? true : false)
+        // setShowInfoModal(localStorage.getItem('game:four-frogs:rulesAnControls') === 'true' ? true : false)
 
         // if (userReduxState._id) {
         //     console.log("Is user")
         // }
 
-        socket.on('game:death-race-landing-details', function (msg) {
-            console.log('game:death-race-landing-details', msg)
+        // socket.on('game:death-race-landing-details', function (msg) {
+        //     console.log('game:death-race-landing-details', msg)
 
-            if (JSON.stringify(msg) !== JSON.stringify(lobbyDetails)) {
-                setLobbyDetails(msg)
-            }
-        });
+        //     if (JSON.stringify(msg) !== JSON.stringify(lobbyDetails)) {
+        //         setLobbyDetails(msg)
+        //     }
+        // });
 
-        return () => {
-            socket.off('game:death-race-landing-details');
-        };
+        // return () => {
+        //     socket.off('game:death-race-landing-details');
+        // };
 
     }, [])
 
     useEffect(() => {
 
         if (socket.connected) {
-            socket.emit('join-room', 'game:death-race-landing');
+            socket.emit('join-room', `game:${game_key}-landing`);
         }
 
         return function cleanup() {
-            socket.emit('leave-room', 'game:death-race-landing')
+            socket.emit('leave-room', `game:${game_key}-landing`);
         };
 
     }, [socket.connected]);
@@ -298,15 +298,29 @@ export default function LobbyPage() {
                                         setValue={setNickname}
                                         noMargin
                                     /> */}
-                                    <input
-                                        ref={el => elementsRef.current[0] = el}
-                                        type="text"
-                                        className="form-control"
-                                        id="nickname"
-                                        value={nickname}
-                                        onChange={(e) => setNickname(e.target.value)}
-                                        placeholder="Enter your nickname"
-                                    />
+                                    <div className="d-flex align-items-center">
+                                        <input
+                                            type="text"
+                                            value={_hasHydrated ? nickname : ''}
+                                            disabled={!_hasHydrated}
+                                            id="nickname"
+                                            name="nickname"
+                                            placeholder="Enter your nickname"
+                                            onChange={(e) => {
+                                                setNickname(e.target.value)
+                                            }}
+                                            className={`form-control form-control-sm`}
+                                        />
+                                        <ArticlesButton
+                                            small
+                                            className=""
+                                            onClick={() => {
+                                                randomNickname()
+                                            }}
+                                        >
+                                            <i className="fad fa-random"></i>
+                                        </ArticlesButton>
+                                    </div>
                                 </div>
 
                                 <div className='mt-1' style={{ fontSize: '0.8rem' }}>Visible to all players</div>
@@ -317,7 +331,7 @@ export default function LobbyPage() {
                         <div className="card-body">
 
                             <div
-                            //  className='mb-3'
+                             className='mb-3'
                             >
                                 <Link href={{
                                     pathname: `/play`
@@ -333,13 +347,15 @@ export default function LobbyPage() {
                                 </Link>
                             </div>
 
-                            {/* <div className="fw-bold mb-1 small text-center">
-                                {lobbyDetails.players.length || 0} player{lobbyDetails.players.length > 1 && 's'} in the lobby.
-                            </div> */}
+                            <div className="fw-bold mb-1 small text-center">
+                                {lobbyDetails.players.length || 0} player{lobbyDetails.players.length !== 1 && 's'} in the lobby.
+                            </div>
 
-                            {/* <div className="servers">
+                            <div className="servers">
     
-                                {[1, 2, 3, 4].map(id => {
+                                {[
+                                    ...Array(2).keys().map(i => i + 1)
+                                ].map(id => {
     
                                     let lobbyLookup = lobbyDetails?.fourFrogsGlobalState?.games?.find(lobby =>
                                         parseInt(lobby.server_id) == id
@@ -398,7 +414,7 @@ export default function LobbyPage() {
                                     )
                                 })}
     
-                            </div> */}
+                            </div>
 
                         </div>
 
@@ -437,10 +453,15 @@ export default function LobbyPage() {
                                 }}
                             >
                                 <i className="fad fa-info-square"></i>
-                                Rules & Controls
+                                Info
                             </ArticlesButton>
 
-                            <Link href={'https://github.com/Articles-Joey/catching-game'} target='_blank' rel='noopener noreferrer' className='w-50'>
+                            <a
+                                href={'https://github.com/Articles-Joey/catching-game'}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='w-50'
+                            >
                                 <ArticlesButton
                                     ref={el => elementsRef.current[4] = el}
                                     className={`w-100`}
@@ -452,7 +473,7 @@ export default function LobbyPage() {
                                     <i className="fab fa-github"></i>
                                     Github
                                 </ArticlesButton>
-                            </Link>
+                            </a>
 
                             <ArticlesButton
                                 ref={el => elementsRef.current[5] = el}
@@ -466,7 +487,7 @@ export default function LobbyPage() {
                                 Credits
                             </ArticlesButton>
 
-                            {userDetails &&
+                            {userDetails ?
                                 <div className='w-100 mt-3 d-flex justify-content-center'>
                                     <ArticlesButton
                                         // ref={el => elementsRef.current[5] = el}
@@ -484,6 +505,8 @@ export default function LobbyPage() {
                                         My Friends
                                     </ArticlesButton>
                                 </div>
+                                :
+                                ''
                             }
 
 

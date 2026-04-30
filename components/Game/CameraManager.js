@@ -35,6 +35,8 @@ export default function CameraManager() {
         // Original: Y=10, Z=30. Ratio Z/Y = 3.
         
         // But simply moving Z is easiest.
+       
+        return
         
         // Let's only enforce minimum distance for fit.
         if (camera.position.z < dist) {
@@ -47,13 +49,15 @@ export default function CameraManager() {
 
     useFrame((state) => {
         
-        if (timer < 40 && timer > 0) {
-            const time = state.clock.getElapsedTime();
-            state.camera.position.x = Math.sin(time) * 10;
-            state.camera.position.y = 10;
-            state.camera.position.z = 30;
-            state.camera.lookAt(0, 0, 0);
-        }
+        // Annoying effect that will be temp mystery pickup
+
+        // if (timer < 40 && timer > 0) {
+        //     const time = state.clock.getElapsedTime();
+        //     state.camera.position.x = Math.sin(time) * 10;
+        //     state.camera.position.y = 10;
+        //     state.camera.position.z = 30;
+        //     state.camera.lookAt(0, 0, 0);
+        // }
 
     });
 
