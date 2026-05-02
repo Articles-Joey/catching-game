@@ -32,9 +32,12 @@ export const useSocketStore = create((set) => ({
         // Disconnect but do not dump socket store or socket.on and socket.connected will be undefined if not careful
         // return { socket: null };
     }),
-    startGame: (gameId) => {
+    startGame: (gameId, status) => {
         set((state) => {
-            state.socket.emit(`game:${game_name_key}:start`, { game_id: gameId });
+            state.socket.emit(`game:${game_name_key}:start`, { 
+                game_id: gameId, 
+                status: status 
+            });
             return {}
         })
     },

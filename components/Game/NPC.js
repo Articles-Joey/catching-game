@@ -4,11 +4,14 @@ import { useFrame } from "@react-three/fiber";
 import { Vector3, Quaternion, Matrix4 } from "three";
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
 import generateRandomInteger from "@/util/generateRandomInteger";
+import { useGameStore } from "@/hooks/useGameStore";
 
 export default function NPC({ startPosition = [5, 1, 5] }) {
 
     const [action, setAction] = useState("Idle");
     const [rotation, setRotation] = useState([0, 0, 0]);
+
+    const status = useGameStore(state => state.gameState.status)
     
     // NPC state
     const destinationRef = useRef(null);
@@ -39,6 +42,14 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
     };
 
     useFrame((state, delta) => {
+        if (status !== "In Progress") {
+            if (action !== "Idle") {
+                setAction("Idle");
+                api.velocity.set(0, 0, 0);
+            }
+            return;
+        }
+
         if (!destinationRef.current) {
             destinationRef.current = pickNewDestination();
         }

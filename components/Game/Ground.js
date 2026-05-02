@@ -14,6 +14,9 @@ export default function Ground({ args }) {
         // mass: 0,
         type: 'Static',
         args: args,
+        userData: {
+            isGround: true
+        },
         position: [0, 0, 0],
         rotation: [-Math.PI / 2, 0, 0]
     }))

@@ -40,8 +40,8 @@ export default function GlobalClientModals() {
     const showCreditsModal = useStore((state) => state.showCreditsModal)
     const setShowCreditsModal = useStore((state) => state.setShowCreditsModal)
 
-    const friendsModal = useStore((state) => state.friendsModal)
-    const setFriendsModal = useStore((state) => state.setFriendsModal)
+    const showFriendsModal = useStore((state) => state.showFriendsModal)
+    const setShowFriendsModal = useStore((state) => state.setShowFriendsModal)
 
     const {
         data: userToken,
@@ -124,11 +124,11 @@ export default function GlobalClientModals() {
                 />
             }
 
-            {friendsModal &&
+            {showFriendsModal &&
                 <FriendsList
                     componentType="modal"
-                    show={friendsModal}
-                    setShow={setFriendsModal}
+                    show={showFriendsModal}
+                    setShow={setShowFriendsModal}
                     user_id={
                         userDetails ? userDetails.user_id : null
                     }

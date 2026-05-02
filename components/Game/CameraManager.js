@@ -36,16 +36,14 @@ export default function CameraManager() {
         
         // But simply moving Z is easiest.
        
-        return
+        // return
         
-        // Let's only enforce minimum distance for fit.
-        if (camera.position.z < dist) {
-             camera.position.z = Math.max(30, dist);
-             camera.position.y = Math.max(10, dist / 3); // Adjust height to keep angle
-             camera.lookAt(0,0,0);
-        }
+        // Always enforce distance for fit.
+        camera.position.z = Math.max(20, dist / 1.5);
+        camera.position.y = Math.max(25, dist / 3); // Adjust height to keep angle
+        camera.lookAt(0,0,0);
 
-    }, [size, camera]);
+    }, [size.width, size.height, camera]);
 
     useFrame((state) => {
         

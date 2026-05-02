@@ -10,17 +10,17 @@
         }
     }
 
-    &.show-sidebar {
-        .panel-left {
-            display: flex;
-        }
+    // &.show-sidebar {
+    //     .panel-left {
+    //         display: flex;
+    //     }
 
-        .menu-bar {
-            @include media-breakpoint-up(lg) {
-                display: none;
-            }
-        }
-    }
+    //     .menu-bar {
+    //         @include media-breakpoint-up(lg) {
+    //             display: none;
+    //         }
+    //     }
+    // }
 
     .background {
         position: fixed;
@@ -84,42 +84,44 @@
         }
     }
 
-    .menu-bar {
-        // position: fixed;
-        // bottom: 0;
-        // left: 0;
-        // width: 100%;
-        // height: 50px;
-        // z-index: 3;
+    // .menu-bar {
+    //     // position: fixed;
+    //     // bottom: 0;
+    //     // left: 0;
+    //     // width: 100%;
+    //     // height: 50px;
+    //     // z-index: 3;
 
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        height: 50px;
-        z-index: 3;
-    }
+    //     position: fixed;
+    //     bottom: 0;
+    //     left: 0;
+    //     width: 50px;
+    //     height: 50px;
+    //     z-index: 3;
+    // }
 
-    .mobile-menu {
-        position: fixed;
-        bottom: 0px;
-        left: 0;
-        width: 100%;
-        top: 0px;
-        // height: calc(100vh - 50px);
-        z-index: 2;
-        background-color: rgba(#955d39, 0.8);
-        transform: translateY(calc(100% + 50px));
-        transition-duration: 200ms;
-        padding: 1rem;
-        display: flex;
-        align-items: flex-end;
+    // .mobile-menu {
+    //     position: fixed;
+    //     bottom: 0px;
+    //     left: 0;
+    //     width: 100%;
+    //     top: 0px;
+    //     // height: calc(100vh - 50px);
+    //     z-index: 2;
+    //     background-color: rgba(#955d39, 0.8);
+    //     transform: translateY(calc(100% + 50px));
+    //     transition-duration: 200ms;
+    //     padding: 1rem;
+    //     display: flex;
+    //     align-items: flex-end;
 
-        &.show {
-            transform: translateY(0);
-        }
+    //     justify-content: center;
 
-    }
+    //     &.show {
+    //         transform: translateY(0);
+    //     }
+
+    // }
 
     .touch-controls-area {
         position: fixed;
@@ -176,20 +178,23 @@
             transform: translateX(-50%);
             z-index: 2;
             display: flex;
-            flex-direction: column;
+            // flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: rgba(0, 100, 17, 0.5);
             border-radius: 20px;
             padding: 0.5rem;
-            width: 300px;
+            width: 350px;
 
             // @include media-breakpoint-down(sm) {
             //     transform: scale(0.85) translateX(-50%);
             // }
 
             .score {
-                font-size: 2rem;
+                margin-right: 1rem;
+                display: flex;
+                flex-wrap: nowrap;
+                font-size: 1rem;
                 color: white;
                 text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.7);
             }
@@ -214,25 +219,25 @@
         // padding: 1rem;
     }
 
-    .panel-left,
-    .panel-right {
-        width: 300px;
-        height: calc(100vh - 0px);
-        flex-shrink: 0;
-    }
+    // .panel-left,
+    // .panel-right {
+    //     width: 300px;
+    //     height: calc(100vh - 0px);
+    //     flex-shrink: 0;
+    // }
 
-    .panel-left {
-        display: none;
-        // display: flex;
-        // justify-content: center;
-        // align-items: center;
-    }
+    // .panel-left {
+    //     display: none;
+    //     // display: flex;
+    //     // justify-content: center;
+    //     // align-items: center;
+    // }
 
-    .panel-right {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    // .panel-right {
+    //     display: flex;
+    //     justify-content: center;
+    //     align-items: center;
+    // }
 
     .game-panel {
         width: 100%;

@@ -31,14 +31,21 @@ function EnemyBase({ args, position, rotation }) {
 
     const moveSpeed = 8; // Adjusted for linear movement
     const amplitude = 15; // Max distance on X-axis
-    
+
     const positionRef = useRef(new Vector3(position[0], position[1], position[2]));
     const targetRef = useRef(null);
     const initialZ = position[2]; // Remember starting Z lane
 
+    const status = useGameStore(state => state.gameState.status)
+
     // Linear movement logic
     useFrame((state, delta) => {
-        
+
+        if (status !== "In Progress") {
+            api.velocity.set(0, 0, 0);
+            return;
+        }
+
         // Initialize or validate target
         if (!targetRef.current) {
             // Pick a side opposite to current position
@@ -50,14 +57,14 @@ function EnemyBase({ args, position, rotation }) {
 
         const direction = new Vector3().subVectors(targetRef.current, positionRef.current);
         const distance = direction.length();
-        
+
         // Check if reached target (threshold)
         if (distance < 0.2) {
             // Set new target on the OTHER side
             // If we just arrived at X = 15, current is 15, target should be -15.
             const targetX = targetRef.current.x > 0 ? -amplitude : amplitude;
             const targetZ = initialZ + generateRandomInteger(-10, 10);
-            
+
             targetRef.current.set(targetX, position[1], targetZ);
         } else {
             // Move towards target

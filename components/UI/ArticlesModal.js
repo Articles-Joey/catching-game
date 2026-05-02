@@ -20,7 +20,8 @@ export default function ArticlesModal({
     centered,
     scrollable,
     size,
-    actionVariant
+    actionVariant,
+    footerOverride
 }) {
 
     const [showModal, setShowModal] = useState(true)
@@ -67,38 +68,42 @@ export default function ArticlesModal({
 
                 <Modal.Footer className="justify-content-between">
 
-                    {!action && <div></div>}
+                    {footerOverride && footerOverride}
 
-                    {(!disableClose || closeAction) && <div>
-                        <ArticlesButton
-                            variant="outline-dark"
-                            onClick={() => {
-
-                                if (closeAction) {
-                                    closeAction()
-                                } else {
-                                    setShowModal(false)
-                                }
-
-                            }}
-                        >
-                            {/* Close */}
-                            {closeText || 'Close'}
-                        </ArticlesButton>
-                    </div>}
-
-                    {action &&
-                        <ArticlesButton
-                            variant={actionVariant ? actionVariant : "articles"}
-                            disabled={disableAction}
-                            onClick={() => {
-                                console.log('action')
-                                action(setShowModal)
-                            }}
-                        >
-                            {actionText || 'Continue'}
-                        </ArticlesButton>
-                    }
+                    {!footerOverride && <>
+                        {!action && <div></div>}
+    
+                        {(!disableClose || closeAction) && <div>
+                            <ArticlesButton
+                                variant="outline-dark"
+                                onClick={() => {
+    
+                                    if (closeAction) {
+                                        closeAction()
+                                    } else {
+                                        setShowModal(false)
+                                    }
+    
+                                }}
+                            >
+                                {/* Close */}
+                                {closeText || 'Close'}
+                            </ArticlesButton>
+                        </div>}
+    
+                        {action &&
+                            <ArticlesButton
+                                variant={actionVariant ? actionVariant : "articles"}
+                                disabled={disableAction}
+                                onClick={() => {
+                                    console.log('action')
+                                    action(setShowModal)
+                                }}
+                            >
+                                {actionText || 'Continue'}
+                            </ArticlesButton>
+                        }
+                    </>}
 
                 </Modal.Footer>
 

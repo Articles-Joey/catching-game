@@ -36,12 +36,12 @@ export const useStore = create()(
                 }))
             },
 
-            friendsModal: false,
-            setFriendsModal: (newValue) => {
-                set((prev) => ({
-                    friendsModal: newValue
-                }))
-            },
+            // friendsModal: false,
+            // setFriendsModal: (newValue) => {
+            //     set((prev) => ({
+            //         friendsModal: newValue
+            //     }))
+            // },
 
             audioSettings: {
                 enabled: true,
@@ -52,6 +52,14 @@ export const useStore = create()(
             setAudioSettings: (newValue) => {
                 set((prev) => ({
                     audioSettings: newValue
+                }))
+            },
+
+            // Fixed or Orbit
+            cameraMode: 'Fixed',
+            setCameraMode: (newValue) => {
+                set((prev) => ({
+                    cameraMode: newValue
                 }))
             },
 

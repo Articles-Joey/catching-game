@@ -62,7 +62,8 @@ function GameCanvas(props) {
 
     const graphicsQuality = useStore((state) => state.graphicsQuality)
 
-    const timer = useGameStore((state) => state.timer)
+    const timer = useGameStore((state) => state.gameState.timer)
+    // const timer = useGameStore((state) => state.timer)
 
     let gameContent = (
         <>
@@ -93,7 +94,7 @@ function GameCanvas(props) {
                 position={[0, 1.2, 0]}
             />
 
-            {timer <= 40 &&
+            {timer >= 40 &&
                 <Enemy
 
                     // Sphere
@@ -106,7 +107,7 @@ function GameCanvas(props) {
                 />
             }
 
-            {timer <= 20 &&
+            {timer >= 20 &&
                 <Enemy
 
                     // Sphere
@@ -119,10 +120,10 @@ function GameCanvas(props) {
                 />
             }
 
-            <NPC />
+            {/* <NPC />
             
             {timer <= 40 && <NPC />}
-            {timer <= 20 && <NPC />}
+            {timer <= 20 && <NPC />} */}
 
         </>
     )
@@ -150,9 +151,7 @@ function GameCanvas(props) {
                 </>
             }
 
-            <OrbitControls
-            // autoRotate={gameState?.status == 'In Lobby'}
-            />
+            {/* <OrbitControls /> */}
 
             <CameraManager />
 
@@ -165,8 +164,8 @@ function GameCanvas(props) {
             {darkMode ?
                 <directionalLight
                     castShadow
-                    position={[0, 10, -100]}
-                    intensity={2}
+                    position={[0, 100, 0]}
+                    intensity={0.2}
                 // shadow-camera-left={-20}
                 // shadow-camera-right={20}
                 // shadow-camera-top={20}

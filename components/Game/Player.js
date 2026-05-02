@@ -91,6 +91,8 @@ function Player(props) {
 
     const { socket } = useSocketStore()
 
+    // const status = useGameStore(state => state.gameState.status)
+
     const { controllerState, setControllerState } = useControllerStore()
 
     // const [character, setCharacter] = useLocalStorageNew("game:ocean-rings:character", {
@@ -229,11 +231,22 @@ function Player(props) {
         mass: 10,
         args: [1],
         position: startPosition,
+        userData: {
+            isPlayer: true
+        },
         onCollide: (e) => {
-            
+
             console.log("Player Collide", e)
 
             if (e.body.userData.isEnemy) {
+
+                const status = useGameStore.getState().gameState.status
+
+                if (status !== "In Progress") {
+                    api.velocity.set(0, 0, 0);
+                    return;
+                }
+
                 if (!isDeadRef.current) {
 
                     // const currentScore = useGameStore.getState().score
@@ -241,8 +254,13 @@ function Player(props) {
 
                     subtractHealth(1)
 
+                    socket.emit('game:catching-game:hit', {
+                        server: server,
+                    })
+
                     setIsDead(true);
                     setAction("Death");
+
                     setTimeout(() => {
                         if (useGameStore.getState().health > 0) {
                             setIsDead(false);

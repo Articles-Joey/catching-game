@@ -34,6 +34,7 @@ const assets_src = 'games/Cannon/'
 
 const game_key = 'catching-game'
 const game_name = 'Catching Game'
+const game_port = 3030
 
 // import {
 //     Ad,
@@ -53,6 +54,8 @@ const ReturnToLauncherButton = dynamic(() =>
     import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
     { ssr: false }
 );
+
+import SessionButton from '@articles-media/articles-dev-box/SessionButton';
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
@@ -81,8 +84,8 @@ export default function LobbyPage() {
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
-    const friendsModal = useStore((state) => state.friendsModal)
-    const setFriendsModal = useStore((state) => state.setFriendsModal)
+    // const friendsModal = useStore((state) => state.friendsModal)
+    // const setFriendsModal = useStore((state) => state.setFriendsModal)
 
     const nickname = useStore((state) => state.nickname)
     const setNickname = useStore((state) => state.setNickname)
@@ -487,7 +490,7 @@ export default function LobbyPage() {
                                 Credits
                             </ArticlesButton>
 
-                            {userDetails ?
+                            {/* {userDetails ?
                                 <div className='w-100 mt-3 d-flex justify-content-center'>
                                     <ArticlesButton
                                         // ref={el => elementsRef.current[5] = el}
@@ -507,12 +510,16 @@ export default function LobbyPage() {
                                 </div>
                                 :
                                 ''
-                            }
-
+                            } */}
 
                         </div>
 
                     </div>
+
+                    <SessionButton
+                        port={game_port}
+                        friendsButton={true}
+                    />
 
                     <ReturnToLauncherButton />
 

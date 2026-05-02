@@ -44,12 +44,13 @@ export const useGameStore = create((set) => ({
         }))
     },
 
-    cameraMode: 'Player',
-    setCameraMode: (newValue) => {
-        set((prev) => ({
-            cameraMode: newValue
-        }))
-    },
+    // // Fixed or Orbit
+    // cameraMode: 'Player',
+    // setCameraMode: (newValue) => {
+    //     set((prev) => ({
+    //         cameraMode: newValue
+    //     }))
+    // },
 
     playerLocation: false,
     setPlayerLocation: (newValue) => {

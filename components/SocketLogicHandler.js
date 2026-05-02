@@ -153,7 +153,7 @@ export default function SocketLogicHandler(props) {
         });
 
         socket.on(`game-update`, function (msg) {
-            console.log(`game-update`, msg)
+            // console.log(`game-update`, msg)
             const setGameState = useGameStore.getState().setGameState
             setGameState(msg)
         });

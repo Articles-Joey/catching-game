@@ -23,6 +23,10 @@ import { useGameStore } from '@/hooks/useGameStore';
 import AudioHandler from '@/components/Game/AudioHandler';
 import ArticlesModal from '@/components/UI/ArticlesModal';
 
+import GameMenu from '@articles-media/articles-dev-box/GameMenu';
+import UiOverlay from '@/components/UI/UiOverlay';
+import Link from 'next/link';
+
 const TouchControls = dynamic(() => import('@/components/UI/TouchControls'), {
     ssr: false,
 });
@@ -44,8 +48,19 @@ export default function GamePage() {
     const sidebar = useStore((state) => state.sidebar)
     const nickname = useStore((state) => state.nickname)
 
-    const score = useGameStore((state) => state.score)
-    const health = useGameStore((state) => state.health)
+    // const score = useGameStore((state) => state.score)
+
+    // const health = useGameStore((state) => state.health)
+    const players = useGameStore(state => state.gameState.players)
+    const score = useMemo(() => {
+        const player = players?.find(p => p.id === socket.id)
+        return player ? player.score : 0;
+    }, [players, socket.id])
+    const health = useMemo(() => {
+        const player = players?.find(p => p.id === socket.id)
+        return player ? player.health : 0;
+    }, [players, socket.id])
+
     // const timer = useGameStore((state) => state.timer)
     const setScore = useGameStore((state) => state.setScore)
     const setHealth = useGameStore((state) => state.setHealth)
@@ -63,19 +78,19 @@ export default function GamePage() {
 
     // const [ cameraMode, setCameraMode ] = useState('Player')
 
-    const [players, setPlayers] = useState([])
+    // const [players, setPlayers] = useState([])
 
     const showMenu = useStore((state) => state.showMenu)
     const setShowMenu = useStore((state) => state.setShowMenu)
     // const [showMenu, setShowMenu] = useState(false)
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (sidebar == true) {
-            setShowMenu(false)
-        }
+    //     if (sidebar == true) {
+    //         setShowMenu(false)
+    //     }
 
-    }, [sidebar])
+    // }, [sidebar])
 
     useEffect(() => {
 
@@ -141,11 +156,35 @@ export default function GamePage() {
                         disableClose={true}
                         modalClassName="game-over-modal"
                         title={"Game Over!"}
-                        action={() => (
+                        action={() => {
                             // reloadScene()
-                            startGame(server)
-                        )}
+                            // startGame(server, "In Lobby")
+                        }}
                         actionText={"Play Again?"}
+                        footerOverride={
+                            <div className='d-flex justify-content-between w-100'>
+                                <Link href={"/"} className="w-50">
+                                    <ArticlesButton
+                                        className="w-100"
+                                        onClick={() => {
+                                            // reloadScene();
+                                        }}
+                                    >
+                                        <i className='fad fa-arrow-left'></i>
+                                        Exit to Lobby
+                                    </ArticlesButton>
+                                </Link>
+                                <ArticlesButton
+                                    className="w-50"
+                                    onClick={() => {
+                                        startGame(server, "In Lobby");
+                                    }}
+                                >
+                                    <i className='fad fa-play'></i>
+                                    Play Again?
+                                </ArticlesButton>
+                            </div>
+                        }
                     >
                         <div className='text-center'>
                             <h2>{`Time's Up!`}</h2>
@@ -165,7 +204,21 @@ export default function GamePage() {
 
             </Suspense>
 
-            <div className="menu-bar card card-articles ">
+            <GameMenu
+                useStore={useStore}
+                LeftPanelContent={LeftPanelContent}
+                // menuBarStyle={"Bar"}
+                menuBarStyle={"Corner Button"}
+                // TODO add positioning for corner button style
+                // menuBarConfig={{
+                //     style: "Corner Button",
+                //     menuButtonPosition: ""
+                // }}
+                sidebarStyle={"Static Panel"}
+            // sidebarStyle={"Floating Panel"}
+            />
+
+            {/* <div className="menu-bar card card-articles ">
 
                 <div className="d-flex justify-content-center align-items-center h-100 w-100">
                     <ArticlesButton
@@ -173,34 +226,37 @@ export default function GamePage() {
                         className="w-100 h-100"
                         active={showMenu}
                         onClick={() => {
-                            setShowMenu(prev => !prev)
+                            setShowMenu(!showMenu)
                         }}
                     >
                         <i className="fad fa-bars"></i>
-                        {/* <span>Menu</span> */}
                     </ArticlesButton>
                 </div>
 
-            </div>
+            </div> */}
 
-            <div className={`mobile-menu ${showMenu && 'show'}`}>
+            {/* <div 
+                className={`mobile-menu ${showMenu && 'show'}`}
+                onClick={() => setShowMenu(false)}
+            >
                 <div
                     style={{
                         maxWidth: '300px'
                     }}
-                    className='mx-auto'
+                    className='mobile-menu-container'
+                    onClick={(e) => e.stopPropagation()}
                 >
                     <LeftPanelContent
                         {...panelProps}
                     />
                 </div>
-            </div>
+            </div> */}
 
             <TouchControls
             // touchControlsEnabled={touchControlsEnabled}
             />
 
-            <div className='panel-left'>
+            {/* <div className='panel-left'>
 
                 <div className='card rounded-0'>
                     <LeftPanelContent
@@ -208,7 +264,7 @@ export default function GamePage() {
                     />
                 </div>
 
-            </div>
+            </div> */}
 
             {/* <div className='game-info'>
                 <div className="card card-articles card-sm">
@@ -222,23 +278,7 @@ export default function GamePage() {
 
             <div className='canvas-wrap'>
 
-                <div className='game-ui-overlay'>
-
-                    <div className='score'>
-                        Timer: {timer} - Score: {score}
-                    </div>
-
-                    <div>
-                        {[...Array(health)].map((_, index) =>
-                            <img
-                                key={index}
-                                src={"/img/heart.png"}
-                                width={50}
-                            ></img>
-                        )}
-                    </div>
-
-                </div>
+                <UiOverlay />
 
                 <GameCanvas
                     key={sceneKey}

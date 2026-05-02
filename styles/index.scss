@@ -9,6 +9,16 @@
         --bs-card-bg: rgb(149, 93, 57) !important;
         --bs-card-bg-hex: #955d39;
     }
+
+    [data-bs-theme='dark'] {
+        .card {
+            --bs-card-bg: rgb(69, 42, 25) !important;
+            --bs-card-bg-hex: #452a19 !important;
+            --bs-body-color: white !important;
+            --bs-card-color: white !important;
+            --bs-card-cap-color: white !important;
+        }
+    }
 }
 
 button {
@@ -20,8 +30,11 @@ i {
 }
 
 .game-over-modal {
-    .modal-header, .modal-body, .modal-footer {
-        justify-content: center!important;
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        justify-content: center !important;
     }
 }
 

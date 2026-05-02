@@ -36,7 +36,8 @@ export default function GameDetailsPanel() {
                             >
                                 {player.ready ? "Ready" : "Not Ready"}
                             </span>
-                            {player.nickname || "?"}
+                            <span>{player.nickname || "?"} </span>
+                            <span>- {player.score || 0}</span>
                         </div>
 
                         {/* <div className="player-name">Ready: {player.ready ? "Yes" : "No"}</div> */}
@@ -106,8 +107,9 @@ function RoundAndTimer() {
             <ArticlesButton
                 small
                 className="w-100 mt-1"
+                disabled={status === "In Progress"}
                 onClick={() => {
-                    startGame(server)
+                    startGame(server, "In Progress")
                 }}
             >
                 Start Game
