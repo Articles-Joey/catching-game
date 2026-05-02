@@ -6,44 +6,23 @@ import Link from 'next/link'
 
 import { useLandingNavigation } from '@/hooks/useLandingNavigation';
 
-// import { useSelector, useDispatch } from 'react-redux'
-
-// import ROUTES from 'components/constants/routes'
-
 import ArticlesButton from '@/components/UI/Button';
-// import SingleInput from '@/components/Articles/SingleInput';
-// import { useLocalStorageNew } from '@/hooks/useLocalStorageNew';
-// import IsDev from '@/components/IsDev';
-// import { ChromePicker } from 'react-color';
+
 import { useSocketStore } from '@/hooks/useSocketStore';
 import { useSearchParams } from 'next/navigation';
-import { useGameStore } from '@/hooks/useGameStore';
-
-// import GameScoreboard from 'components/Games/GameScoreboard'
-
-// const Ad = dynamic(() => import('components/Ads/Ad'), {
-//     ssr: false,
-// });
-
-// const PrivateGameModal = dynamic(
-//     () => import('app/(site)/community/games/four-frogs/components/PrivateGameModal'),
-//     { ssr: false }
-// )
-
-const assets_src = 'games/Cannon/'
 
 const game_key = 'catching-game'
 const game_name = 'Catching Game'
 const game_port = 3030
 
-// import {
-//     Ad,
-//     GameScoreboard, 
-//     // ReturnToLauncherButton,
-// } from '@articles-media/articles-dev-box';
-
-import GameScoreboard from '@articles-media/articles-dev-box/GameScoreboard';
-import Ad from '@articles-media/articles-dev-box/Ad';
+const GameScoreboard = dynamic(() =>
+    import('@articles-media/articles-dev-box/GameScoreboard'),
+    { ssr: false }
+);
+const Ad = dynamic(() =>
+    import('@articles-media/articles-dev-box/Ad'),
+    { ssr: false }
+);
 
 import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
 import useUserToken from '@articles-media/articles-dev-box/useUserToken';
@@ -78,25 +57,14 @@ export default function LobbyPage() {
         socket: state.socket,
     }));
 
-    // const userReduxState = useSelector((state) => state.auth.user_details)
-    const userReduxState = false
-
     const darkMode = useStore((state) => state.darkMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
-
-    // const friendsModal = useStore((state) => state.friendsModal)
-    // const setFriendsModal = useStore((state) => state.setFriendsModal)
 
     const nickname = useStore((state) => state.nickname)
     const setNickname = useStore((state) => state.setNickname)
     const nicknameKeyboard = useStore((state) => state.nicknameKeyboard)
     const randomNickname = useStore((state) => state.randomNickname)
     const _hasHydrated = useStore((state) => state._hasHydrated)
-    // const [nickname, setNickname] = useLocalStorageNew("game:nickname", userReduxState.display_name)
-
-    // const [showInfoModal, setShowInfoModal] = useState(false)
-    // const [showSettingsModal, setShowSettingsModal] = useState(false)
-    // const [showPrivateGameModal, setShowPrivateGameModal] = useState(false)
 
     const setShowInfoModal = useStore((state) => state.setShowInfoModal)
     const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
@@ -110,28 +78,6 @@ export default function LobbyPage() {
 
     useEffect(() => {
 
-        // setShowInfoModal(localStorage.getItem('game:four-frogs:rulesAnControls') === 'true' ? true : false)
-
-        // if (userReduxState._id) {
-        //     console.log("Is user")
-        // }
-
-        // socket.on('game:death-race-landing-details', function (msg) {
-        //     console.log('game:death-race-landing-details', msg)
-
-        //     if (JSON.stringify(msg) !== JSON.stringify(lobbyDetails)) {
-        //         setLobbyDetails(msg)
-        //     }
-        // });
-
-        // return () => {
-        //     socket.off('game:death-race-landing-details');
-        // };
-
-    }, [])
-
-    useEffect(() => {
-
         if (socket.connected) {
             socket.emit('join-room', `game:${game_key}-landing`);
         }
@@ -141,14 +87,6 @@ export default function LobbyPage() {
         };
 
     }, [socket.connected]);
-
-    useEffect(() => {
-
-        // console.log(
-        //     helloWorld()
-        // );
-
-    }, [])
 
     const {
         data: userToken,
@@ -234,13 +172,6 @@ export default function LobbyPage() {
                 />
             </Suspense>
 
-            {/* {showPrivateGameModal &&
-                <PrivateGameModal
-                    show={showPrivateGameModal}
-                    setShow={setShowPrivateGameModal}
-                />
-            } */}
-
             <div className='background-wrap'>
                 {darkMode ?
                     <Image
@@ -281,26 +212,12 @@ export default function LobbyPage() {
                         className="card card-articles card-sm mb-4"
                     >
 
-                        {/* <div style={{ position: 'relative', height: '200px' }}>
-                            <Image
-                                src={Logo}
-                                alt=""
-                                fill
-                                style={{ objectFit: 'cover' }}
-                            />
-                        </div> */}
-
                         <div className='card-header d-flex align-items-center'>
 
                             <div className="flex-grow-1">
 
                                 <div className="form-group articles mb-0">
                                     <label htmlFor="nickname">Nickname</label>
-                                    {/* <SingleInput
-                                        value={nickname}
-                                        setValue={setNickname}
-                                        noMargin
-                                    /> */}
                                     <div className="d-flex align-items-center">
                                         <input
                                             type="text"
@@ -490,28 +407,6 @@ export default function LobbyPage() {
                                 Credits
                             </ArticlesButton>
 
-                            {/* {userDetails ?
-                                <div className='w-100 mt-3 d-flex justify-content-center'>
-                                    <ArticlesButton
-                                        // ref={el => elementsRef.current[5] = el}
-                                        className={`w-50`}
-                                        active={
-                                            friendsModal
-                                        }
-                                        small
-                                        onClick={() => {
-                                            // setShowCreditsModal(true)
-                                            setFriendsModal(true);
-                                        }}
-                                    >
-                                        <i className="fad fa-user-friends"></i>
-                                        My Friends
-                                    </ArticlesButton>
-                                </div>
-                                :
-                                ''
-                            } */}
-
                         </div>
 
                     </div>
@@ -522,24 +417,6 @@ export default function LobbyPage() {
                     />
 
                     <ReturnToLauncherButton />
-
-                    {/* {launcher_mode &&
-                        <ArticlesButton
-                            ref={el => elementsRef.current[6] = el}
-                            className={`w-100`}
-                            small
-                            style={{
-                                zIndex: 10,
-                                position: "relative",
-                            }}
-                            onClick={() => {
-                                window.history.back()
-                            }}
-                        >
-                            <i className="fad fa-gamepad"></i>
-                            Return to Games
-                        </ArticlesButton>
-                    } */}
 
                 </div>
 

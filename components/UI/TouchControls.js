@@ -4,6 +4,7 @@ import nipplejs from 'nipplejs';
 import ArticlesButton from "@/components/UI/Button";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useStore } from "@/hooks/useStore";
+import useTouchControlsStore from "@/hooks/useTouchControlsStore";
 
 const arePropsEqual = (prevProps, nextProps) => {
     return JSON.stringify(prevProps) === JSON.stringify(nextProps);
@@ -31,7 +32,9 @@ function JumpButtonBase() {
 
 const JumpButton = memo(JumpButtonBase);
 
-function TouchControlsBase({  }) {
+function TouchControlsBase({ }) {
+
+    const touchControlsEnabled = useTouchControlsStore((state) => state.enabled);
 
     const setTouchControls = useStore((state) => state.setTouchControls);
     const managerRef = useRef(null);
@@ -58,7 +61,7 @@ function TouchControlsBase({  }) {
             if (data.direction) {
                 const angle = data.angle.degree;
                 // nipplejs angles: right=0, up=90, left=180, down=270
-                
+
                 let up = false;
                 let down = false;
                 let left = false;
@@ -75,7 +78,7 @@ function TouchControlsBase({  }) {
                 if (angle >= 300 || angle <= 60) right = true;
 
                 const currentControls = useStore.getState().touchControls;
-                
+
                 // Only update if changed
                 if (currentControls.up !== up || currentControls.down !== down || currentControls.left !== left || currentControls.right !== right) {
                     setTouchControls({
@@ -87,20 +90,20 @@ function TouchControlsBase({  }) {
         });
 
         manager.on('end', () => {
-             const currentControls = useStore.getState().touchControls;
-             setTouchControls({
-                 ...currentControls,
-                 up: false, down: false, left: false, right: false
-             });
+            const currentControls = useStore.getState().touchControls;
+            setTouchControls({
+                ...currentControls,
+                up: false, down: false, left: false, right: false
+            });
         });
 
         return () => {
             if (managerRef.current) managerRef.current.destroy();
         };
 
-    }, []);
+    }, [touchControlsEnabled]);
 
-    const touchControlsEnabled = useStore((state) => state.touchControlsEnabled);
+    if (!touchControlsEnabled) return null;
 
     return (
         <div className={`touch-controls-area ${!touchControlsEnabled ? 'd-none' : ''}`} style={{
@@ -112,19 +115,19 @@ function TouchControlsBase({  }) {
             // pointerEvents: 'none', // Allow clicking through empty areas
             // zIndex: 100
         }}>
-             
-             {/* Joystick Container - Pointer events enabled here */}
-             <div style={{
-                position: 'absolute', 
-                bottom: '0px', 
-                left: '0px', 
+
+            {/* Joystick Container - Pointer events enabled here */}
+            <div style={{
+                position: 'absolute',
+                bottom: '0px',
+                left: '0px',
                 width: '100%',
                 height: '100%',
                 pointerEvents: 'auto',
                 touchAction: 'none' // Prevent scrolling
             }} id="zone_joystick">
             </div>
-            
+
             {/* Jump Button Container */}
             {/* <div style={{
                 position: 'absolute', 

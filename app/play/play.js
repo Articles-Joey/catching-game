@@ -56,41 +56,18 @@ export default function GamePage() {
         const player = players?.find(p => p.id === socket.id)
         return player ? player.score : 0;
     }, [players, socket.id])
-    const health = useMemo(() => {
-        const player = players?.find(p => p.id === socket.id)
-        return player ? player.health : 0;
-    }, [players, socket.id])
+    // const health = useMemo(() => {
+    //     const player = players?.find(p => p.id === socket.id)
+    //     return player ? player.health : 0;
+    // }, [players, socket.id])
 
-    // const timer = useGameStore((state) => state.timer)
     const setScore = useGameStore((state) => state.setScore)
     const setHealth = useGameStore((state) => state.setHealth)
-    const timer = useGameStore((state) => state.timer)
     const setTimer = useGameStore((state) => state.setTimer)
 
-    const router = useRouter()
-    const pathname = usePathname()
     const searchParams = useSearchParams()
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
-
-    // const { controllerState, setControllerState } = useControllerStore()
-    // const [showControllerState, setShowControllerState] = useState(false)
-
-    // const [ cameraMode, setCameraMode ] = useState('Player')
-
-    // const [players, setPlayers] = useState([])
-
-    const showMenu = useStore((state) => state.showMenu)
-    const setShowMenu = useStore((state) => state.setShowMenu)
-    // const [showMenu, setShowMenu] = useState(false)
-
-    // useEffect(() => {
-
-    //     if (sidebar == true) {
-    //         setShowMenu(false)
-    //     }
-
-    // }, [sidebar])
 
     useEffect(() => {
 
@@ -111,7 +88,6 @@ export default function GamePage() {
     }, [server, socket.connected, nickname]);
 
     const sceneKey = useStore((state) => state.sceneKey)
-    const setSceneKey = useStore((state) => state.setSceneKey)
 
     useEffect(() => {
         setHealth(5);
@@ -120,19 +96,6 @@ export default function GamePage() {
     }, [sceneKey])
 
     const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
-
-    let panelProps = {
-        // server,
-        // players,
-        // touchControlsEnabled,
-        // setTouchControlsEnabled,
-        // reloadScene,
-        // controllerState,
-        // isFullscreen,
-        // requestFullscreen,
-        // exitFullscreen,
-        // setShowMenu
-    }
 
     const game_name = 'Catching Game'
     const game_key = 'catching-game'
@@ -207,74 +170,16 @@ export default function GamePage() {
             <GameMenu
                 useStore={useStore}
                 LeftPanelContent={LeftPanelContent}
-                // menuBarStyle={"Bar"}
-                menuBarStyle={"Corner Button"}
-                // TODO add positioning for corner button style
-                // menuBarConfig={{
-                //     style: "Corner Button",
-                //     menuButtonPosition: ""
-                // }}
-                sidebarStyle={"Static Panel"}
-            // sidebarStyle={"Floating Panel"}
+                menuBarConfig={{
+                    style: "Corner Button",
+                    menuBarButtonPosition: "Left"
+                }}
+                sidebarConfig={{
+                    style: "Static Panel",
+                }}
             />
 
-            {/* <div className="menu-bar card card-articles ">
-
-                <div className="d-flex justify-content-center align-items-center h-100 w-100">
-                    <ArticlesButton
-                        small
-                        className="w-100 h-100"
-                        active={showMenu}
-                        onClick={() => {
-                            setShowMenu(!showMenu)
-                        }}
-                    >
-                        <i className="fad fa-bars"></i>
-                    </ArticlesButton>
-                </div>
-
-            </div> */}
-
-            {/* <div 
-                className={`mobile-menu ${showMenu && 'show'}`}
-                onClick={() => setShowMenu(false)}
-            >
-                <div
-                    style={{
-                        maxWidth: '300px'
-                    }}
-                    className='mobile-menu-container'
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <LeftPanelContent
-                        {...panelProps}
-                    />
-                </div>
-            </div> */}
-
-            <TouchControls
-            // touchControlsEnabled={touchControlsEnabled}
-            />
-
-            {/* <div className='panel-left'>
-
-                <div className='card rounded-0'>
-                    <LeftPanelContent
-                        {...panelProps}
-                    />
-                </div>
-
-            </div> */}
-
-            {/* <div className='game-info'>
-                <div className="card card-articles card-sm">
-                    <div className="card-body">
-                        <pre> 
-                            {JSON.stringify(playerData, undefined, 2)}
-                        </pre>
-                    </div>
-                </div>
-            </div> */}
+            <TouchControls />
 
             <div className='canvas-wrap'>
 
