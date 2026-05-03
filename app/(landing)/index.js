@@ -27,6 +27,9 @@ const Ad = dynamic(() =>
 import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
 import useUserToken from '@articles-media/articles-dev-box/useUserToken';
 
+import NicknameInput from '@articles-media/articles-dev-box/NicknameInput';
+import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
+
 import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
 
 const ReturnToLauncherButton = dynamic(() =>
@@ -214,38 +217,10 @@ export default function LobbyPage() {
 
                         <div className='card-header d-flex align-items-center'>
 
-                            <div className="flex-grow-1">
+                            <NicknameInput 
+                                useStore={useStore}
+                            />
 
-                                <div className="form-group articles mb-0">
-                                    <label htmlFor="nickname">Nickname</label>
-                                    <div className="d-flex align-items-center">
-                                        <input
-                                            type="text"
-                                            value={_hasHydrated ? nickname : ''}
-                                            disabled={!_hasHydrated}
-                                            id="nickname"
-                                            name="nickname"
-                                            placeholder="Enter your nickname"
-                                            onChange={(e) => {
-                                                setNickname(e.target.value)
-                                            }}
-                                            className={`form-control form-control-sm`}
-                                        />
-                                        <ArticlesButton
-                                            small
-                                            className=""
-                                            onClick={() => {
-                                                randomNickname()
-                                            }}
-                                        >
-                                            <i className="fad fa-random"></i>
-                                        </ArticlesButton>
-                                    </div>
-                                </div>
-
-                                <div className='mt-1' style={{ fontSize: '0.8rem' }}>Visible to all players</div>
-
-                            </div>
                         </div>
 
                         <div className="card-body">
@@ -340,72 +315,10 @@ export default function LobbyPage() {
 
                         <div className="card-footer d-flex flex-wrap justify-content-center">
 
-                            <div className='w-50 d-flex'>
-                                <ArticlesButton
-                                    ref={el => elementsRef.current[2] = el}
-                                    className={`w-100`}
-                                    small
-                                    onClick={() => {
-                                        setShowSettingsModal(true)
-                                    }}
-                                >
-                                    <i className="fad fa-cog"></i>
-                                    Settings
-                                </ArticlesButton>
-                                <ArticlesButton
-                                    // ref={el => elementsRef.current[2] = el}
-                                    className={``}
-                                    small
-                                    onClick={() => {
-                                        toggleDarkMode()
-                                    }}
-                                >
-                                    {darkMode ? <i className="fad fa-sun"></i> : <i className="fad fa-moon"></i>}
-                                </ArticlesButton>
-                            </div>
-
-                            <ArticlesButton
-                                ref={el => elementsRef.current[3] = el}
-                                className={`w-50`}
-                                small
-                                onClick={() => {
-                                    setShowInfoModal(true)
-                                }}
-                            >
-                                <i className="fad fa-info-square"></i>
-                                Info
-                            </ArticlesButton>
-
-                            <a
-                                href={'https://github.com/Articles-Joey/catching-game'}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='w-50'
-                            >
-                                <ArticlesButton
-                                    ref={el => elementsRef.current[4] = el}
-                                    className={`w-100`}
-                                    small
-                                    onClick={() => {
-
-                                    }}
-                                >
-                                    <i className="fab fa-github"></i>
-                                    Github
-                                </ArticlesButton>
-                            </a>
-
-                            <ArticlesButton
-                                ref={el => elementsRef.current[5] = el}
-                                className={`w-50`}
-                                small
-                                onClick={() => {
-                                    setShowCreditsModal(true)
-                                }}
-                            >
-                                <i className="fad fa-users"></i>
-                                Credits
-                            </ArticlesButton>
+                            <GameMenuPrimaryButtonGroup 
+                                useStore={useStore}
+                                type="Landing"
+                            />
 
                         </div>
 

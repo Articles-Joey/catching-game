@@ -14,47 +14,13 @@ import DebugCard from "./DebugCard";
 import useFullscreen from '@articles-media/articles-dev-box/useFullscreen';
 import GameDetailsPanel from "./GameDetailsPanel";
 
-function LeftPanelContent(props) {
+import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
 
-    const {
-        // isFullscreen,
-        // requestFullscreen,
-        // exitFullscreen,
-        // reloadScene
-    } = props;
+function LeftPanelContent(props) {
 
     const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
 
     const reloadScene = useStore((state) => state.reloadScene)
-
-    // const {
-    //     socket,
-    // } = useSocketStore(state => ({
-    //     socket: state.socket,
-    // }));
-
-    // const {
-    //     score,
-    //     playerLocation,
-    //     debug,
-    //     setDebug
-    // } = useGameStore(state => ({
-    //     score: state.score,
-    //     playerLocation: state.playerLocation,
-    //     debug: state.debug,
-    //     setDebug: state.setDebug
-    // }));
-
-    const debug = useStore((state) => state.debug);
-    const setDebug = useStore((state) => state.setDebug)
-
-    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
-
-    const darkMode = useStore((state) => state.darkMode)
-    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
-
-    const sidebar = useStore((state) => state.sidebar)
-    const setSidebar = useStore((state) => state.setSidebar)
 
     return (
         <div className='w-100'>
@@ -63,72 +29,10 @@ function LeftPanelContent(props) {
 
                 <div className="card-body d-flex flex-wrap">
 
-                    <Link
-                        href={'/'}
-                        className="w-50"
-                    >
-                        <ArticlesButton
-                            className='w-100'
-                            small
-                        >
-                            <i className="fad fa-arrow-alt-square-left"></i>
-                            <span>Leave Game</span>
-                        </ArticlesButton>
-                    </Link>
-
-                    <ArticlesButton
-                        small
-                        className="w-50"
-                        active={isFullscreen}
-                        onClick={() => {
-                            if (isFullscreen) {
-                                exitFullscreen()
-                            } else {
-                                requestFullscreen()
-                            }
-                        }}
-                    >
-                        {isFullscreen && <span>Exit </span>}
-                        {!isFullscreen && <span><i className='fad fa-expand'></i></span>}
-                        <span>Fullscreen</span>
-                    </ArticlesButton>
-
-                    <div className='w-50 d-flex'>
-                        <ArticlesButton
-                            // ref={el => elementsRef.current[2] = el}
-                            className={`w-100`}
-                            small
-                            onClick={() => {
-                                setShowSettingsModal(true)
-                            }}
-                        >
-                            <i className="fad fa-cog"></i>
-                            Settings
-                        </ArticlesButton>
-                        <ArticlesButton
-                            // ref={el => elementsRef.current[2] = el}
-                            className={``}
-                            small
-                            onClick={() => {
-                                toggleDarkMode()
-                            }}
-                        >
-                            {darkMode ? <i className="fad fa-sun"></i> : <i className="fad fa-moon"></i>}
-                        </ArticlesButton>
-                    </div>
-
-                    <ArticlesButton
-                        // ref={el => elementsRef.current[2] = el}
-                        className={`w-50`}
-                        small
-                        active={sidebar}
-                        onClick={() => {
-                            setSidebar(!sidebar)
-                        }}
-                    >
-                        <i className="fad fa-cog"></i>
-                        Sidebar
-                    </ArticlesButton>
+                    <GameMenuPrimaryButtonGroup 
+                        useStore={useStore}
+                        type="GameMenu"
+                    />
 
                 </div>
 

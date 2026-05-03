@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 import typicalZustandStoreExcludes from '@articles-media/articles-dev-box/typicalZustandStoreExcludes';
 import typicalZustandStoreStateSlice from '@articles-media/articles-dev-box/typicalZustandStoreStateSlice';
+
 import generateRandomNickname from '@/util/generateRandomNickname';
 
 export const useStore = create()(
