@@ -11,9 +11,9 @@ import ArticlesButton from '@/components/UI/Button';
 import { useSocketStore } from '@/hooks/useSocketStore';
 import { useSearchParams } from 'next/navigation';
 
-const game_key = 'catching-game'
-const game_name = 'Catching Game'
-const game_port = 3030
+// const game_key = 'catching-game'
+// const game_name = 'Catching Game'
+// const game_port = 3030
 
 const GameScoreboard = dynamic(() =>
     import('@articles-media/articles-dev-box/GameScoreboard'),
@@ -82,11 +82,11 @@ export default function LobbyPage() {
     useEffect(() => {
 
         if (socket.connected) {
-            socket.emit('join-room', `game:${game_key}-landing`);
+            socket.emit('join-room', `game:${process.env.NEXT_PUBLIC_GAME_KEY}-landing`);
         }
 
         return function cleanup() {
-            socket.emit('leave-room', `game:${game_key}-landing`);
+            socket.emit('leave-room', `game:${process.env.NEXT_PUBLIC_GAME_KEY}-landing`);
         };
 
     }, [socket.connected]);
@@ -97,7 +97,7 @@ export default function LobbyPage() {
         isLoading: userTokenLoading,
         mutate: userTokenMutate
     } = useUserToken(
-        "3030"
+        process.env.NEXT_PUBLIC_GAME_PORT
     );
 
     const {
@@ -325,7 +325,7 @@ export default function LobbyPage() {
                     </div>
 
                     <SessionButton
-                        port={game_port}
+                        port={process.env.NEXT_PUBLIC_GAME_PORT}
                         friendsButton={true}
                     />
 
@@ -334,7 +334,7 @@ export default function LobbyPage() {
                 </div>
 
                 <GameScoreboard
-                    game={game_name}
+                    game={process.env.NEXT_PUBLIC_GAME_NAME}
                     style="Default"
                     darkMode={darkMode ? true : false}
                     prepend={
@@ -355,7 +355,7 @@ export default function LobbyPage() {
                 <Ad
                     style="Default"
                     section={"Games"}
-                    section_id={game_name}
+                    section_id={process.env.NEXT_PUBLIC_GAME_NAME}
                     darkMode={darkMode ? true : false}
                     user_ad_token={userToken}
                     userDetails={userDetails}

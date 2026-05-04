@@ -67,20 +67,15 @@ export const useStore = create()(
         }),
         {
             name: 'catching-game-store', // name of the item in the storage (must be unique)
+            version: 1,
             onRehydrateStorage: (state) => {
                 return () => state.setHasHydrated(true)
             },
-            // storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
             partialize: (state) =>
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => ![
                         ...typicalZustandStoreExcludes,
                         'friendsModal',
-                        // Exclude list of keys to not persist
-                        // 'infoModal',
-                        // 'settingsModal',
-                        // 'creditsModal',
-                        // 'showMenu'
                     ].includes(key))
                 ),
         },

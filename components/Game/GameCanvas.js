@@ -65,6 +65,9 @@ function GameCanvas(props) {
     const timer = useGameStore((state) => state.gameState.timer)
     // const timer = useGameStore((state) => state.timer)
 
+    // const controlType = useStore(state => state.controlType);
+    const showStats = useStore((state) => state?.debugConfig?.showStats);
+
     let gameContent = (
         <>
             <Player />
@@ -144,12 +147,9 @@ function GameCanvas(props) {
     return (
         <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
 
-            {process.env.NODE_ENV === 'development' &&
-                <>
-                    {/* <axesHelper args={[5]} /> */}
-                    <Stats className="stats-overlay" />
-                </>
-            }
+            {showStats && <>
+                <Stats className="stats-overlay" />
+            </>}
 
             {/* <OrbitControls /> */}
 

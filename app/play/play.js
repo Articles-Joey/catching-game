@@ -26,6 +26,7 @@ import ArticlesModal from '@/components/UI/ArticlesModal';
 import GameMenu from '@articles-media/articles-dev-box/GameMenu';
 import UiOverlay from '@/components/UI/UiOverlay';
 import Link from 'next/link';
+import classNames from 'classnames';
 
 const TouchControls = dynamic(() => import('@/components/UI/TouchControls'), {
     ssr: false,
@@ -72,7 +73,7 @@ export default function GamePage() {
     useEffect(() => {
 
         if (server && socket.connected) {
-            const roomName = `game:${game_key}-room-${server}`;
+            const roomName = `game:${NEXT_PUBLIC_GAME_KEY}-room-${server}`;
             socket.emit('join-room', roomName, {
                 game_id: server,
                 nickname: nickname,
@@ -87,6 +88,7 @@ export default function GamePage() {
 
     }, [server, socket.connected, nickname]);
 
+    const status = useGameStore(state => state.gameState.status)
     const sceneKey = useStore((state) => state.sceneKey)
 
     useEffect(() => {
@@ -95,18 +97,23 @@ export default function GamePage() {
         setTimer(60);
     }, [sceneKey])
 
-    const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
+    // const { isFullscreen, requestFullscreen, exitFullscreen } = useFullscreen();
 
-    const game_name = 'Catching Game'
-    const game_key = 'catching-game'
-
-    const status = useGameStore(state => state.gameState.status)
+    // const game_name = 'Catching Game'
+    // const game_key = 'catching-game'
 
     return (
 
         <div
-            className={`${game_key}-game-page ${isFullscreen && 'fullscreen'} ${sidebar && 'show-sidebar'}`}
-            id={`${game_key}-game-page`}
+            className={classNames(
+                `${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`,
+                {
+                    'menu-open': useStore.getState().menuOpen,
+                    'fullscreen': useFullscreen().isFullscreen,
+                    'show-sidebar': useStore.getState().sidebar,
+                }
+            )}
+            id={`${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`}
         >
 
             <Suspense>
