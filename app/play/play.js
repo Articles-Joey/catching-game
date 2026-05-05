@@ -47,6 +47,7 @@ export default function GamePage() {
     }));
 
     const sidebar = useStore((state) => state.sidebar)
+    const menuOpen = useStore((state) => state.menuOpen)
     const nickname = useStore((state) => state.nickname)
 
     // const score = useGameStore((state) => state.score)
@@ -108,9 +109,9 @@ export default function GamePage() {
             className={classNames(
                 `${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`,
                 {
-                    'menu-open': useStore.getState().menuOpen,
+                    'menu-open': menuOpen,
                     'fullscreen': useFullscreen().isFullscreen,
-                    'show-sidebar': useStore.getState().sidebar,
+                    'show-sidebar': sidebar,
                 }
             )}
             id={`${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`}

@@ -193,7 +193,7 @@ export default function LobbyPage() {
                 }
             </div>
 
-            <div className="container d-flex flex-column flex-lg-row justify-content-center align-items-center">
+            <div className="container d-flex flex-column flex-lg-row justify-content-center align-items-center py-3">
 
                 <div
                     style={{ "width": "20rem" }}

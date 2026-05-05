@@ -19,8 +19,8 @@ export const useSocketStore = create((set) => ({
             reconnectionDelay: 5000,
             reconnectionDelayMax: 10000,
             query: {
-                client: "catching-game",
-            }
+                client: process.env.NEXT_PUBLIC_GAME_KEY,
+            },
         });
         newSocket.connect();
         set({ socket: newSocket });
@@ -34,9 +34,9 @@ export const useSocketStore = create((set) => ({
     }),
     startGame: (gameId, status) => {
         set((state) => {
-            state.socket.emit(`game:${game_name_key}:start`, { 
-                game_id: gameId, 
-                status: status 
+            state.socket.emit(`game:${game_name_key}:start`, {
+                game_id: gameId,
+                status: status
             });
             return {}
         })
