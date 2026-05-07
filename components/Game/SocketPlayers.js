@@ -8,7 +8,7 @@ import { degToRad } from "three/src/math/MathUtils.js";
 export default function SocketPlayers() {
 
     const players = useGameStore(state => state.gameState.players)
-    const socket = useGameStore(state => state.socket)
+    // const socket = useGameStore(state => state.socket)
 
     const searchParams = useSearchParams()
     const { server } = Object.fromEntries(searchParams.entries())

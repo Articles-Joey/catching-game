@@ -37,13 +37,6 @@ export const useStore = create()(
                 }))
             },
 
-            // friendsModal: false,
-            // setFriendsModal: (newValue) => {
-            //     set((prev) => ({
-            //         friendsModal: newValue
-            //     }))
-            // },
-
             audioSettings: {
                 enabled: true,
                 game_volume: 50,
@@ -66,7 +59,7 @@ export const useStore = create()(
 
         }),
         {
-            name: 'catching-game-store', // name of the item in the storage (must be unique)
+            name: `${process.env.NEXT_PUBLIC_GAME_KEY}-store`,
             version: 1,
             onRehydrateStorage: (state) => {
                 return () => state.setHasHydrated(true)
@@ -75,7 +68,6 @@ export const useStore = create()(
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => ![
                         ...typicalZustandStoreExcludes,
-                        'friendsModal',
                     ].includes(key))
                 ),
         },

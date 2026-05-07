@@ -4,45 +4,45 @@ import { createWithEqualityFn as create } from 'zustand/traditional'
 
 export const useGameStore = create((set) => ({
 
-    nickname: '',
-    setNickname: (newValue) => {
-        set((prev) => ({
-            nickname: newValue
-        }))
-    },
+    // nickname: '',
+    // setNickname: (newValue) => {
+    //     set((prev) => ({
+    //         nickname: newValue
+    //     }))
+    // },
 
-    darkMode: false,
-    toggleDarkMode: () => {
-        set((prev) => ({
-            darkMode: !prev.darkMode
-        }))
-    },
-    setDarkMode: (newValue) => {
-        set((prev) => ({
-            darkMode: newValue
-        }))
-    },
+    // darkMode: false,
+    // toggleDarkMode: () => {
+    //     set((prev) => ({
+    //         darkMode: !prev.darkMode
+    //     }))
+    // },
+    // setDarkMode: (newValue) => {
+    //     set((prev) => ({
+    //         darkMode: newValue
+    //     }))
+    // },
 
-    showSettingsModal: false,
-    setShowSettingsModal: (newValue) => {
-        set((prev) => ({
-            showSettingsModal: newValue
-        }))
-    },
+    // showSettingsModal: false,
+    // setShowSettingsModal: (newValue) => {
+    //     set((prev) => ({
+    //         showSettingsModal: newValue
+    //     }))
+    // },
 
-    showInfoModal: false,
-    setShowInfoModal: (newValue) => {
-        set((prev) => ({
-            showInfoModal: newValue
-        }))
-    },
+    // showInfoModal: false,
+    // setShowInfoModal: (newValue) => {
+    //     set((prev) => ({
+    //         showInfoModal: newValue
+    //     }))
+    // },
 
-    showCreditsModal: false,
-    setShowCreditsModal: (newValue) => {
-        set((prev) => ({
-            showCreditsModal: newValue
-        }))
-    },
+    // showCreditsModal: false,
+    // setShowCreditsModal: (newValue) => {
+    //     set((prev) => ({
+    //         showCreditsModal: newValue
+    //     }))
+    // },
 
     // // Fixed or Orbit
     // cameraMode: 'Player',
@@ -73,12 +73,12 @@ export const useGameStore = create((set) => ({
         }))
     },
 
-    debug: 0,
-    setDebug: (newValue) => {
-        set((prev) => ({
-            debug: newValue
-        }))
-    },
+    // debug: 0,
+    // setDebug: (newValue) => {
+    //     set((prev) => ({
+    //         debug: newValue
+    //     }))
+    // },
 
     health: 5,
     subtractHealth: (amount) => {

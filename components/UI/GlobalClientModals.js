@@ -49,7 +49,7 @@ export default function GlobalClientModals() {
         isLoading: userTokenLoading,
         mutate: userTokenMutate
     } = useUserToken(
-        "3030"
+        process.env.NEXT_PUBLIC_GAME_PORT
     );
 
     const {
@@ -97,6 +97,7 @@ export default function GlobalClientModals() {
                                 ]
                             },
                             'Controls': {
+                                touchControls: true
                                 // defaultKeyBindings: {
                                 //     // moveUp: "W",
                                 //     // moveDown: "S",
@@ -119,8 +120,6 @@ export default function GlobalClientModals() {
                 <CreditsModal
                     show={showCreditsModal}
                     setShow={setShowCreditsModal}
-                    owner="Articles-Joey"
-                    repo="catching-game"
                 />
             }
 

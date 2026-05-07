@@ -1,22 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
-import Image from "next/image";
-import dynamic from 'next/dynamic'
-
-// import { useSelector } from 'react-redux'
-
 import { Modal } from "react-bootstrap"
 
-// import ViewUserModal from "@/components/UI/ViewUserModal"
-
-// import BasicLoading from "@/components/loading/BasicLoading";
-
-// import powerups from "app/(site)/community/games/four-frogs/components/powerups";
-
-// import games from "../constants/games";
-const games = []
-
-// import IsDev from "@/components/UI/IsDev";
 import ArticlesButton from "./Button";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
 

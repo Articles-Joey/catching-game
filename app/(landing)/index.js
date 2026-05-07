@@ -11,10 +11,16 @@ import ArticlesButton from '@/components/UI/Button';
 import { useSocketStore } from '@/hooks/useSocketStore';
 import { useSearchParams } from 'next/navigation';
 
-// const game_key = 'catching-game'
-// const game_name = 'Catching Game'
-// const game_port = 3030
-
+import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
+import useUserToken from '@articles-media/articles-dev-box/useUserToken';
+import NicknameInput from '@articles-media/articles-dev-box/NicknameInput';
+import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
+import SessionButton from '@articles-media/articles-dev-box/SessionButton';
+import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
+const ReturnToLauncherButton = dynamic(() =>
+    import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
+    { ssr: false }
+);
 const GameScoreboard = dynamic(() =>
     import('@articles-media/articles-dev-box/GameScoreboard'),
     { ssr: false }
@@ -23,21 +29,6 @@ const Ad = dynamic(() =>
     import('@articles-media/articles-dev-box/Ad'),
     { ssr: false }
 );
-
-import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
-import useUserToken from '@articles-media/articles-dev-box/useUserToken';
-
-import NicknameInput from '@articles-media/articles-dev-box/NicknameInput';
-import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
-
-import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
-
-const ReturnToLauncherButton = dynamic(() =>
-    import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
-    { ssr: false }
-);
-
-import SessionButton from '@articles-media/articles-dev-box/SessionButton';
 
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
