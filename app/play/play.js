@@ -119,7 +119,7 @@ export default function GamePage() {
 
             <Suspense>
 
-                {/* <AudioHandler /> */}
+                <AudioHandler />
 
                 {status == "Game Over" ?
                     <ArticlesModal

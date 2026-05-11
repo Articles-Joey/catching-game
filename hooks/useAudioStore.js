@@ -27,7 +27,7 @@ export const useAudioStore = create()(
     }),
     {
       name: 'audio-store', // name of the item in the storage (must be unique)
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state) => {
         state.setHasHydrated(true)
       },

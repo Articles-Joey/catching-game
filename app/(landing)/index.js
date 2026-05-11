@@ -102,7 +102,7 @@ export default function LobbyPage() {
 
     return (
 
-        <div className="catching-game-landing-page">
+        <div className="landing-page">
 
             <Suspense>
                 <GamepadKeyboard

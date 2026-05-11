@@ -183,17 +183,17 @@ function Player(props) {
 
         const isMoving = moveLeft || moveRight || moveBackward || moveForward ||
             controllerInput.left || controllerInput.right || controllerInput.backward || controllerInput.forward ||
-            touchControls.left || touchControls.right || touchControls.down || touchControls.up;
+            touchControls?.left || touchControls?.right || touchControls?.down || touchControls?.up;
 
         if (isMoving) {
             setAction("Walk");
         }
 
         // Combine inputs
-        const fwd = moveForward || controllerInput.forward || touchControls.up;
-        const bwd = moveBackward || controllerInput.backward || touchControls.down;
-        const lft = moveLeft || controllerInput.left || touchControls.left;
-        const rgt = moveRight || controllerInput.right || touchControls.right;
+        const fwd = moveForward || controllerInput.forward || touchControls?.up;
+        const bwd = moveBackward || controllerInput.backward || touchControls?.down;
+        const lft = moveLeft || controllerInput.left || touchControls?.left;
+        const rgt = moveRight || controllerInput.right || touchControls?.right;
 
         if (fwd && rgt) {
             setLastMove(135); // Forward + Right
@@ -380,11 +380,11 @@ function Player(props) {
         const frontVector = new Vector3(
             0,
             0,
-            (moveForward || touchControls.up || controllerInput.forward ? -1 : 0) - (moveBackward || touchControls.down || controllerInput.backward ? -1 : 0),
+            (moveForward || touchControls?.up || controllerInput.forward ? -1 : 0) - (moveBackward || touchControls?.down || controllerInput.backward ? -1 : 0),
         )
 
         const sideVector = new Vector3(
-            (moveLeft || touchControls.left || controllerInput.left ? 1 : 0) - (moveRight || touchControls.right || controllerInput.right ? 1 : 0),
+            (moveLeft || touchControls?.left || controllerInput.left ? 1 : 0) - (moveRight || touchControls?.right || controllerInput.right ? 1 : 0),
             0,
             0,
         )
@@ -429,18 +429,18 @@ function Player(props) {
             )
         }
 
-        if ((jump || touchControls.jump || controllerInput.jump) && Math.abs(vel.current[1]) < 0.05) {
+        if ((jump || touchControls?.jump || controllerInput.jump) && Math.abs(vel.current[1]) < 0.05) {
 
             console.log("Jump understood")
 
             api.velocity.set(vel.current[0], JUMP_FORCE, vel.current[2])
 
             if (
-                touchControls.jump
+                touchControls?.jump
                 // ||
-                // touchControls.left
+                // touchControls?.left
                 // ||
-                // touchControls.right
+                // touchControls?.right
             ) {
                 setTouchControls({
                     ...touchControls,

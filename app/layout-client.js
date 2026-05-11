@@ -64,6 +64,12 @@ export default function LayoutClient({ children }) {
                             },
                             'Other': {
                                 toontownMode: true,
+                            },
+                            'Debug': {
+                                showStats: true,
+                                children: <>
+
+                                </>,
                             }
                         },
                         reset: () => {

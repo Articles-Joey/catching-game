@@ -1,53 +1,20 @@
-// import { create } from 'zustand'
-import { createWithEqualityFn as create } from 'zustand/traditional'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 import typicalZustandStoreExcludes from '@articles-media/articles-dev-box/typicalZustandStoreExcludes';
 import typicalZustandStoreStateSlice from '@articles-media/articles-dev-box/typicalZustandStoreStateSlice';
 
-import generateRandomNickname from '@/util/generateRandomNickname';
+import randomNicknameConfig from '@/util/randomNicknameConfig';
 
 export const useStore = create()(
     persist(
         (set, get) => ({
 
-            ...typicalZustandStoreStateSlice(set, get, generateRandomNickname),
-
-            touchControls: {
-                jump: false,
-                left: false,
-                right: false,
-                up: false,
-                down: false,
-            },
-            setTouchControls: (newValue) => {
-                set((prev) => ({
-                    touchControls: newValue
-                }))
-            },
-            touchControlsEnabled: false,
-            toggleTouchControlsEnabled: () => {
-                set((prev) => ({
-                    touchControlsEnabled: !prev.touchControlsEnabled
-                }))
-            },
-            setTouchControlsEnabled: (newValue) => {
-                set((prev) => ({
-                    touchControlsEnabled: newValue
-                }))
-            },
-
-            audioSettings: {
-                enabled: true,
-                game_volume: 50,
-                music_volume: 50,
-                sfx_volume: 50
-            },
-            setAudioSettings: (newValue) => {
-                set((prev) => ({
-                    audioSettings: newValue
-                }))
-            },
+            ...typicalZustandStoreStateSlice(
+                set,
+                get,
+                randomNicknameConfig,
+            ),
 
             // Fixed or Orbit
             cameraMode: 'Fixed',
@@ -59,8 +26,8 @@ export const useStore = create()(
 
         }),
         {
-            name: `${process.env.NEXT_PUBLIC_GAME_KEY}-store`,
-            version: 1,
+            name: `${process.env.NEXT_PUBLIC_GAME_KEY}-site-storage`,
+            version: 2,
             onRehydrateStorage: (state) => {
                 return () => state.setHasHydrated(true)
             },

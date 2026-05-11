@@ -16,7 +16,6 @@ export default function AudioHandler() {
         if (typeof window === 'undefined') return;
 
         const music = new Audio(`/audio/Maze Game, Catching Game, Ring Game, and Toon Tag.mp3`);
-        music.volume = audioSettings?.enabled ? (audioSettings?.game_volume / 100) : 0;
         musicRef.current = music;
 
         music.onended = function () {
@@ -27,29 +26,36 @@ export default function AudioHandler() {
         const tryPlay = () => {
             if (!interactedRef.current && audioSettings?.enabled) {
                 interactedRef.current = true;
-                music.currentTime = 0;
                 music.play();
             }
         };
+
+        const events = ['click', 'keydown', 'touchstart', 'pointerdown'];
+        events.forEach((e) => document.addEventListener(e, tryPlay, { once: true }));
+
+        return () => {
+            events.forEach((e) => document.removeEventListener(e, tryPlay));
+            music.pause();
+            musicRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!musicRef.current) return;
+
+        const music = musicRef.current;
+        const volume = audioSettings?.enabled ? (audioSettings?.music_volume / 100) : 0;
+        music.volume = volume;
 
         if (audioSettings?.enabled) {
             if (interactedRef.current) {
-                music.currentTime = 0;
-                music.play();
-            } else {
-                const events = ['click', 'keydown', 'touchstart', 'pointerdown'];
-                events.forEach((e) => document.addEventListener(e, tryPlay, { once: true }));
-
-                return () => {
-                    events.forEach((e) => document.removeEventListener(e, tryPlay));
-                    music.pause();
-                };
+                music.play().catch(() => {
+                    // Handle autoplay restriction if necessary
+                });
             }
-        }
-
-        return () => {
+        } else {
             music.pause();
-        };
+        }
     }, [audioSettings]);
 
     return null;
