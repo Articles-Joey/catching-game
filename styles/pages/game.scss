@@ -4,24 +4,6 @@
     position: relative;
     display: flex;
 
-    &.fullscreen {
-        .mobile-menu {
-            top: 0px;
-        }
-    }
-
-    // &.show-sidebar {
-    //     .panel-left {
-    //         display: flex;
-    //     }
-
-    //     .menu-bar {
-    //         @include media-breakpoint-up(lg) {
-    //             display: none;
-    //         }
-    //     }
-    // }
-
     .background {
         position: fixed;
         top: 0;

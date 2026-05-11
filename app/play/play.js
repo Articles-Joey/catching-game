@@ -47,7 +47,7 @@ export default function GamePage() {
     }));
 
     const sidebar = useStore((state) => state.sidebar)
-    const menuOpen = useStore((state) => state.menuOpen)
+    const showMenu = useStore((state) => state.showMenu)
     const nickname = useStore((state) => state.nickname)
 
     // const score = useGameStore((state) => state.score)
@@ -74,7 +74,7 @@ export default function GamePage() {
     useEffect(() => {
 
         if (server && socket.connected) {
-            const roomName = `game:${NEXT_PUBLIC_GAME_KEY}-room-${server}`;
+            const roomName = `game:${process.env.NEXT_PUBLIC_GAME_KEY}-room-${server}`;
             socket.emit('join-room', roomName, {
                 game_id: server,
                 nickname: nickname,
@@ -109,7 +109,7 @@ export default function GamePage() {
             className={classNames(
                 `${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`,
                 {
-                    'menu-open': menuOpen,
+                    'menu-open': showMenu,
                     'fullscreen': useFullscreen().isFullscreen,
                     'show-sidebar': sidebar,
                 }

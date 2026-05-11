@@ -16,7 +16,7 @@ import "@articles-media/articles-gamepad-helper/dist/articles-gamepad-helper.css
 
 // import SocketLogicHandler from "@/components/SocketLogicHandler";
 import { Suspense } from 'react';
-import GlobalClientModals from '@/components/UI/GlobalClientModals';
+// import GlobalClientModals from '@/components/UI/GlobalClientModals';
 // import DarkModeHandler from '@/components/UI/DarkModeHandler';
 import LayoutClient from './layout-client';
 import SocketLogicHandler from '@/components/SocketLogicHandler';
@@ -57,9 +57,9 @@ export default function RootLayout({ children }) {
         <LayoutClient />
         <SocketLogicHandler />
 
-        <Suspense>
+        {/* <Suspense>
           <GlobalClientModals />
-        </Suspense>
+        </Suspense> */}
 
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>

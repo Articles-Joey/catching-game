@@ -329,17 +329,19 @@ export default function LobbyPage() {
                     style="Default"
                     darkMode={darkMode ? true : false}
                     prepend={
-                        <div
-                            style={{
-                                width: '100%',
-                                height: '200px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <RotatingMascot />
-                        </div>
+                        <>
+                            <div
+                                style={{
+                                    width: '100%',
+                                    height: '200px',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <RotatingMascot />
+                            </div>
+                        </>
                     }
                 />
 
