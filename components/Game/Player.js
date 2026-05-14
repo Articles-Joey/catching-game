@@ -20,6 +20,7 @@ import { useStore } from "@/hooks/useStore"
 import { useAudioStore } from "@/hooks/useAudioStore"
 import { useSocketStore } from "@/hooks/useSocketStore"
 import { useSearchParams } from "next/navigation"
+import useTouchControlsStore from "@/hooks/useTouchControlsStore"
 
 const JUMP_FORCE = 0;
 const SPEED = 12;
@@ -68,8 +69,8 @@ function Player(props) {
     const debug = useStore((state) => state.debug);
     const subtractHealth = useGameStore((state) => state.subtractHealth)
 
-    const touchControls = useStore((state) => state.touchControls)
-    const setTouchControls = useStore((state) => state.setTouchControls)
+    const touchControls = useTouchControlsStore((state) => state.touchControls)
+    const setTouchControls = useTouchControlsStore((state) => state.setTouchControls)
     const targetLocation = useGameStore((state) => state.targetLocation)
     const setTargetLocation = useGameStore((state) => state.setTargetLocation)
 
@@ -187,6 +188,8 @@ function Player(props) {
 
         if (isMoving) {
             setAction("Walk");
+        } else {
+            setAction("Idle");
         }
 
         // Combine inputs
@@ -211,10 +214,6 @@ function Player(props) {
             setLastMove(180); // Forward
         } else if (bwd) {
             setLastMove(0); // Backward
-        }
-
-        if (!isMoving) {
-            setAction("Idle");
         }
 
     }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput, isDead, touchControls])
@@ -350,7 +349,7 @@ function Player(props) {
             setPlayerLocation(newLocation)
 
             if (socket) {
-                socket.emit('game:catching-game:move', {
+                socket.emit(`game:${process.env.NEXT_PUBLIC_GAME_KEY}:move`, {
                     server: server,
                     x: newLocation.x,
                     // y: newLocation.y,

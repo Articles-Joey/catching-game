@@ -11,7 +11,7 @@ export const useSocketStore = create((set) => ({
     }),
     serverUrl: process.env.NEXT_PUBLIC_NODE_SERVER, // Default server URL
     connectSocket: (url) => {
-        console.log("[📶Socket] connectSocket called")
+        // console.log("[📶Socket] connectSocket called")
         const newSocket = io(url || process.env.NEXT_PUBLIC_NODE_SERVER, {
             transports: ["websocket"],
             autoConnect: false,
@@ -45,4 +45,16 @@ export const useSocketStore = create((set) => ({
     setTotalUsers: (total) => set({ totalUsers: total }),
     connected: false,
     setConnected: (total) => set({ connected: total }),
+    authenticated: false,
+    setAuthenticated: (value) => set({ authenticated: value }),
+    loginSocket: (data) => {
+        set((state) => {
+            const socket = state.socket;
+            socket.emit('login-socket', {
+                ...data,
+                game_name: process.env.NEXT_PUBLIC_GAME_NAME,
+            });
+            return {}
+        })
+    },
 }));

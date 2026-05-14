@@ -55,11 +55,11 @@ export default function RootLayout({ children }) {
       >
 
         <LayoutClient />
-        <SocketLogicHandler />
 
-        {/* <Suspense>
-          <GlobalClientModals />
-        </Suspense> */}
+        <Suspense>
+          {/* Needs suspense because of useSearchParams */}
+          <SocketLogicHandler />
+        </Suspense>
 
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>

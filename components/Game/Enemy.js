@@ -9,10 +9,12 @@ import { degToRad } from "three/src/math/MathUtils";
 import { useGameStore } from "@/hooks/useGameStore";
 import generateRandomInteger from "@/util/generateRandomInteger";
 import { useStore } from "@/hooks/useStore";
+import { ModelCogFixed } from "../Models/CogFixed";
 
 function EnemyBase({ args, position, rotation }) {
 
     const debug = useStore((state) => state.debug);
+    const toontownMode = useStore((state) => state.toontownMode);
 
     const [ref, api] = useSphere(() => ({
         mass: 0,
@@ -81,12 +83,22 @@ function EnemyBase({ args, position, rotation }) {
 
     return (
         <group ref={ref}>
-            <ModelKingMen
-                scale={2}
-                action={"Walk"}
-                rotation={[0, degToRad(90), 0]}
-                position={[0, -0.5, 0]}
-            />
+
+            {toontownMode ?
+                <ModelCogFixed
+                    scale={1}
+                    action={"suitC|walk"}
+                    rotation={[0, degToRad(90), 0]}
+                    position={[0, -0.5, 0]}
+                />
+                :
+                <ModelKingMen
+                    scale={2}
+                    action={"Walk"}
+                    rotation={[0, degToRad(90), 0]}
+                    position={[0, -0.5, 0]}
+                />
+            }
 
             {debug && (
                 <mesh castShadow>

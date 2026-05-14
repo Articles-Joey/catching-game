@@ -106,9 +106,10 @@
     // }
 
     .touch-controls-area {
-        position: fixed;
-        bottom: 0px;
-        right: 0;
+        position: absolute;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
         width: 150px;
         height: 150px;
         z-index: 1;

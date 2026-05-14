@@ -47,8 +47,12 @@ export default function LobbyPage() {
 
     const {
         socket,
+        authenticated,
+        loginSocket
     } = useSocketStore(state => ({
         socket: state.socket,
+        authenticated: state.authenticated,
+        loginSocket: state.loginSocket,
     }));
 
     const darkMode = useStore((state) => state.darkMode)
@@ -69,18 +73,6 @@ export default function LobbyPage() {
 
     const elementsRef = useRef([]);
     useLandingNavigation(elementsRef);
-
-    useEffect(() => {
-
-        if (socket.connected) {
-            socket.emit('join-room', `game:${process.env.NEXT_PUBLIC_GAME_KEY}-landing`);
-        }
-
-        return function cleanup() {
-            socket.emit('leave-room', `game:${process.env.NEXT_PUBLIC_GAME_KEY}-landing`);
-        };
-
-    }, [socket.connected]);
 
     const {
         data: userToken,
@@ -208,7 +200,7 @@ export default function LobbyPage() {
 
                         <div className='card-header d-flex align-items-center'>
 
-                            <NicknameInput 
+                            <NicknameInput
                                 useStore={useStore}
                             />
 
@@ -217,7 +209,7 @@ export default function LobbyPage() {
                         <div className="card-body">
 
                             <div
-                             className='mb-3'
+                                className='mb-3'
                             >
                                 <Link href={{
                                     pathname: `/play`
@@ -238,30 +230,30 @@ export default function LobbyPage() {
                             </div>
 
                             <div className="servers">
-    
+
                                 {[
                                     ...Array(2).keys().map(i => i + 1)
                                 ].map(id => {
-    
+
                                     let lobbyLookup = lobbyDetails?.fourFrogsGlobalState?.games?.find(lobby =>
                                         parseInt(lobby.server_id) == id
                                     )
-    
+
                                     return (
                                         <div key={id} className="server">
-    
+
                                             <div className='d-flex justify-content-between align-items-center w-100 mb-2'>
                                                 <div className="mb-0" style={{ fontSize: '0.9rem' }}><b>Server {id}</b></div>
                                                 <div className='mb-0'>{lobbyLookup?.players?.length || 0}/4</div>
                                             </div>
-    
+
                                             <div className='d-flex justify-content-around w-100 mb-1'>
                                                 {[1, 2, 3, 4].map(player_count => {
-    
+
                                                     let playerLookup = false
-    
+
                                                     if (lobbyLookup?.players?.length >= player_count) playerLookup = true
-    
+
                                                     return (
                                                         <div key={player_count} className="icon" style={{
                                                             width: '20px',
@@ -273,12 +265,12 @@ export default function LobbyPage() {
                                                             }),
                                                             border: '1px solid black'
                                                         }}>
-    
+
                                                         </div>
                                                     )
                                                 })}
                                             </div>
-    
+
                                             <Link
                                                 className={``}
                                                 href={{
@@ -295,18 +287,18 @@ export default function LobbyPage() {
                                                     Join
                                                 </ArticlesButton>
                                             </Link>
-    
+
                                         </div>
                                     )
                                 })}
-    
+
                             </div>
 
                         </div>
 
                         <div className="card-footer d-flex flex-wrap justify-content-center">
 
-                            <GameMenuPrimaryButtonGroup 
+                            <GameMenuPrimaryButtonGroup
                                 useStore={useStore}
                                 type="Landing"
                             />

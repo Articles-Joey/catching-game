@@ -2,8 +2,6 @@
 import { memo, useEffect, useRef } from "react";
 import nipplejs from 'nipplejs';
 import ArticlesButton from "@/components/UI/Button";
-import { useGameStore } from "@/hooks/useGameStore";
-import { useStore } from "@/hooks/useStore";
 import useTouchControlsStore from "@/hooks/useTouchControlsStore";
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -12,8 +10,8 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 function JumpButtonBase() {
 
-    const setTouchControls = useStore((state) => state.setTouchControls);
-    const touchControls = useStore((state) => state.touchControls);
+    const setTouchControls = useTouchControlsStore((state) => state.setTouchControls);
+    const touchControls = useTouchControlsStore((state) => state.touchControls);
 
     return (
         <ArticlesButton
@@ -36,7 +34,7 @@ function TouchControlsBase({ }) {
 
     const touchControlsEnabled = useTouchControlsStore((state) => state.enabled);
 
-    const setTouchControls = useStore((state) => state.setTouchControls);
+    const setTouchControls = useTouchControlsStore((state) => state.setTouchControls);
     const managerRef = useRef(null);
 
     useEffect(() => {
@@ -77,7 +75,7 @@ function TouchControlsBase({ }) {
                 // Right: 300 to 360 or 0 to 60
                 if (angle >= 300 || angle <= 60) right = true;
 
-                const currentControls = useStore.getState().touchControls;
+                const currentControls = useTouchControlsStore.getState().touchControls;
 
                 // Only update if changed
                 if (currentControls.up !== up || currentControls.down !== down || currentControls.left !== left || currentControls.right !== right) {
@@ -90,7 +88,7 @@ function TouchControlsBase({ }) {
         });
 
         manager.on('end', () => {
-            const currentControls = useStore.getState().touchControls;
+            const currentControls = useTouchControlsStore.getState().touchControls;
             setTouchControls({
                 ...currentControls,
                 up: false, down: false, left: false, right: false

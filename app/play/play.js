@@ -27,6 +27,7 @@ import GameMenu from '@articles-media/articles-dev-box/GameMenu';
 import UiOverlay from '@/components/UI/UiOverlay';
 import Link from 'next/link';
 import classNames from 'classnames';
+// import SinglePlayerHandler from '@/components/Handlers/SinglePlayerHandler';
 
 const TouchControls = dynamic(() => import('@/components/UI/TouchControls'), {
     ssr: false,
@@ -71,23 +72,23 @@ export default function GamePage() {
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (server && socket.connected) {
-            const roomName = `game:${process.env.NEXT_PUBLIC_GAME_KEY}-room-${server}`;
-            socket.emit('join-room', roomName, {
-                game_id: server,
-                nickname: nickname,
-                client_version: '1',
+    //     if (server && socket.connected) {
+    //         const roomName = `game:${process.env.NEXT_PUBLIC_GAME_KEY}-room-${server}`;
+    //         socket.emit('join-room', roomName, {
+    //             game_id: server,
+    //             nickname: nickname,
+    //             client_version: '1',
 
-            });
+    //         });
 
-            return function cleanup() {
-                socket.emit('leave-room', roomName)
-            };
-        }
+    //         return function cleanup() {
+    //             socket.emit('leave-room', roomName)
+    //         };
+    //     }
 
-    }, [server, socket.connected, nickname]);
+    // }, [server, socket.connected, nickname]);
 
     const status = useGameStore(state => state.gameState.status)
     const sceneKey = useStore((state) => state.sceneKey)
@@ -187,9 +188,11 @@ export default function GamePage() {
                 }}
             />
 
-            <TouchControls />
+            {/* <SinglePlayerHandler /> */}
 
             <div className='canvas-wrap'>
+
+                <TouchControls />
 
                 <UiOverlay />
 
