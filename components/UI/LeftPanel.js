@@ -6,6 +6,7 @@ import DebugCard from "./DebugCard";
 import GameDetailsPanel from "./GameDetailsPanel";
 
 import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
+import { useRouter } from "next/navigation";
 
 function LeftPanelContent(props) {
 
@@ -18,9 +19,10 @@ function LeftPanelContent(props) {
 
                 <div className="card-body d-flex flex-wrap">
 
-                    <GameMenuPrimaryButtonGroup 
+                    <GameMenuPrimaryButtonGroup
                         useStore={useStore}
                         type="GameMenu"
+                        useRouter={useRouter}
                     />
 
                 </div>

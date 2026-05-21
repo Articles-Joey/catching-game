@@ -6,7 +6,9 @@ Catch all the falling treasures while avoiding the enemies walking across the ga
 
 ## Getting Started
 
-First, run the development server:
+First you will need to setup a .env file from the .env.sample provided.
+
+Then development server can be run:
 
 ```bash
 npm run dev
@@ -15,7 +17,7 @@ npm run dev
 # Articles Launcher Compatibility/Checklist
 ✅ Keyboard Support
 ⚠️ Controller Support
-⚠️ Touch Support
+✅ Touch Support
 ✅ ReturnToLauncherButton (@articles-media/articles-dev-box)
 ✅ Scoreboard (@articles-media/articles-dev-box)
 ✅ Ads (@articles-media/articles-dev-box)
@@ -23,6 +25,10 @@ npm run dev
 ## TODO
 
 ...
+
+## Scripts
+
+In the scripts folder is reset_public and sync_to_s3. This is only for Articles Media usage. Allows for putting public folder to CloudFront to lower Vercel charges for the public facing site.
 
 ## Multiplayer
 

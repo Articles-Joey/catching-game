@@ -19,7 +19,7 @@ import { Suspense } from 'react';
 // import GlobalClientModals from '@/components/UI/GlobalClientModals';
 // import DarkModeHandler from '@/components/UI/DarkModeHandler';
 import LayoutClient from './layout-client';
-import SocketLogicHandler from '@/components/SocketLogicHandler';
+import SocketLogicHandler from '@/components/Handlers/SocketLogicHandler';
 // import AudioHandler from '@/components/Game/AudioHandler';
 
 // const geistSans = Geist({
@@ -42,11 +42,6 @@ export default function RootLayout({ children }) {
     <html lang="en">
 
       <head>
-
-        {/* <link
-          rel="stylesheet"
-          href={`${process.env.NEXT_PUBLIC_CDN}fonts/fontawsome/css/all.min.css`}
-        /> */}
 
       </head>
 

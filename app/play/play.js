@@ -188,7 +188,7 @@ export default function GamePage() {
                 }}
             />
 
-            {/* <SinglePlayerHandler /> */}
+            <SinglePlayerHandler />
 
             <div className='canvas-wrap'>
 
