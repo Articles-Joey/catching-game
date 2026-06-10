@@ -30,6 +30,22 @@ const Ad = dynamic(() =>
     { ssr: false }
 );
 
+import PageTemplateLandingPage from '@articles-media/articles-dev-box/PageTemplateLandingPage';
+
+// const backgroundImage = `img/preview.webp`;
+const LandingBackgroundAnimation = dynamic(() =>
+    import('@/components/Game/LandingBackgroundAnimation'),
+    {
+        ssr: false,
+        // loading: () => <img
+        //     src={backgroundImage.src}
+        //     alt=""
+        //     // fill
+        //     style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
+        // />
+    }
+);
+
 import { useStore } from '@/hooks/useStore';
 import dynamic from 'next/dynamic';
 import RotatingMascot from '@/components/UI/RotatingMascot';
@@ -56,6 +72,7 @@ export default function LobbyPage() {
     }));
 
     const darkMode = useStore((state) => state.darkMode)
+    const toontownMode = useStore((state) => state.toontownMode)
     const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
     const nickname = useStore((state) => state.nickname)
@@ -93,8 +110,7 @@ export default function LobbyPage() {
     });
 
     return (
-
-        <div className="landing-page">
+        <>
 
             <Suspense>
                 <GamepadKeyboard
@@ -158,196 +174,62 @@ export default function LobbyPage() {
                 />
             </Suspense>
 
-            <div className='background-wrap'>
-                {darkMode ?
-                    <Image
-                        src={`/img/dark-preview.webp`}
-                        alt=""
-                        fill
-                        style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
-                    />
-                    :
-                    <Image
-                        src={`/img/preview.webp`}
-                        alt=""
-                        fill
-                        style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
-                    />
+            <PageTemplateLandingPage
+                useSocketStore={useSocketStore}
+                useStore={useStore}
+                // RotatingMascot={RotatingMascot}
+                Link={Link}
+                // logoImage={`/img/temp_logo.webp`}
+                LandingBackgroundAnimation={
+                    <LandingBackgroundAnimation />
                 }
-            </div>
-
-            <div className="container d-flex flex-column flex-lg-row justify-content-center align-items-center py-3">
-
-                <div
-                    style={{ "width": "20rem" }}
-                >
-
+                heroOverride={<>
                     <img
-                        src={`/img/temp_logo.webp`}
-                        alt="Catching Game Logo"
-                        className="mt-4"
-                        height={200}
-                        style={{
-                            objectFit: "contain",
-                            width: "100%"
-                        }}
-                    >
-                    </img>
-
-                    <div
-                        className="card card-articles card-sm mb-4"
-                    >
-
-                        <div className='card-header d-flex align-items-center'>
-
-                            <NicknameInput
-                                useStore={useStore}
-                            />
-
-                        </div>
-
-                        <div className="card-body">
-
-                            <div
-                                className='mb-3'
-                            >
-                                <Link href={{
-                                    pathname: `/play`
-                                }}>
-                                    <ArticlesButton
-                                        ref={el => elementsRef.current[1] = el}
-                                        className={`w-100`}
-                                        small
-                                    >
-                                        <i className="fas fa-play"></i>
-                                        Play Single Player
-                                    </ArticlesButton>
-                                </Link>
-                            </div>
-
-                            <div className="fw-bold mb-1 small text-center">
-                                {lobbyDetails?.online_player_count || 0} player{lobbyDetails?.online_player_count !== 1 && 's'} in the lobby.
-                            </div>
-
-                            <div className="servers">
-
-                                {[
-                                    ...Array(2).keys().map(i => i + 1)
-                                ].map(id => {
-
-                                    let lobbyLookup = lobbyDetails?.fourFrogsGlobalState?.games?.find(lobby =>
-                                        parseInt(lobby.server_id) == id
-                                    )
-
-                                    return (
-                                        <div key={id} className="server">
-
-                                            <div className='d-flex justify-content-between align-items-center w-100 mb-2'>
-                                                <div className="mb-0" style={{ fontSize: '0.9rem' }}><b>Server {id}</b></div>
-                                                <div className='mb-0'>{lobbyLookup?.players?.length || 0}/4</div>
-                                            </div>
-
-                                            <div className='d-flex justify-content-around w-100 mb-1'>
-                                                {[1, 2, 3, 4].map(player_count => {
-
-                                                    let playerLookup = false
-
-                                                    if (lobbyLookup?.players?.length >= player_count) playerLookup = true
-
-                                                    return (
-                                                        <div key={player_count} className="icon" style={{
-                                                            width: '20px',
-                                                            height: '20px',
-                                                            ...(playerLookup ? {
-                                                                backgroundColor: 'black',
-                                                            } : {
-                                                                backgroundColor: 'gray',
-                                                            }),
-                                                            border: '1px solid black'
-                                                        }}>
-
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-
-                                            <Link
-                                                className={``}
-                                                href={{
-                                                    pathname: `/play`,
-                                                    query: {
-                                                        server: id
-                                                    }
-                                                }}
-                                            >
-                                                <ArticlesButton
-                                                    className="px-5"
-                                                    small
-                                                >
-                                                    Join
-                                                </ArticlesButton>
-                                            </Link>
-
-                                        </div>
-                                    )
-                                })}
-
-                            </div>
-
-                        </div>
-
-                        <div className="card-footer d-flex flex-wrap justify-content-center">
-
-                            <GameMenuPrimaryButtonGroup
-                                useStore={useStore}
-                                type="Landing"
-                            />
-
-                        </div>
-
-                    </div>
-
-                    <SessionButton
-                        port={process.env.NEXT_PUBLIC_GAME_PORT}
-                        friendsButton={true}
+                        src={
+                            toontownMode ?
+                                "img/temp_logo.webp"
+                                :
+                                "img/temp_logo.webp"
+                        }
+                        alt="Hero Image"
+                        className='w-100'
                     />
+                </>}
+                NicknameInputConfig={{
+                    // PreComponent:
+                    //     <>
+                    //         <img
+                    //             className='panel-bg me-2'
+                    //             src="img/toontown_icon.webp"
+                    //             width={70}
+                    //             height={70}
+                    //         />
+                    //     </>
+                }}
+                backgroundImage={
+                    toontownMode ?
+                        darkMode ?
+                            `img/dark-preview.webp`
+                            :
+                            `img/preview.webp`
+                        :
+                        darkMode ?
+                            `img/dark-preview.webp`
+                            :
+                            `img/preview.webp`
+                }
+                singlePlayerConfig={{
+                    attachServerType: "single-player",
+                }}
+                multiplayerConfig={{
+                    type: "WebSocket",
+                    // comingSoon: true,
+                    defaultServers: 2,
+                    // privateServerSupport: false,
+                    onlinePlayersTemplate: "2.0",
+                }}
+            />
 
-                    <ReturnToLauncherButton />
-
-                </div>
-
-                <GameScoreboard
-                    game={process.env.NEXT_PUBLIC_GAME_NAME}
-                    style="Default"
-                    darkMode={darkMode ? true : false}
-                    prepend={
-                        <>
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '200px',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <RotatingMascot />
-                            </div>
-                        </>
-                    }
-                />
-
-                <Ad
-                    style="Default"
-                    section={"Games"}
-                    section_id={process.env.NEXT_PUBLIC_GAME_NAME}
-                    darkMode={darkMode ? true : false}
-                    user_ad_token={userToken}
-                    userDetails={userDetails}
-                    userDetailsLoading={userDetailsLoading}
-                />
-
-            </div>
-        </div>
+        </>
     );
 }

@@ -1,5 +1,8 @@
 @use "@/styles/components/global.scss" as *;
 
+@use "@/styles/components/game-timer-overlay.scss" as *;
+@use "@/styles/components/game-over-overlay.scss" as *;
+
 .catching-game-game-page {
     position: relative;
     display: flex;
@@ -65,45 +68,6 @@
             transform: translateX(-50%) translateY(calc(-50% + 50px));
         }
     }
-
-    // .menu-bar {
-    //     // position: fixed;
-    //     // bottom: 0;
-    //     // left: 0;
-    //     // width: 100%;
-    //     // height: 50px;
-    //     // z-index: 3;
-
-    //     position: fixed;
-    //     bottom: 0;
-    //     left: 0;
-    //     width: 50px;
-    //     height: 50px;
-    //     z-index: 3;
-    // }
-
-    // .mobile-menu {
-    //     position: fixed;
-    //     bottom: 0px;
-    //     left: 0;
-    //     width: 100%;
-    //     top: 0px;
-    //     // height: calc(100vh - 50px);
-    //     z-index: 2;
-    //     background-color: rgba(#955d39, 0.8);
-    //     transform: translateY(calc(100% + 50px));
-    //     transition-duration: 200ms;
-    //     padding: 1rem;
-    //     display: flex;
-    //     align-items: flex-end;
-
-    //     justify-content: center;
-
-    //     &.show {
-    //         transform: translateY(0);
-    //     }
-
-    // }
 
     .touch-controls-area {
         position: absolute;

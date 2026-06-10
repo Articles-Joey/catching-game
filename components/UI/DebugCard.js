@@ -21,11 +21,11 @@ export default function DebugCard({
                     <div>
                         <span>Position: </span>
                         <span>
-                            {playerLocation[0]?.toFixed(2)}
+                            {playerLocation?.x?.toFixed(2)}
                             <span> - </span>
-                            {playerLocation[1]?.toFixed(2)}
+                            {playerLocation?.y?.toFixed(2)}
                             <span> - </span>
-                            {playerLocation[2]?.toFixed(2)}
+                            {playerLocation?.z?.toFixed(2)}
                         </span>
                     </div>
                 </div>

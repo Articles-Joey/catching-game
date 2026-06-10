@@ -1,3 +1,4 @@
+import useGameFunctions from "@/hooks/useGameFunctions"
 import { useGameStore } from "@/hooks/useGameStore"
 
 export default function UiOverlay() {
@@ -6,17 +7,24 @@ export default function UiOverlay() {
     const health = useGameStore((state) => state.health)
     // const timer = useGameStore((state) => state.timer)
 
-    const timer = useGameStore((state) => state.gameState.timer)
+    const gameState = useGameStore((state) => state.gameState)
+    const timer = gameState.timer
+    const status = gameState.status
+
+    const {
+        playerHealth,
+        playerScore,
+    } = useGameFunctions()
 
     return (
         <div className='game-ui-overlay'>
 
             <div className='score'>
-                Timer: {timer || 0} - Score: {score}
+                Timer: {timer || 0} - Score: {playerScore()}
             </div>
 
             <div>
-                {[...Array(health)].map((_, index) =>
+                {[...Array(playerHealth())].map((_, index) =>
                     <img
                         key={index}
                         src={"/img/heart.png"}
@@ -24,6 +32,10 @@ export default function UiOverlay() {
                     ></img>
                 )}
             </div>
+
+            {/* {status == "Game Over" && 
+            
+            } */}
 
         </div>
     )

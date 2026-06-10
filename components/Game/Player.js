@@ -21,6 +21,7 @@ import { useAudioStore } from "@/hooks/useAudioStore"
 import { useSocketStore } from "@/hooks/useSocketStore"
 import { useSearchParams } from "next/navigation"
 import useTouchControlsStore from "@/hooks/useTouchControlsStore"
+import useGameFunctions from "@/hooks/useGameFunctions"
 
 const JUMP_FORCE = 0;
 const SPEED = 12;
@@ -40,6 +41,12 @@ function Player(props) {
     const searchParams = useSearchParams()
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
+
+    const {
+        addScore,
+        subtractScore,
+        subtractHealth,
+    } = useGameFunctions()
 
     // const { setPlayerData, teleportPlayer, setTeleportPlayer } = props;
 
@@ -67,7 +74,7 @@ function Player(props) {
     // const score = useGameStore((state) => state.score)
     const setScore = useGameStore((state) => state.setScore)
     const debug = useStore((state) => state.debug);
-    const subtractHealth = useGameStore((state) => state.subtractHealth)
+    // const subtractHealth = useGameStore((state) => state.subtractHealth)
 
     const touchControls = useTouchControlsStore((state) => state.touchControls)
     const setTouchControls = useTouchControlsStore((state) => state.setTouchControls)
@@ -274,10 +281,13 @@ function Player(props) {
                 }
             }
 
-            if (e.body.userData.isPositiveObject) {
-                const currentScore = useGameStore.getState().score
-                setScore(currentScore + 1)
-            }
+            // if (e.body.userData.isPositiveObject) {
+
+            //     const currentScore = useGameStore.getState().score
+            //     setScore(currentScore + 1)
+            //     incrementScore(1)
+
+            // }
 
         }
     }))
@@ -458,6 +468,10 @@ function Player(props) {
             <group
                 ref={playerModelRef}
             >
+
+                {/* TODO - Add player nickname to scene */}
+                {/* TODO - Add AMCOT Characters package */}
+
                 <SpacesuitModel
                     scale={2}
                     action={action}
@@ -473,9 +487,6 @@ function Player(props) {
                 material={material}
             >
                 <sphereGeometry args={[1, 32, 32]} />
-
-                {/* {character.model == 'Clownfish' && <ClownfishModel rotation={[0, Math.PI / 1, 0]} />}
-                {character.model == 'Bone Fish' && <BoneFishModel rotation={[0, -Math.PI / 2, 0]} />} */}
 
                 {/* <Text
                     color="black" position={[0, -0.7, 0]} scale={0.3} anchorX="center" anchorY="middle"

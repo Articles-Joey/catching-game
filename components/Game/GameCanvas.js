@@ -53,7 +53,9 @@ const textureOther = new TextureLoader().load(`img/grass.webp`)
 //     );
 // };
 
-function GameCanvas(props) {
+function GameCanvas({
+    landingAnimationMode = false,
+}) {
 
     const debug = useStore((state) => state.debug);
 
@@ -68,92 +70,22 @@ function GameCanvas(props) {
     // const controlType = useStore(state => state.controlType);
     const showStats = useStore((state) => state?.debugConfig?.showStats);
 
-    let gameContent = (
-        <>
-            <Player />
-
-            <SocketPlayers />
-
-            <FallingItems />
-
-            <Ground
-                args={[30, 30]}
-            // args={[30, 0.5, 30]}
-            />
-
-            {/* Old Single player */}
-            {/* <FallingObjects
-
-            /> */}
-
-            <Enemy
-
-                // Sphere
-                args={[1, 6, 6]}
-
-                // Box
-                // args={[2, 2, 2]}
-
-                position={[0, 1.2, 0]}
-            />
-
-            {timer >= 40 &&
-                <Enemy
-
-                    // Sphere
-                    args={[1, 6, 6]}
-
-                    // Box
-                    // args={[2, 2, 2]}
-
-                    position={[0, 1.2, 0]}
-                />
-            }
-
-            {timer >= 20 &&
-                <Enemy
-
-                    // Sphere
-                    args={[1, 6, 6]}
-
-                    // Box
-                    // args={[2, 2, 2]}
-
-                    position={[0, 1.2, 0]}
-                />
-            }
-
-            {/* <NPC />
-            
-            {timer <= 40 && <NPC />}
-            {timer <= 20 && <NPC />} */}
-
-        </>
-    )
-
-    let physicsContent
-    if (debug) {
-        physicsContent = (
-            <Debug>
-                {gameContent}
-            </Debug>
-        )
-    } else {
-        physicsContent = (
-            gameContent
-        )
-    }
-
     return (
         <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
-
+            aww
             {showStats && <>
                 <Stats className="stats-overlay" />
             </>}
 
-            {/* <OrbitControls /> */}
+            {landingAnimationMode &&
+                <OrbitControls
+                    autoRotate
+                />
+            }
 
-            <CameraManager />
+            {!landingAnimationMode &&
+                <CameraManager />
+            }
 
             <TimeHandler />
 
@@ -267,7 +199,75 @@ function GameCanvas(props) {
 
             <Physics>
 
-                {physicsContent}
+                <Debug
+                    scale={
+                        debug ? 1 : 0
+                    }
+                >
+
+                    <>
+                        {!landingAnimationMode &&
+                            <Player />
+                        }
+
+                        <SocketPlayers />
+
+                        <FallingItems />
+
+                        <Ground
+                            args={[30, 30]}
+                        // args={[30, 0.5, 30]}
+                        />
+
+                        {/* Old Single player */}
+                        {/* <FallingObjects
+                        /> */}
+
+                        <Enemy
+
+                            // Sphere
+                            args={[1, 6, 6]}
+
+                            // Box
+                            // args={[2, 2, 2]}
+
+                            position={[0, 1.2, 0]}
+                        />
+
+                        {timer >= 40 &&
+                            <Enemy
+
+                                // Sphere
+                                args={[1, 6, 6]}
+
+                                // Box
+                                // args={[2, 2, 2]}
+
+                                position={[0, 1.2, 0]}
+                            />
+                        }
+
+                        {timer >= 20 &&
+                            <Enemy
+
+                                // Sphere
+                                args={[1, 6, 6]}
+
+                                // Box
+                                // args={[2, 2, 2]}
+
+                                position={[0, 1.2, 0]}
+                            />
+                        }
+
+                        {/* <NPC />
+            
+            {timer <= 40 && <NPC />}
+            {timer <= 20 && <NPC />} */}
+
+                    </>
+
+                </Debug>
 
             </Physics>
 

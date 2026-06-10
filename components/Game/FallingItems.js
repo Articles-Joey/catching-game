@@ -1,4 +1,5 @@
 
+import useGameHelpers from "@/hooks/useGameHelpers";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useSocketStore } from "@/hooks/useSocketStore";
 import { useSphere } from "@react-three/cannon";
@@ -32,8 +33,17 @@ function FallingItem({ obj }) {
 
     const socket = useSocketStore(state => state.socket)
 
+    const setGameState = useGameStore(state => state.setGameState)
+
+    const {
+        decreasePlayerScore,
+        increasePlayerScore,
+    } = useGameHelpers();
+
     const { type, pickedUp } = obj;
-    const setScore = useGameStore((state) => state.setScore);
+
+    // const setScore = useGameStore((state) => state.setScore);
+
     const score = useGameStore((state) => state.score);
     const ref = useRef();
 
@@ -75,16 +85,26 @@ function FallingItem({ obj }) {
 
                 console.log("Active falling item hit a player!")
 
-                if (type === "Point") setScore(score + 1);
+                if (server) {
 
-                if (type === "Penalty") setScore(score - 1);
+                    if (socket) {
+                        socket.emit('game:catching-game:collision', {
+                            server: server,
+                            fallingItem_id: obj.id,
+                            type: type,
+                        })
+                    }
 
-                if (socket) {
-                    socket.emit('game:catching-game:collision', {
-                        server: server,
-                        fallingItem_id: obj.id,
-                        type: type,
-                    })
+                } else {
+
+                    console.log("Single player type", type)
+
+                    if (type === "Point") increasePlayerScore(1, e.body.userData.playerId);
+
+                    if (type === "Penalty") decreasePlayerScore(1, e.body.userData.playerId);
+
+                    setDespawned(true);
+
                 }
 
             }

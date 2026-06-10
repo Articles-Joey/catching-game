@@ -2,6 +2,7 @@ import { useGameStore } from "@/hooks/useGameStore"
 import ArticlesButton from "./Button"
 import { useSearchParams } from "next/navigation"
 import { useSocketStore } from "@/hooks/useSocketStore"
+import useGameFunctions from "@/hooks/useGameFunctions"
 // import { useIceSlideStore } from "@/hooks/useIceSlideStore"
 
 export default function GameDetailsPanel() {
@@ -44,9 +45,9 @@ export default function GameDetailsPanel() {
 
                         <div className="d-flex justify-content-between">
 
-                            <div>X: {player?.x?.toFixed(2) || 0} | Z: {player?.z?.toFixed(2) || 0}</div>
+                            <div>X: {player?.position?.x?.toFixed(2) || 0} | Z: {player?.position?.z?.toFixed(2) || 0}</div>
 
-                            <div className="d-flex">
+                            {/* <div className="d-flex">
                                 <div className="me-2">
                                     <i className="fad fa-rocket"></i>
                                     {player.hitPower}
@@ -55,7 +56,7 @@ export default function GameDetailsPanel() {
                                     <i className="fad fa-undo"></i>
                                     {player.hitRotation}
                                 </div>
-                            </div>
+                            </div> */}
 
                         </div>
 
@@ -89,7 +90,9 @@ function RoundAndTimer() {
     const timer = useGameStore(state => state.gameState.timer)
     const status = useGameStore(state => state.gameState.status)
 
-    const startGame = useSocketStore(state => state.startGame)
+    // const startGame = useSocketStore(state => state.startGame)
+
+    const { startGame } = useGameFunctions()
 
     const searchParams = useSearchParams()
     const params = Object.fromEntries(searchParams.entries());

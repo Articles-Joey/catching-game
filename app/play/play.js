@@ -27,7 +27,9 @@ import GameMenu from '@articles-media/articles-dev-box/GameMenu';
 import UiOverlay from '@/components/UI/UiOverlay';
 import Link from 'next/link';
 import classNames from 'classnames';
-// import SinglePlayerHandler from '@/components/Handlers/SinglePlayerHandler';
+import SinglePlayerHandler from '@/components/Handlers/SinglePlayerHandler';
+import useGameFunctions from '@/hooks/useGameFunctions';
+import GameOverOverlay from '@/components/UI/GameOverOverlay';
 
 const TouchControls = dynamic(() => import('@/components/UI/TouchControls'), {
     ssr: false,
@@ -41,11 +43,13 @@ export default function GamePage() {
 
     const {
         socket,
-        startGame
+        // startGame
     } = useSocketStore(state => ({
         socket: state.socket,
-        startGame: state.startGame
+        // startGame: state.startGame
     }));
+
+    const { startGame } = useGameFunctions()
 
     const sidebar = useStore((state) => state.sidebar)
     const showMenu = useStore((state) => state.showMenu)
@@ -118,64 +122,6 @@ export default function GamePage() {
             id={`${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`}
         >
 
-            <Suspense>
-
-                <AudioHandler />
-
-                {status == "Game Over" ?
-                    <ArticlesModal
-                        show={true}
-                        disableClose={true}
-                        modalClassName="game-over-modal"
-                        title={"Game Over!"}
-                        action={() => {
-                            // reloadScene()
-                            // startGame(server, "In Lobby")
-                        }}
-                        actionText={"Play Again?"}
-                        footerOverride={
-                            <div className='d-flex justify-content-between w-100'>
-                                <Link href={"/"} className="w-50">
-                                    <ArticlesButton
-                                        className="w-100"
-                                        onClick={() => {
-                                            // reloadScene();
-                                        }}
-                                    >
-                                        <i className='fad fa-arrow-left'></i>
-                                        Exit to Lobby
-                                    </ArticlesButton>
-                                </Link>
-                                <ArticlesButton
-                                    className="w-50"
-                                    onClick={() => {
-                                        startGame(server, "In Lobby");
-                                    }}
-                                >
-                                    <i className='fad fa-play'></i>
-                                    Play Again?
-                                </ArticlesButton>
-                            </div>
-                        }
-                    >
-                        <div className='text-center'>
-                            <h2>{`Time's Up!`}</h2>
-                            <p className='mb-0'>Your final score is: <strong>{score}</strong></p>
-                            {/* <ArticlesButton
-                                onClick={() => {
-                                    reloadScene();
-                                }}
-                            >
-                                Play Again?
-                            </ArticlesButton> */}
-                        </div>
-                    </ArticlesModal>
-                    :
-                    ''
-                }
-
-            </Suspense>
-
             <GameMenu
                 useStore={useStore}
                 LeftPanelContent={LeftPanelContent}
@@ -195,6 +141,8 @@ export default function GamePage() {
                 <TouchControls />
 
                 <UiOverlay />
+
+                <GameOverOverlay />
 
                 <GameCanvas
                     key={sceneKey}
