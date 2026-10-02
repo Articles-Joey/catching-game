@@ -1,131 +1,76 @@
-import { useEffect, useState, useRef } from "react";
+"use client";
 
-import Image from "next/image";
-import dynamic from 'next/dynamic'
-
-// import { useSelector } from 'react-redux'
-
-import { Modal } from "react-bootstrap";
-
+import { useRef, useState } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import WebIcon from "@mui/icons-material/Web";
+import ArticlesModal from "./ArticlesModal";
 import ArticlesButton from "./Button";
-import Link from "next/link";
 import { useModalNavigation } from "@/hooks/useModalNavigation";
-
-// import { B } from "@articles-media/articles-gamepad-helper/XboxIcons";
 import B from "@articles-media/articles-gamepad-helper/dist/img/Xbox UI/B.svg";
-// import B from "@articles-media/articles-gamepad-helper/public/img/Xbox UI/B.svg";
 
-export default function CreditsModal({
-    show,
-    setShow,
-}) {
-
-    const [showModal, setShowModal] = useState(true)
-
+export default function CreditsModal({ show = true, setShow }) {
+    const [showModal, setShowModal] = useState(true);
     const elementsRef = useRef([]);
     useModalNavigation(elementsRef, () => setShowModal(false));
 
     return (
-        <>
-            {/* {lightboxData && (
-                <Lightbox
-                    mainSrc={lightboxData?.location}
-                    onCloseRequest={() => setLightboxData(null)}
-                    reactModalStyle={{
-                        overlay: {
-                            zIndex: '2000'
-                        }
-                    }}
-                />
-            )} */}
-
-            <Modal
-                className="articles-modal games-info-modal"
-                size='md'
-                show={showModal}
-                centered
-                scrollable
-                onExited={() => {
-                    setShow(false)
-                }}
-                onHide={() => {
-                    setShowModal(false)
-                }}
-            >
-
-                <Modal.Header closeButton>
-                    <Modal.Title>Game Credits</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body className="flex-column p-3">
-
-                    <h6 className="mb-2">
-                        Developer: Articles Joey
-                    </h6>
-
-                    <Link href="https://github.com/articles-joey/catching-game" target="_blank" rel="noopener noreferrer">
-                        <ArticlesButton
-                            ref={el => elementsRef.current[0] = el}
-                            size=""
-                            className="mb-4"
-                        >
-                            <i className="fab fa-github me-2"></i>
-                            <span>View on Github</span>
-                        </ArticlesButton>
-                    </Link>
-
-                    <h6 className="mb-2">
-                        Publisher: Articles Media
-                    </h6>
-
-                    <Link href="https://github.com/Articles-Media" target="_blank" rel="noopener noreferrer">
-                        <ArticlesButton
-                            ref={el => elementsRef.current[1] = el}
-                            size=""
-                            className="mb-4"
-                        >
-                            <i className="fad fa-browser me-2"></i>
-                            <span>View Website</span>
-                        </ArticlesButton>
-                    </Link>
-
-                    <h6 className="mb-2">
-                        Attributions
-                    </h6>
-
-                    <Link href="https://github.com/Articles-Joey/catching-game/blob/main/README.md#attributions" target="_blank" rel="noopener noreferrer">
-                        <ArticlesButton
-                            ref={el => elementsRef.current[2] = el}
-                            size=""
-                            className=""
-                        >
-                            <i className="fab fa-github me-2"></i>
-                            <span>View on Github</span>
-                        </ArticlesButton>
-                    </Link>
-
-                </Modal.Body>
-
-                <Modal.Footer className="justify-content-between">
-
-                    <div></div>
-
+        <ArticlesModal
+            title="Game Credits"
+            show={show && showModal}
+            setShow={(visible) => {
+                setShow(visible);
+                setShowModal(true);
+            }}
+            footerOverride={(setOpen) => (
+                <>
+                    <Box />
                     <ArticlesButton
-                        ref={el => elementsRef.current[3] = el}
+                        ref={(el) => { elementsRef.current[3] = el; }}
                         variant="outline-dark"
-                        onClick={() => {
-                            setShow(false)
-                        }}
-                        className="d-flex align-items-center"
+                        onClick={() => setOpen(false)}
+                        startIcon={<Box component="img" src={B.src} alt="" sx={{ width: 24 }} />}
                     >
-                        <img src={B.src} className="me-1" alt="Close" />
                         Close
                     </ArticlesButton>
-
-                </Modal.Footer>
-
-            </Modal>
-        </>
-    )
-
+                </>
+            )}
+        >
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", py: 1 }}>
+                <Typography component="h6" variant="subtitle1" sx={{ mb: 1 }}>Developer: Articles Joey</Typography>
+                <ArticlesButton
+                    href="https://github.com/articles-joey/catching-game"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ref={(el) => { elementsRef.current[0] = el; }}
+                    startIcon={<GitHubIcon />}
+                    sx={{ mb: 3 }}
+                >
+                    View on GitHub
+                </ArticlesButton>
+                <Typography component="h6" variant="subtitle1" sx={{ mb: 1 }}>Publisher: Articles Media</Typography>
+                <ArticlesButton
+                    href="https://github.com/Articles-Media"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ref={(el) => { elementsRef.current[1] = el; }}
+                    startIcon={<WebIcon />}
+                    sx={{ mb: 3 }}
+                >
+                    View Website
+                </ArticlesButton>
+                <Typography component="h6" variant="subtitle1" sx={{ mb: 1 }}>Attributions</Typography>
+                <ArticlesButton
+                    href="https://github.com/Articles-Joey/catching-game/blob/main/README.md#attributions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ref={(el) => { elementsRef.current[2] = el; }}
+                    startIcon={<GitHubIcon />}
+                >
+                    View on GitHub
+                </ArticlesButton>
+            </Box>
+        </ArticlesModal>
+    );
 }

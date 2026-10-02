@@ -1,61 +1,35 @@
-import { useGameStore } from "@/hooks/useGameStore"
-import ArticlesButton from "./Button"
+"use client";
 
-export default function DebugCard({
-    reloadScene
-}) {
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { useGameStore } from "@/hooks/useGameStore";
+import ArticlesButton from "./Button";
 
-    const score = useGameStore((state) => state.score)
-    const playerLocation = useGameStore((state) => state.playerLocation)
+export default function DebugCard({ reloadScene }) {
+    const score = useGameStore((state) => state.score);
+    const playerLocation = useGameStore((state) => state.playerLocation);
 
     return (
-        <div
-            className="card card-articles card-sm"
-        >
-            <div className="card-body">
-
-                <div className="small text-muted">Debug Controls</div>
-
-                <div className="small border p-2">
-                    <div>Score: {score}</div>
-                    <div>
-                        <span>Position: </span>
-                        <span>
-                            {playerLocation?.x?.toFixed(2)}
-                            <span> - </span>
-                            {playerLocation?.y?.toFixed(2)}
-                            <span> - </span>
-                            {playerLocation?.z?.toFixed(2)}
-                        </span>
-                    </div>
-                </div>
-
-                <div className='d-flex flex-column'>
-
-                    <div>
-                        <ArticlesButton
-                            size="sm"
-                            className="w-50"
-                            onClick={reloadScene}
-                        >
-                            <i className="fad fa-redo"></i>
-                            Reload Game
-                        </ArticlesButton>
-
-                        <ArticlesButton
-                            size="sm"
-                            className="w-50"
-                            onClick={reloadScene}
-                        >
-                            <i className="fad fa-redo"></i>
-                            Reset Camera
-                        </ArticlesButton>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    )
-
+        <Card sx={{ bgcolor: "game.card", backgroundImage: "none", fontSize: "0.875rem", border: 1, borderColor: "divider" }}>
+            <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>
+                <Box sx={{ fontSize: "0.875em", color: "text.secondary" }}>Debug Controls</Box>
+                <Box sx={{ fontSize: "0.875em", border: 1, borderColor: "divider", p: 1 }}>
+                    <Box>Score: {score}</Box>
+                    <Box>
+                        Position: {playerLocation?.x?.toFixed(2)} - {playerLocation?.y?.toFixed(2)} - {playerLocation?.z?.toFixed(2)}
+                    </Box>
+                </Box>
+                <Box sx={{ display: "flex" }}>
+                    <ArticlesButton small sx={{ width: "50%" }} onClick={reloadScene} startIcon={<RestartAltIcon />}>
+                        Reload Game
+                    </ArticlesButton>
+                    <ArticlesButton small sx={{ width: "50%" }} onClick={reloadScene} startIcon={<RestartAltIcon />}>
+                        Reset Camera
+                    </ArticlesButton>
+                </Box>
+            </CardContent>
+        </Card>
+    );
 }

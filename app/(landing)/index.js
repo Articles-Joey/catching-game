@@ -1,235 +1,164 @@
-"use client"
-import { useEffect, useContext, useState, useRef, Suspense } from 'react';
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
+import { Suspense, useRef } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import Box from "@mui/material/Box";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import InfoIcon from "@mui/icons-material/Info";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+import PaletteIcon from "@mui/icons-material/Palette";
+import { GamepadKeyboard, PieMenu } from "@articles-media/articles-gamepad-helper";
+import PageTemplateLandingPage from "@articles-media/articles-dev-box/PageTemplateLandingPage";
+import { useLandingNavigation } from "@/hooks/useLandingNavigation";
+import { useSocketStore } from "@/hooks/useSocketStore";
+import { useStore } from "@/hooks/useStore";
 
-import { useLandingNavigation } from '@/hooks/useLandingNavigation';
-
-import ArticlesButton from '@/components/UI/Button';
-
-import { useSocketStore } from '@/hooks/useSocketStore';
-import { useSearchParams } from 'next/navigation';
-
-import useUserDetails from '@articles-media/articles-dev-box/useUserDetails';
-import useUserToken from '@articles-media/articles-dev-box/useUserToken';
-import NicknameInput from '@articles-media/articles-dev-box/NicknameInput';
-import GameMenuPrimaryButtonGroup from '@articles-media/articles-dev-box/GameMenuPrimaryButtonGroup';
-import SessionButton from '@articles-media/articles-dev-box/SessionButton';
-import { GamepadKeyboard, PieMenu } from '@articles-media/articles-gamepad-helper';
-const ReturnToLauncherButton = dynamic(() =>
-    import('@articles-media/articles-dev-box/ReturnToLauncherButton'),
-    { ssr: false }
-);
-const GameScoreboard = dynamic(() =>
-    import('@articles-media/articles-dev-box/GameScoreboard'),
-    { ssr: false }
-);
-const Ad = dynamic(() =>
-    import('@articles-media/articles-dev-box/Ad'),
-    { ssr: false }
+const LandingBackgroundAnimation = dynamic(
+    () => import("@/components/Game/LandingBackgroundAnimation"),
+    { ssr: false },
 );
 
-import PageTemplateLandingPage from '@articles-media/articles-dev-box/PageTemplateLandingPage';
-
-// const backgroundImage = `img/preview.webp`;
-const LandingBackgroundAnimation = dynamic(() =>
-    import('@/components/Game/LandingBackgroundAnimation'),
-    {
-        ssr: false,
-        // loading: () => <img
-        //     src={backgroundImage.src}
-        //     alt=""
-        //     // fill
-        //     style={{ objectFit: 'cover', objectPosition: 'center', filter: 'blur(10px)' }}
-        // />
-    }
-);
-
-import { useStore } from '@/hooks/useStore';
-import dynamic from 'next/dynamic';
-import RotatingMascot from '@/components/UI/RotatingMascot';
+// PieMenu renders its label as a React node; its icon field is not rendered.
+function menuLabel(Icon, text) {
+    return (
+        <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+            <Icon fontSize="small" />
+            {text}
+        </Box>
+    );
+}
 
 export default function LobbyPage() {
-
-    const searchParams = useSearchParams()
-    const searchParamsObject = Object.fromEntries(searchParams.entries())
-    let {
-        controllerMode,
-        launcher_mode,
-    } = searchParamsObject
-
-    launcher_mode = launcher_mode === '1' ? true : false
-
-    const {
-        socket,
-        authenticated,
-        loginSocket
-    } = useSocketStore(state => ({
-        socket: state.socket,
-        authenticated: state.authenticated,
-        loginSocket: state.loginSocket,
-    }));
-
-    const darkMode = useStore((state) => state.darkMode)
-    const toontownMode = useStore((state) => state.toontownMode)
-    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
-
-    const nickname = useStore((state) => state.nickname)
-    const setNickname = useStore((state) => state.setNickname)
-    const nicknameKeyboard = useStore((state) => state.nicknameKeyboard)
-    const randomNickname = useStore((state) => state.randomNickname)
-    const _hasHydrated = useStore((state) => state._hasHydrated)
-
-    const setShowInfoModal = useStore((state) => state.setShowInfoModal)
-    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal)
-    const setShowCreditsModal = useStore((state) => state.setShowCreditsModal)
-
-    const lobbyDetails = useStore((state) => state.lobbyDetails)
-    const setLobbyDetails = useStore((state) => state.setLobbyDetails)
+    const darkMode = useStore((state) => state.darkMode);
+    const toggleDarkMode = useStore((state) => state.toggleDarkMode);
+    const nicknameKeyboard = useStore((state) => state.nicknameKeyboard);
+    const setShowSettingsModal = useStore((state) => state.setShowSettingsModal);
+    const setShowCreditsModal = useStore((state) => state.setShowCreditsModal);
 
     const elementsRef = useRef([]);
     useLandingNavigation(elementsRef);
 
-    const {
-        data: userToken,
-        error: userTokenError,
-        isLoading: userTokenLoading,
-        mutate: userTokenMutate
-    } = useUserToken(
-        process.env.NEXT_PUBLIC_GAME_PORT
-    );
-
-    const {
-        data: userDetails,
-        error: userDetailsError,
-        isLoading: userDetailsLoading,
-        mutate: userDetailsMutate
-    } = useUserDetails({
-        token: userToken
-    });
-
     return (
-        <>
-
+        <Box
+            sx={{
+                position: "relative",
+                isolation: "isolate",
+                "--articles-button-background-color": "#5ba030",
+                "--articles-button-color": "#000",
+                "& .landing-page": {
+                    flexGrow: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "calc(100vh - 100px)",
+                },
+                "& .card": { "--articles-card-font-color": "#000" },
+                "& .MuiInputBase-root": { bgcolor: "#2e2b2c", color: "#fff" },
+                // NicknameInput supplies its own important colors in dev-box.
+                "& #nickname": { color: "#fff !important", WebkitTextFillColor: "#fff !important", caretColor: "#fff" },
+                "& #nickname::placeholder": {
+                    color: "rgba(255,255,255,0.5) !important",
+                    WebkitTextFillColor: "rgba(255,255,255,0.5) !important",
+                    opacity: 1,
+                },
+                "& .servers": { display: "grid", gap: "5px", gridTemplateColumns: "repeat(2, minmax(0, 1fr))" },
+                "& .server": {
+                    p: "0.5rem",
+                    border: "1px solid rgba(0,0,0,0.25)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                },
+                "& .ad-wrap": {
+                    mt: "1rem",
+                    "@media (min-width: 992px)": {
+                        mt: 0,
+                        display: "block",
+                        position: "absolute",
+                        right: "1rem",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                    },
+                },
+                "& .background-wrap": {
+                    position: "fixed",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: -1,
+                    "& img": { filter: "blur(2px)" },
+                },
+                "& button:focus, & input:focus, & a:focus": {
+                    outline: "3px solid #fff",
+                    outlineOffset: 2,
+                    boxShadow: "0 0 15px rgba(255,255,255,0.8)",
+                    zIndex: 10,
+                    position: "relative",
+                },
+            }}
+        >
             <Suspense>
-                <GamepadKeyboard
-                    disableToggle={true}
-                    active={nicknameKeyboard}
-                    onFinish={(text) => {
-                        console.log("FINISH KEYBOARD", text)
-                        useStore.getState().setNickname(text);
-                        useStore.getState().setNicknameKeyboard(false);
-                    }}
-                    onCancel={(text) => {
-                        console.log("CANCEL KEYBOARD", text)
-                        // useStore.getState().setNickname(text);
-                        useStore.getState().setNicknameKeyboard(false);
-                    }}
-                />
-                <PieMenu
-                    options={[
-                        {
-                            label: 'Settings',
-                            icon: 'fad fa-cog',
-                            callback: () => {
-                                setShowSettingsModal(prev => !prev)
-                            }
-                        },
-                        {
-                            label: 'Go Back',
-                            icon: 'fad fa-arrow-left',
-                            callback: () => {
-                                window.history.back()
-                            }
-                        },
-                        {
-                            label: 'Credits',
-                            icon: 'fad fa-info-circle',
-                            callback: () => {
-                                setShowCreditsModal(true)
-                            }
-                        },
-                        {
-                            label: 'Game Launcher',
-                            icon: 'fad fa-gamepad',
-                            callback: () => {
-                                window.location.href = 'https://games.articles.media';
-                            }
-                        },
-                        {
-                            label: `${darkMode ? "Light" : "Dark"} Mode`,
-                            icon: 'fad fa-palette',
-                            callback: () => {
-                                toggleDarkMode()
-                            }
-                        }
-                    ]}
-                    onFinish={(event) => {
-                        console.log("Event", event)
-                        if (event.callback) {
-                            event.callback()
-                        }
-                    }}
-                />
+                <Box data-hide-in-screenshot-mode="true">
+                    <GamepadKeyboard
+                        disableToggle
+                        active={nicknameKeyboard}
+                        onFinish={(text) => {
+                            useStore.getState().setNickname(text);
+                            useStore.getState().setNicknameKeyboard(false);
+                        }}
+                        onCancel={() => useStore.getState().setNicknameKeyboard(false)}
+                    />
+                    <PieMenu
+                        options={[
+                            {
+                                label: menuLabel(SettingsIcon, "Settings"),
+                                callback: () => setShowSettingsModal(!useStore.getState().showSettingsModal),
+                            },
+                            {
+                                label: menuLabel(ArrowBackIcon, "Go Back"),
+                                callback: () => window.history.back(),
+                            },
+                            {
+                                label: menuLabel(InfoIcon, "Credits"),
+                                callback: () => setShowCreditsModal(true),
+                            },
+                            {
+                                label: menuLabel(SportsEsportsIcon, "Game Launcher"),
+                                callback: () => { window.location.href = "https://games.articles.media"; },
+                            },
+                            {
+                                label: menuLabel(PaletteIcon, `${darkMode ? "Light" : "Dark"} Mode`),
+                                callback: toggleDarkMode,
+                            },
+                        ]}
+                        onFinish={(event) => event.callback?.()}
+                    />
+                </Box>
             </Suspense>
 
             <PageTemplateLandingPage
                 useSocketStore={useSocketStore}
                 useStore={useStore}
-                // RotatingMascot={RotatingMascot}
                 Link={Link}
-                // logoImage={`/img/temp_logo.webp`}
-                LandingBackgroundAnimation={
-                    <LandingBackgroundAnimation />
+                useRouter={useRouter}
+                LandingBackgroundAnimation={<LandingBackgroundAnimation />}
+                heroOverride={
+                    <Box component="img" src="/img/temp_logo.webp" alt="Catching Game" sx={{ width: "100%" }} />
                 }
-                heroOverride={<>
-                    <img
-                        src={
-                            toontownMode ?
-                                "img/temp_logo.webp"
-                                :
-                                "img/temp_logo.webp"
-                        }
-                        alt="Hero Image"
-                        className='w-100'
-                    />
-                </>}
-                NicknameInputConfig={{
-                    // PreComponent:
-                    //     <>
-                    //         <img
-                    //             className='panel-bg me-2'
-                    //             src="img/toontown_icon.webp"
-                    //             width={70}
-                    //             height={70}
-                    //         />
-                    //     </>
-                }}
-                backgroundImage={
-                    toontownMode ?
-                        darkMode ?
-                            `img/dark-preview.webp`
-                            :
-                            `img/preview.webp`
-                        :
-                        darkMode ?
-                            `img/dark-preview.webp`
-                            :
-                            `img/preview.webp`
-                }
+                backgroundImage={darkMode ? "/img/dark-preview.webp" : "/img/preview.webp"}
                 singlePlayerConfig={{
                     attachServerType: "single-player",
+                    attachUrlParams: { server_type: "single-player" },
                 }}
                 multiplayerConfig={{
                     type: "WebSocket",
-                    // comingSoon: true,
                     defaultServers: 2,
-                    // privateServerSupport: false,
                     onlinePlayersTemplate: "2.0",
                 }}
             />
-
-        </>
+        </Box>
     );
 }

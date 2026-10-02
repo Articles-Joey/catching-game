@@ -1,36 +1,14 @@
 "use client";
 import { memo, useEffect, useRef } from "react";
 import nipplejs from 'nipplejs';
-import ArticlesButton from "@/components/UI/Button";
+import Box from "@mui/material/Box";
 import useTouchControlsStore from "@/hooks/useTouchControlsStore";
 
 const arePropsEqual = (prevProps, nextProps) => {
     return JSON.stringify(prevProps) === JSON.stringify(nextProps);
 };
 
-function JumpButtonBase() {
-
-    const setTouchControls = useTouchControlsStore((state) => state.setTouchControls);
-    const touchControls = useTouchControlsStore((state) => state.touchControls);
-
-    return (
-        <ArticlesButton
-            onClick={() => {
-                setTouchControls({
-                    ...touchControls,
-                    jump: true
-                })
-            }}
-            style={{ padding: '20px 40px', fontSize: '1.2rem', opacity: 0.8 }}
-        >
-            Jump
-        </ArticlesButton>
-    )
-}
-
-const JumpButton = memo(JumpButtonBase);
-
-function TouchControlsBase({ }) {
+function TouchControlsBase() {
 
     const touchControlsEnabled = useTouchControlsStore((state) => state.enabled);
 
@@ -99,45 +77,42 @@ function TouchControlsBase({ }) {
             if (managerRef.current) managerRef.current.destroy();
         };
 
-    }, [touchControlsEnabled]);
+    }, [touchControlsEnabled, setTouchControls]);
 
     if (!touchControlsEnabled) return null;
 
     return (
-        <div className={`touch-controls-area ${!touchControlsEnabled ? 'd-none' : ''}`} style={{
-            // position: 'absolute',
-            // top: 0,
-            // left: 0,
-            // width: '100vw',
-            // height: '100vh',
-            // pointerEvents: 'none', // Allow clicking through empty areas
-            // zIndex: 100
-        }}>
-
-            {/* Joystick Container - Pointer events enabled here */}
-            <div style={{
-                position: 'absolute',
-                bottom: '0px',
-                left: '0px',
-                width: '100%',
-                height: '100%',
-                pointerEvents: 'auto',
-                touchAction: 'none' // Prevent scrolling
-            }} id="zone_joystick">
-            </div>
-
-            {/* Jump Button Container */}
-            {/* <div style={{
-                position: 'absolute', 
-                bottom: '60px', 
-                right: '40px', 
-                pointerEvents: 'auto'
-            }}>
-                 <JumpButton />
-            </div> */}
-
-        </div>
-    )
+        <Box
+            className="touch-controls-area"
+            data-hide-in-screenshot-mode="true"
+            sx={{
+                position: "absolute",
+                bottom: 50,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 150,
+                height: 150,
+                zIndex: 1,
+                bgcolor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+        >
+            <Box
+                id="zone_joystick"
+                sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    pointerEvents: "auto",
+                    touchAction: "none",
+                }}
+            />
+        </Box>
+    );
 }
 
 const TouchControls = memo(TouchControlsBase, arePropsEqual);

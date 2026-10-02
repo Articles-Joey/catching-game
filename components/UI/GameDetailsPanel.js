@@ -1,123 +1,73 @@
-import { useGameStore } from "@/hooks/useGameStore"
-import ArticlesButton from "./Button"
-import { useSearchParams } from "next/navigation"
-import { useSocketStore } from "@/hooks/useSocketStore"
-import useGameFunctions from "@/hooks/useGameFunctions"
-// import { useIceSlideStore } from "@/hooks/useIceSlideStore"
+"use client";
+
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import { useSearchParams } from "next/navigation";
+import { useGameStore } from "@/hooks/useGameStore";
+import useGameFunctions from "@/hooks/useGameFunctions";
+import ArticlesButton from "./Button";
 
 export default function GameDetailsPanel() {
-
-    const players = useGameStore(state => state.gameState.players)
-    const fallingItems = useGameStore(state => state.gameState.fallingItems)
+    const players = useGameStore((state) => state.gameState.players);
+    const fallingItems = useGameStore((state) => state.gameState.fallingItems);
 
     return (
-        <div className="card game-details-panel">
-
-            <div className="card-body">
-
-                <div className="h6 mb-2 d-flex justify-content-between">
+        <Card sx={{ bgcolor: "game.card", backgroundImage: "none", border: 1, borderColor: "divider" }}>
+            <CardContent>
+                <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", fontSize: "1rem" }}>
                     <RoundAndTimer />
-                </div>
-
-                <div>Players</div>
-
-                {players?.length > 0 && players.map((player, index) => (
-                    <div key={index} className="player-entry border p-2">
-
-                        {/* <div className="player-color" style={{ backgroundColor: player.color }}></div> */}
-
-                        <div className="" style={{ fontSize: "0.6rem" }}>ID: {player.id}</div>
-
-                        <div className="player-name d-flex align-items-center">
-                            <span
-                                className={`badge ${player.ready ? 'bg-success' : 'bg-danger'} me-1`}
-                                style={{
-                                    fontSize: "0.6rem"
-                                }}
-                            >
-                                {player.ready ? "Ready" : "Not Ready"}
-                            </span>
-                            <span>{player.nickname || "?"} </span>
-                            <span>- {player.score || 0}</span>
-                        </div>
-
-                        {/* <div className="player-name">Ready: {player.ready ? "Yes" : "No"}</div> */}
-
-                        <div className="d-flex justify-content-between">
-
-                            <div>X: {player?.position?.x?.toFixed(2) || 0} | Z: {player?.position?.z?.toFixed(2) || 0}</div>
-
-                            {/* <div className="d-flex">
-                                <div className="me-2">
-                                    <i className="fad fa-rocket"></i>
-                                    {player.hitPower}
-                                </div>
-                                <div>
-                                    <i className="fad fa-undo"></i>
-                                    {player.hitRotation}
-                                </div>
-                            </div> */}
-
-                        </div>
-
-                    </div>
+                </Box>
+                <Box>Players</Box>
+                {players?.map((player) => (
+                    <Box key={player.id} sx={{ border: 1, borderColor: "divider", p: 1 }}>
+                        <Box sx={{ fontSize: "0.6rem" }}>ID: {player.id}</Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                            <Chip
+                                label={player.ready ? "Ready" : "Not Ready"}
+                                color={player.ready ? "success" : "error"}
+                                size="small"
+                                sx={{ height: 20, fontSize: "0.6rem" }}
+                            />
+                            <Box component="span">{player.nickname || "?"} - {player.score || 0}</Box>
+                        </Box>
+                        <Box>X: {player?.position?.x?.toFixed(2) || 0} | Z: {player?.position?.z?.toFixed(2) || 0}</Box>
+                    </Box>
                 ))}
-
-                <div>Falling Items</div>
-
-                {fallingItems?.length > 0 && fallingItems.map((obj, index) => (
-                    <div key={obj.id} className="player-entry border p-2">
-
-                        <div className="" style={{ fontSize: "0.6rem" }}>ID: {obj.id}</div>
-
-                        <div className="d-flex justify-content-between">
-
-                            <div>X: {obj?.x?.toFixed(2) || 0} | Z: {obj?.z?.toFixed(2) || 0}</div>
-
-                        </div>
-
-                    </div>
+                <Box>Falling Items</Box>
+                {fallingItems?.map((obj) => (
+                    <Box key={obj.id} sx={{ border: 1, borderColor: "divider", p: 1 }}>
+                        <Box sx={{ fontSize: "0.6rem" }}>ID: {obj.id}</Box>
+                        <Box>X: {obj?.x?.toFixed(2) || 0} | Z: {obj?.z?.toFixed(2) || 0}</Box>
+                    </Box>
                 ))}
-
-            </div>
-
-        </div>
-    )
+            </CardContent>
+        </Card>
+    );
 }
 
 function RoundAndTimer() {
-
-    const timer = useGameStore(state => state.gameState.timer)
-    const status = useGameStore(state => state.gameState.status)
-
-    // const startGame = useSocketStore(state => state.startGame)
-
-    const { startGame } = useGameFunctions()
-
-    const searchParams = useSearchParams()
-    const params = Object.fromEntries(searchParams.entries());
-    const { server } = params
+    const timer = useGameStore((state) => state.gameState.timer);
+    const status = useGameStore((state) => state.gameState.status);
+    const { startGame } = useGameFunctions();
+    const searchParams = useSearchParams();
+    const server = searchParams.get("server");
 
     return (
-        <div className="w-100">
-
-            <div className="d-flex align-items-center w-100 justify-content-between">
-                {/* <div>Round: {gameState?.round || 0}</div> */}
-                <div>Time: {timer || 0}</div>
-                <div>Status: {status || "N/A"}</div>
-            </div>
-
+        <Box sx={{ width: "100%" }}>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <Box>Time: {timer || 0}</Box>
+                <Box>Status: {status || "N/A"}</Box>
+            </Box>
             <ArticlesButton
                 small
-                className="w-100 mt-1"
+                sx={{ width: "100%", mt: 0.5 }}
                 disabled={status === "In Progress"}
-                onClick={() => {
-                    startGame(server, "In Progress")
-                }}
+                onClick={() => startGame(server, "In Progress")}
             >
                 Start Game
             </ArticlesButton>
-
-        </div>
-    )
+        </Box>
+    );
 }
