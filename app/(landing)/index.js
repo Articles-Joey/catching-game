@@ -41,6 +41,36 @@ export default function LobbyPage() {
     const elementsRef = useRef([]);
     useLandingNavigation(elementsRef);
 
+    const pieOptions = [
+        {
+            label: "Settings",
+            Icon: SettingsIcon,
+            callback: () => useStore.getState().setShowSettingsModal(true),
+        },
+        {
+            label: "Go Back",
+            Icon: ArrowBackIcon,
+            callback: () => window.history.back(),
+        },
+        {
+            label: "Credits",
+            Icon: InfoIcon,
+            callback: () => useStore.getState().setShowCreditsModal(true),
+        },
+        {
+            label: "Game Launcher",
+            Icon: SportsEsportsIcon,
+            callback: () => {
+                window.location.href = "https://games.articles.media";
+            },
+        },
+        {
+            label: `${darkMode ? "Light" : "Dark"} Mode`,
+            Icon: PaletteIcon,
+            callback: () => useStore.getState().toggleDarkMode(),
+        },
+    ];
+
     return (
         <Box
             sx={{
@@ -112,28 +142,22 @@ export default function LobbyPage() {
                         onCancel={() => useStore.getState().setNicknameKeyboard(false)}
                     />
                     <PieMenu
-                        options={[
-                            {
-                                label: menuLabel(SettingsIcon, "Settings"),
-                                callback: () => setShowSettingsModal(!useStore.getState().showSettingsModal),
-                            },
-                            {
-                                label: menuLabel(ArrowBackIcon, "Go Back"),
-                                callback: () => window.history.back(),
-                            },
-                            {
-                                label: menuLabel(InfoIcon, "Credits"),
-                                callback: () => setShowCreditsModal(true),
-                            },
-                            {
-                                label: menuLabel(SportsEsportsIcon, "Game Launcher"),
-                                callback: () => { window.location.href = "https://games.articles.media"; },
-                            },
-                            {
-                                label: menuLabel(PaletteIcon, `${darkMode ? "Light" : "Dark"} Mode`),
-                                callback: toggleDarkMode,
-                            },
-                        ]}
+                        options={pieOptions.map(({ label, Icon, callback }) => ({
+                            label: (
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 0.5,
+                                    }}
+                                >
+                                    <Icon fontSize="small" />
+                                    {label}
+                                </Box>
+                            ),
+                            callback,
+                        }))}
                         onFinish={(event) => event.callback?.()}
                     />
                 </Box>
@@ -151,7 +175,6 @@ export default function LobbyPage() {
                 backgroundImage={darkMode ? "/img/dark-preview.webp" : "/img/preview.webp"}
                 singlePlayerConfig={{
                     attachServerType: "single-player",
-                    attachUrlParams: { server_type: "single-player" },
                 }}
                 multiplayerConfig={{
                     type: "WebSocket",
