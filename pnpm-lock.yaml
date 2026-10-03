@@ -110,7 +110,7 @@ importers:
   .:
     dependencies:
       '@articles-media/articles-dev-box':
-        specifier: 2.0.0-beta.3
+        specifier: 2.0.0
         version: 2.0.0-beta.3(3c8fb6227a43623ee3aea3627d2fd981)
       '@articles-media/articles-gamepad-helper':
         specifier: ^0.0.13
