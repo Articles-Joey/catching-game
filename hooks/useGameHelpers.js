@@ -20,9 +20,10 @@ export default function useGameHelpers() {
                 ...gameState,
                 status: status || 'In Progress',
                 timer: 0, // Set the initial timer value (e.g., 60 seconds)
-                players: gameState.players.map(player => ({
+                players: (gameState.players || []).map(player => ({
                     ...player,
-                    score: 0 // Initialize player scores to 0
+                    score: 0,
+                    health: 5,
                 }))
             })
 

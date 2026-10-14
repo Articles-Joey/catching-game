@@ -23,6 +23,8 @@ export const useStore = create()(
                     cameraMode: newValue
                 }))
             },
+            // The active game camera registers this handler while mounted.
+            resetCamera: null,
 
         }),
         {
@@ -35,6 +37,7 @@ export const useStore = create()(
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => ![
                         ...typicalZustandStoreExcludes,
+                        'resetCamera',
                     ].includes(key))
                 ),
         },

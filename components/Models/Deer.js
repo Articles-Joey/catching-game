@@ -8,11 +8,13 @@ import React, { useEffect } from 'react'
 import { useGraph } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
+import useModelShadows from '@/hooks/useModelShadows'
 
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Assets/Quaternius/Animals/Models/Deer.glb`
 
 export function ModelQuaterniusAnimalsDeer(props) {
   const group = React.useRef()
+  useModelShadows(group)
   const { scene, animations } = useGLTF(link)
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone)

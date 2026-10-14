@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Box from "@mui/material/Box";
 import classNames from "classnames";
@@ -12,6 +12,7 @@ import { useGameStore } from "@/hooks/useGameStore";
 import UiOverlay from "@/components/UI/UiOverlay";
 import SinglePlayerHandler from "@/components/Handlers/SinglePlayerHandler";
 import GameOverOverlay from "@/components/UI/GameOverOverlay";
+import useTouchControlsStore from "@/hooks/useTouchControlsStore";
 
 const TouchControls = dynamic(() => import("@/components/UI/TouchControls"), { ssr: false });
 const GameCanvas = dynamic(() => import("@/components/Game/GameCanvas"), { ssr: false });
@@ -20,16 +21,27 @@ export default function GamePage() {
     const sidebar = useStore((state) => state.sidebar);
     const showMenu = useStore((state) => state.showMenu);
     const sceneKey = useStore((state) => state.sceneKey);
-    const setScore = useGameStore((state) => state.setScore);
-    const setHealth = useGameStore((state) => state.setHealth);
-    const setTimer = useGameStore((state) => state.setTimer);
+    const beginGameSession = useGameStore((state) => state.beginGameSession);
+    const resetGame = useGameStore((state) => state.resetGame);
+    const setShowGameOverModal = useStore((state) => state.setShowGameOverModal);
+    const [sessionReady, setSessionReady] = useState(false);
     const { isFullscreen } = useFullscreen();
 
     useEffect(() => {
-        setHealth(5);
-        setScore(0);
-        setTimer(60);
-    }, [sceneKey, setHealth, setScore, setTimer]);
+        beginGameSession();
+        setShowGameOverModal(false);
+        setSessionReady(true);
+
+        return () => {
+            resetGame();
+            setShowGameOverModal(false);
+            useTouchControlsStore.getState().setTouchControls({
+                jump: false, left: false, right: false, up: false, down: false,
+            });
+        };
+    }, [beginGameSession, resetGame, setShowGameOverModal]);
+
+    if (!sessionReady) return null;
 
     return (
         <Box
@@ -39,7 +51,29 @@ export default function GamePage() {
                 "show-sidebar": sidebar,
             })}
             id={`${process.env.NEXT_PUBLIC_GAME_KEY}-game-page`}
-            sx={{ position: "relative", display: "flex" }}
+            sx={(theme) => ({
+                position: "relative",
+                display: "flex",
+                "--toontown-bg-color": theme.palette.mode === "dark" ? "#a0a56c" : "#faffc7",
+                "--toontown-green-color": theme.palette.mode === "dark" ? "#005300" : "#019f02",
+                "--game-menu-header-background-color": "rgba(1, 159, 2, 0.5)",
+                "--game-menu-divider-color": "rgba(1, 80, 2, 0.2)",
+                // Match Cannon's menu skin on desktop and inside the mobile menu.
+                "& .panel-left, & .menu-bar, & .mobile-menu-container": {
+                    bgcolor: "var(--toontown-bg-color)",
+                    color: "#000",
+                    border: "2px solid var(--toontown-green-color)",
+                    borderRadius: "10px",
+                    "--card-background-override": "transparent",
+                    "--articles-button-background-color": "#ffd351",
+                    "--articles-button-hover-background-color": "#ffe078",
+                    "--articles-button-color": "#000",
+                    "--articles-button-hover-color": "#000",
+                    "--articles-card-font-color": "#000",
+                    "--articles-card-background-color": "transparent",
+                },
+                "& .panel-left, & .mobile-menu-container": { borderWidth: "10px" },
+            })}
         >
             <GameMenu
                 useStore={useStore}

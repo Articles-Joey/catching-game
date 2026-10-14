@@ -14,6 +14,8 @@ import { useGameStore } from "@/hooks/useGameStore";
 import { useScoreStore } from "@/hooks/useScoreStore";
 import useGameHelpers from "@/hooks/useGameHelpers";
 import ArticlesButton from "./Button";
+import ScoreList from "./ScoreList";
+import formatGameEndedAt from "@/util/formatGameEndedAt";
 
 export default function GameOverOverlay() {
     const searchParams = useSearchParams();
@@ -22,9 +24,11 @@ export default function GameOverOverlay() {
     const gameState = useGameStore((state) => state.gameState);
     const maxScore = useScoreStore((state) => state.maxScore);
     const recentScores = useScoreStore((state) => state.recentScores);
+    const bestScores = useScoreStore((state) => state.bestScores);
     const { startGame } = useGameHelpers();
     const isSinglePlayer = serverType === "single-player" || !server;
     const playerScore = gameState?.players?.[0]?.score || 0;
+    const playerDied = gameState?.players?.[0]?.health <= 0;
 
     if (gameState?.status !== "Game Over") return null;
 
@@ -38,7 +42,7 @@ export default function GameOverOverlay() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 zIndex: 3,
-                width: 300,
+                width: 600,
                 maxWidth: "calc(100vw - 32px)",
                 maxHeight: "calc(100dvh - 32px)",
                 overflowY: "auto",
@@ -49,17 +53,37 @@ export default function GameOverOverlay() {
                     Game Over
                 </Box>
                 <CardContent sx={{ textAlign: "center" }}>
-                    <Typography component="h2" variant="h5" sx={{ mb: 1 }}>Time&apos;s Up!</Typography>
+                    <Typography component="h2" variant="h5" sx={{ mb: 1 }}>
+                        {playerDied ? "Out of Health!" : "Time's Up!"}
+                    </Typography>
+                    <Typography
+                        component={gameState.endedAt ? "time" : "span"}
+                        dateTime={gameState.endedAt ?? undefined}
+                        variant="caption"
+                        sx={{ display: "block", mb: 1, color: "text.secondary" }}
+                    >
+                        Finished: {formatGameEndedAt(gameState.endedAt)}
+                    </Typography>
                     {isSinglePlayer && (
                         <>
                             <Box>You had a final score of {playerScore}!</Box>
-                            <Box>Your highest score is {maxScore}!</Box>
+                            {playerDied && <Box sx={{ mt: 1 }}>This score wasn&apos;t saved.</Box>}
+                            {bestScores.length > 0 && <Box>Your highest score is {maxScore}!</Box>}
                             <Divider sx={{ my: 2 }} />
-                            <Box>Recent Scores:</Box>
-                            {recentScores.length === 0 && <Box>No recent scores found.</Box>}
-                            {recentScores.map((score, index) => (
-                                <Box key={index}>{score.nickname}: {score.score}</Box>
-                            ))}
+                            <Box sx={{
+                                display: "grid",
+                                gridTemplateColumns: bestScores.length > 0 ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)",
+                                gap: 2,
+                            }}>
+                                {bestScores.length > 0 && (
+                                    <ScoreList title="Best Scores" scores={bestScores} />
+                                )}
+                                <ScoreList
+                                    title="Recent Scores"
+                                    scores={[...recentScores].reverse()}
+                                    emptyMessage="No recent scores found."
+                                />
+                            </Box>
                         </>
                     )}
                 </CardContent>

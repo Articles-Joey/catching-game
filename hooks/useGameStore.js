@@ -1,30 +1,47 @@
 // import { create } from 'zustand'
 import { createWithEqualityFn as create } from 'zustand/traditional'
 
+export const GAME_DURATION_SECONDS = 60;
+
+const initialGameState = () => ({
+    sessionActive: false,
+    playerLocation: false,
+    score: 0,
+    timer: GAME_DURATION_SECONDS,
+    health: 5,
+    maxHeight: 0,
+    distance: 0,
+    obstacles: [],
+    shift: false,
+    teleport: false,
+    targetLocation: null,
+    gameState: {},
+});
+
 export const useGameStore = create((set) => ({
 
-    playerLocation: false,
+    ...initialGameState(),
+    beginGameSession: () => set({ ...initialGameState(), sessionActive: true }),
+    resetGame: () => set(initialGameState()),
+
     setPlayerLocation: (newValue) => {
         set((prev) => ({
             playerLocation: newValue
         }))
     },
 
-    score: 0,
     setScore: (newValue) => {
         set((prev) => ({
             score: newValue
         }))
     },
 
-    timer: 60,
     setTimer: (newValue) => {
         set((prev) => ({
             timer: newValue
         }))
     },
 
-    health: 5,
     subtractHealth: (amount) => {
         set((prev) => ({
             health: Math.max(0, prev.health - amount)
@@ -36,14 +53,12 @@ export const useGameStore = create((set) => ({
         }))
     },
 
-    maxHeight: 0,
     setMaxHeight: (newValue) => {
         set((prev) => ({
             maxHeight: newValue
         }))
     },
 
-    distance: 0,
     setDistance: (newValue) => {
         set((prev) => ({
             distance: newValue
@@ -55,39 +70,49 @@ export const useGameStore = create((set) => ({
         }))
     },
 
-    obstacles: [],
     setObstacles: (newValue) => {
         set((prev) => ({
             obstacles: newValue
         }))
     },
 
-    shift: false,
     setShift: (newValue) => {
         set((prev) => ({
             shift: newValue
         }))
     },
 
-    teleport: false,
     setTeleport: (newValue) => {
         set((prev) => ({
             teleport: newValue
         }))
     },
 
-    targetLocation: null,
     setTargetLocation: (newValue) => {
         set((prev) => ({
             targetLocation: newValue
         }))
     },
 
-    gameState: {},
     setGameState: (newValue) => {
-        set((prev) => ({
-            gameState: newValue
-        }))
+        // Ignore late socket updates after leaving the game.
+        set((prev) => {
+            if (!prev.sessionActive) return {};
+
+            const localPlayer = newValue.players?.find((player) => player.id === "local");
+            const playerDied = newValue.status === "In Progress" && localPlayer?.health <= 0;
+            const gameState = playerDied ? { ...newValue, status: "Game Over", timer: 0 } : newValue;
+            const previousEndedAt = prev.gameState.status === "Game Over" ? prev.gameState.endedAt : null;
+
+            return {
+                gameState: {
+                    ...gameState,
+                    endedAt: gameState.status === "Game Over"
+                        ? previousEndedAt ?? gameState.endedAt ?? new Date().toISOString()
+                        : null,
+                },
+            };
+        })
     },
 
 }))

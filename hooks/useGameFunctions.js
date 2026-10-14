@@ -27,6 +27,7 @@ export default function useGameFunctions() {
                 ...gameState,
                 status: status || 'In Progress',
                 timer: 0,
+                players: (gameState.players || []).map(player => ({ ...player, score: 0, health: 5 })),
             })
         }
 

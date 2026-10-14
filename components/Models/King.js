@@ -10,11 +10,13 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import skinColor from './skinColor'
 import * as THREE from 'three'
+import useModelShadows from '@/hooks/useModelShadows'
 
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Assets/Quaternius/men/King-transformed.glb`
 
 export function Model(props) {
   const group = React.useRef()
+  useModelShadows(group)
   const { scene, animations } = useGLTF(link)
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone)

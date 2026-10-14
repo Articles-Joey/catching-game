@@ -1,49 +1,63 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import { useSearchParams } from "next/navigation";
 import { useGameStore } from "@/hooks/useGameStore";
 import useGameFunctions from "@/hooks/useGameFunctions";
 import ArticlesButton from "./Button";
+import MenuCard from "./MenuCard";
 
-export default function GameDetailsPanel() {
+const sectionHeaderSx = {
+    p: 1,
+    bgcolor: "var(--game-menu-header-background-color)",
+    borderBottom: 1,
+    borderColor: "var(--game-menu-divider-color)",
+};
+
+export default function GameDetailsPanel({ debug }) {
     const players = useGameStore((state) => state.gameState.players);
     const fallingItems = useGameStore((state) => state.gameState.fallingItems);
 
     return (
-        <Card sx={{ bgcolor: "game.card", backgroundImage: "none", border: 1, borderColor: "divider" }}>
-            <CardContent>
-                <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", fontSize: "1rem" }}>
-                    <RoundAndTimer />
-                </Box>
-                <Box>Players</Box>
-                {players?.map((player) => (
-                    <Box key={player.id} sx={{ border: 1, borderColor: "divider", p: 1 }}>
-                        <Box sx={{ fontSize: "0.6rem" }}>ID: {player.id}</Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                            <Chip
-                                label={player.ready ? "Ready" : "Not Ready"}
-                                color={player.ready ? "success" : "error"}
-                                size="small"
-                                sx={{ height: 20, fontSize: "0.6rem" }}
-                            />
-                            <Box component="span">{player.nickname || "?"} - {player.score || 0}</Box>
+        <>
+            <MenuCard sx={{ p: 2 }}>
+                <RoundAndTimer />
+            </MenuCard>
+            <MenuCard>
+                <Box sx={sectionHeaderSx}>Players</Box>
+                <Box sx={{ p: 1 }}>
+                    {players?.map((player) => (
+                        <Box key={player.id} sx={{ border: 1, borderColor: "var(--game-menu-divider-color)", p: 1 }}>
+                            <Box sx={{ fontSize: "0.6rem" }}>ID: {player.id}</Box>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                <Chip
+                                    label={player.ready ? "Ready" : "Not Ready"}
+                                    color={player.ready ? "success" : "error"}
+                                    size="small"
+                                    sx={{ height: 20, fontSize: "0.6rem" }}
+                                />
+                                <Box component="span">{player.nickname || "?"} - {player.score || 0}</Box>
+                            </Box>
+                            <Box>X: {player?.position?.x?.toFixed(2) || 0} | Z: {player?.position?.z?.toFixed(2) || 0}</Box>
                         </Box>
-                        <Box>X: {player?.position?.x?.toFixed(2) || 0} | Z: {player?.position?.z?.toFixed(2) || 0}</Box>
+                    ))}
+                </Box>
+            </MenuCard>
+            {debug && (
+                <MenuCard>
+                    <Box sx={sectionHeaderSx}>Falling Items</Box>
+                    <Box sx={{ p: 1 }}>
+                        {fallingItems?.map((obj) => (
+                            <Box key={obj.id} sx={{ border: 1, borderColor: "var(--game-menu-divider-color)", p: 1 }}>
+                                <Box sx={{ fontSize: "0.6rem" }}>ID: {obj.id}</Box>
+                                <Box>X: {obj?.x?.toFixed(2) || 0} | Z: {obj?.z?.toFixed(2) || 0}</Box>
+                            </Box>
+                        ))}
                     </Box>
-                ))}
-                <Box>Falling Items</Box>
-                {fallingItems?.map((obj) => (
-                    <Box key={obj.id} sx={{ border: 1, borderColor: "divider", p: 1 }}>
-                        <Box sx={{ fontSize: "0.6rem" }}>ID: {obj.id}</Box>
-                        <Box>X: {obj?.x?.toFixed(2) || 0} | Z: {obj?.z?.toFixed(2) || 0}</Box>
-                    </Box>
-                ))}
-            </CardContent>
-        </Card>
+                </MenuCard>
+            )}
+        </>
     );
 }
 
@@ -62,6 +76,7 @@ function RoundAndTimer() {
             </Box>
             <ArticlesButton
                 small
+                variant="success"
                 sx={{ width: "100%", mt: 0.5 }}
                 disabled={status === "In Progress"}
                 onClick={() => startGame(server, "In Progress")}

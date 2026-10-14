@@ -3,9 +3,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from "react"
 import { useStore } from "@/hooks/useStore"
-import { useSocketStore } from "@/hooks/useSocketStore"
 import { useSearchParams } from "next/navigation";
-import { useGameStore } from "@/hooks/useGameStore";
+import { GAME_DURATION_SECONDS, useGameStore } from "@/hooks/useGameStore";
 import { useScoreStore } from '@/hooks/useScoreStore';
 
 const totalRounds = 5;
@@ -47,8 +46,6 @@ export default function SinglePlayerHandler() {
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
 
-    const socket = useSocketStore(state => state.socket)
-
     const nickname = useStore((state) => state.nickname)
 
     const gameState = useGameStore(state => state.gameState)
@@ -59,13 +56,9 @@ export default function SinglePlayerHandler() {
     const playersLength = gameState?.players?.length || 0;
     const playerLocation = useGameStore((state) => state.playerLocation)
 
-    if (server) {
-        console.warn("Not single player mode, server param found:", server)
-        return null;
-    }
-
     useEffect(() => {
 
+        if (server) return;
         if (playersLength == 0) return
 
         const gameState = useGameStore.getState().gameState;
@@ -85,11 +78,12 @@ export default function SinglePlayerHandler() {
             ]
         })
     }, [
-        playerLocation, playersLength
+        playerLocation, playersLength, server
     ])
 
     useEffect(() => {
 
+        if (server) return;
         console.warn("SinglePlayerHandler - Player length check", status)
 
         if (
@@ -122,10 +116,11 @@ export default function SinglePlayerHandler() {
 
         }
 
-    }, [players?.length, status])
+    }, [players?.length, status, server])
 
     useEffect(() => {
 
+        if (server) return;
         console.warn("SinglePlayerHandler - Status change detected", status)
 
         let interval;
@@ -143,37 +138,28 @@ export default function SinglePlayerHandler() {
                 }
 
                 const currentGameTimer = currentGameState.timer ?? 0;
+                const localPlayer = currentGameState.players?.find((player) => player.id === 'local');
+
+                if (localPlayer?.health <= 0) {
+                    setGameState({ ...currentGameState, status: 'Game Over', timer: 0 });
+                    return;
+                }
 
                 const now = Date.now();
 
-                if (
-                    currentGameTimer
-                    >=
-                    59
-                    // 5
-                ) {
+                if (currentGameTimer >= GAME_DURATION_SECONDS - 1) {
+                    const endedAt = new Date(now).toISOString();
 
-                    if (
-                        currentGameState.players?.[0]?.score &&
-                        currentGameState.players?.[0]?.score > useScoreStore.getState().maxScore
-                    ) {
-                        useScoreStore.getState().setMaxScore(currentGameState.players?.[0]?.score || 0)
+                    if (localPlayer?.health > 0) {
+                        useScoreStore.getState().recordScore(localPlayer.score ?? 0, endedAt);
                     }
-
-                    useScoreStore.getState().addRecentScore(currentGameState.players?.[0]?.score || 0)
 
                     setGameState({
                         ...currentGameState,
                         status: 'Game Over',
-                        timer: 0
+                        timer: 0,
+                        endedAt,
                     });
-
-                    // useStore.getState().setShowGameOverModal({
-                    //     rankings: [],
-                    //     winner: {
-                    //         nickname: "123",
-                    //     }
-                    // })
 
                 } else {
                     setGameState({
@@ -204,6 +190,8 @@ export default function SinglePlayerHandler() {
             if (interval) clearInterval(interval);
         };
 
-    }, [status])
+    }, [status, server])
+
+    return null;
 
 }

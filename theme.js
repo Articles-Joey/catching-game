@@ -11,7 +11,8 @@ const roboto = Roboto({
 });
 
 export function createAppTheme(mode = "dark") {
-    const cardBackground = mode === "dark" ? "#452a19" : "#955d39";
+    const cardBackground = mode === "dark" ? "#a0a56c" : "#faffc7";
+    const cardBorder = mode === "dark" ? "#005300" : "#019f02";
 
     return createTheme({
         cssVariables: true,
@@ -24,6 +25,17 @@ export function createAppTheme(mode = "dark") {
             fontFamily: roboto.style.fontFamily,
         },
         components: {
+            MuiCard: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: cardBackground,
+                        backgroundImage: "none",
+                        color: "#000",
+                        border: `2px solid ${cardBorder}`,
+                        borderRadius: "10px",
+                    },
+                },
+            },
             MuiButton: {
                 styleOverrides: {
                     root: { fontSize: "0.75rem" },
@@ -45,7 +57,25 @@ export function createAppTheme(mode = "dark") {
                     ...bootstrapCompatibilityTheme.MuiCssBaseline.styleOverrides(muiTheme),
                     ":root": {
                         "--card-background-override": cardBackground,
-                        "--articles-card-font-color": mode === "dark" ? "#fff" : "#212529",
+                        "--articles-card-font-color": "#000",
+                        "--toontown-bg-color": cardBackground,
+                        "--toontown-green-color": cardBorder,
+                    },
+                    ".landing-page .card, .landing-page .MuiCard-root": {
+                        backgroundColor: cardBackground,
+                        color: "#000",
+                        border: `10px solid ${cardBorder}`,
+                        borderRadius: "10px",
+                        "--articles-button-background-color": "#ffd351",
+                        "--articles-button-hover-background-color": "#ffe078",
+                        "--articles-button-color": "#000",
+                        "--articles-button-hover-color": "#000",
+                        "--articles-card-font-color": "#000",
+                    },
+                    ".landing-page .card-header, .landing-page .card-footer, .landing-page .MuiCardHeader-root": {
+                        backgroundColor: "rgba(1, 159, 2, 0.5)",
+                        color: "#000",
+                        borderColor: "rgba(1, 80, 2, 0.2)",
                     },
                     ".stats-overlay": {
                         position: "fixed",
@@ -53,6 +83,9 @@ export function createAppTheme(mode = "dark") {
                         right: "0 !important",
                         left: "initial !important",
                         zIndex: 4,
+                    },
+                    '[data-articles-dev-box-screenshot-mode="enabled"] .stats-overlay': {
+                        display: "none !important",
                     },
                 }),
             },

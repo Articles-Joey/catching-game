@@ -4,19 +4,48 @@ Command: npx gltfjsx@6.5.3 CogFixed.glb -T
 Files: CogFixed.glb [13.02MB] > F:\My Documents\Sites games\ice-slide\public\models\CogFixed-transformed.glb [8MB] (39%)
 */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useGraph } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
-import * as THREE from 'three'
+import useModelShadows from '@/hooks/useModelShadows'
+
+const cogClipCache = new WeakMap()
+
+function getCogClips(animations) {
+  if (!cogClipCache.has(animations)) {
+    cogClipCache.set(animations, animations.map((clip) => {
+      // Use Cog's actual first animated frame, without assuming a frame rate.
+      const firstFrameTime = clip.tracks.reduce((earliest, track) => {
+        if (track.times.length < 2) return earliest
+        const nextTime = track.times.find((time) => time > 0)
+        return nextTime === undefined ? earliest : Math.min(earliest, nextTime)
+      }, Infinity)
+      if (!Number.isFinite(firstFrameTime) || firstFrameTime >= clip.duration) return clip
+
+      const trimmed = clip.clone()
+      for (const track of trimmed.tracks) {
+        // Put the first frame before playback time zero. Retain its key data so
+        // constant and sparsely keyed bone transforms keep their interpolation.
+        track.shift(-firstFrameTime)
+      }
+      // Keep the original final frame and all remaining playback timing.
+      trimmed.duration = clip.duration - firstFrameTime
+      return trimmed
+    }))
+  }
+  return cogClipCache.get(animations)
+}
 
 export function ModelCogFixed(props) {
   const { action: actionName = 'Action' } = props
   const group = React.useRef()
-  const { scene, animations } = useGLTF('models/CogFixed-transformed.glb')
+  useModelShadows(group)
+  const { scene, animations } = useGLTF('/models/CogFixed-transformed.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone)
-  const { actions } = useAnimations(animations, group)
+  const clips = React.useMemo(() => getCogClips(animations), [animations])
+  const { actions } = useAnimations(clips, group)
 
   useEffect(() => {
     if (!actions) return
@@ -25,8 +54,8 @@ export function ModelCogFixed(props) {
     let targetAction = actions[actionName]
     
     // If specific action name not found, try to use index 31 as default behavior
-    if (!targetAction && animations.length > 31) {
-        targetAction = actions[animations[31].name]
+    if (!targetAction && clips.length > 31) {
+        targetAction = actions[clips[31].name]
     }
 
     if (!targetAction) return
@@ -34,12 +63,12 @@ export function ModelCogFixed(props) {
     targetAction.reset().fadeIn(0.5).play()
     
     return () => targetAction.fadeOut(0.5)
-  }, [actions, actionName, animations])
+  }, [actions, actionName, clips])
 
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Scene">
-        <group name="Object_7" scale={0.004}>
+        <group name="Object_7" scale={0.006}>
           <primitive object={nodes._rootJoint} />
         </group>
         <skinnedMesh name="Object_10" geometry={nodes.Object_10.geometry} material={materials.cog_shoe} skeleton={nodes.Object_10.skeleton} scale={0.004} />
@@ -56,4 +85,4 @@ export function ModelCogFixed(props) {
   )
 }
 
-useGLTF.preload('models/CogFixed-transformed.glb')
+useGLTF.preload('/models/CogFixed-transformed.glb')

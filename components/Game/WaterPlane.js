@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { useRef, useMemo } from 'react'
-import { extend, useThree, useLoader, useFrame } from '@react-three/fiber'
+import { extend, useLoader, useFrame } from '@react-three/fiber'
 import { Water } from 'three-stdlib'
 import { useStore } from '@/hooks/useStore'
 
@@ -14,7 +14,6 @@ export default function WaterPlane(props) {
     const darkMode = useStore((state) => state.darkMode)
     
     const ref = useRef()
-    const gl = useThree((state) => state.gl)
 
     const waterNormals = useLoader(THREE.TextureLoader, link)
 
@@ -25,12 +24,11 @@ export default function WaterPlane(props) {
             textureWidth: 512,
             textureHeight: 512,
             waterNormals,
-            sunDirection: [1000, 10, 0],
+            sunDirection: new THREE.Vector3(-45, 90, 40).normalize(),
             sunColor: darkMode ? 0x222222 : 0xffffff,
             waterColor: darkMode ? 0x011111 : 0x001e0f,
             distortionScale: 3.7,
             fog: false,
-            format: gl.encoding
         }),
         [waterNormals, darkMode]
     )
@@ -42,12 +40,12 @@ export default function WaterPlane(props) {
 
     if (graphicsQuality === 'Low') {
         return (
-            <mesh {...props} rotation-x={-Math.PI / 2}>
+            <mesh {...props} rotation-x={-Math.PI / 2} receiveShadow>
                 <planeGeometry args={[250, 250]} />
                 <meshStandardMaterial color="#001e0f" />
             </mesh>
         )
     }
 
-    return <water ref={ref} args={[geom, config]} {...props} rotation-x={-Math.PI / 2} />
+    return <water ref={ref} args={[geom, config]} {...props} rotation-x={-Math.PI / 2} receiveShadow />
 }

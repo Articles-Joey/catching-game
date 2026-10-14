@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import PageTemplateLandingPage from "@articles-media/articles-dev-box/PageTempla
 import { useLandingNavigation } from "@/hooks/useLandingNavigation";
 import { useSocketStore } from "@/hooks/useSocketStore";
 import { useStore } from "@/hooks/useStore";
+import { useGameStore } from "@/hooks/useGameStore";
 
 const LandingBackgroundAnimation = dynamic(
     () => import("@/components/Game/LandingBackgroundAnimation"),
@@ -32,6 +33,8 @@ function menuLabel(Icon, text) {
 }
 
 export default function LobbyPage() {
+    const resetGame = useGameStore((state) => state.resetGame);
+    const setShowGameOverModal = useStore((state) => state.setShowGameOverModal);
     const darkMode = useStore((state) => state.darkMode);
     const toggleDarkMode = useStore((state) => state.toggleDarkMode);
     const nicknameKeyboard = useStore((state) => state.nicknameKeyboard);
@@ -40,6 +43,11 @@ export default function LobbyPage() {
 
     const elementsRef = useRef([]);
     useLandingNavigation(elementsRef);
+
+    useEffect(() => {
+        resetGame();
+        setShowGameOverModal(false);
+    }, [resetGame, setShowGameOverModal]);
 
     const pieOptions = [
         {
@@ -76,8 +84,6 @@ export default function LobbyPage() {
             sx={{
                 position: "relative",
                 isolation: "isolate",
-                "--articles-button-background-color": "#5ba030",
-                "--articles-button-color": "#000",
                 "& .landing-page": {
                     flexGrow: 1,
                     display: "flex",
@@ -85,7 +91,6 @@ export default function LobbyPage() {
                     alignItems: "center",
                     minHeight: "calc(100vh - 100px)",
                 },
-                "& .card": { "--articles-card-font-color": "#000" },
                 "& .MuiInputBase-root": { bgcolor: "#2e2b2c", color: "#fff" },
                 // NicknameInput supplies its own important colors in dev-box.
                 "& #nickname": { color: "#fff !important", WebkitTextFillColor: "#fff !important", caretColor: "#fff" },

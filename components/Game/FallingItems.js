@@ -1,137 +1,100 @@
-
 import useGameHelpers from "@/hooks/useGameHelpers";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useSocketStore } from "@/hooks/useSocketStore";
-import { useSphere } from "@react-three/cannon";
+import { BallCollider, RigidBody } from "@react-three/rapier";
+import { useFrame } from "@react-three/fiber";
 import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
+import FallingItemShadow from "./FallingItemShadow";
+import Acorn from "@/components/Models/Acorn";
+import Anvil from "@/components/Models/Anvil";
+
+const itemColors = { Point: "green", Penalty: "red", PowerUp: "blue" };
 
 export default function FallingItems() {
-
-    const fallingItems = useGameStore(state => state.gameState.fallingItems)
+    const fallingItems = useGameStore((state) => state.gameState.fallingItems);
 
     return (
         <group>
-            {fallingItems?.length > 0 && fallingItems.map((obj, index) => {
-
-                return (
-                    <FallingItem
-                        key={obj.id}
-                        obj={obj}
-                    />
-                )
-            })}
+            {fallingItems?.map((obj) => <FallingItem key={obj.id} obj={obj} />)}
         </group>
-    )
+    );
 }
 
 function FallingItem({ obj }) {
-
-    const searchParams = useSearchParams()
-    const params = Object.fromEntries(searchParams.entries());
-    const { server } = params
-
-    const socket = useSocketStore(state => state.socket)
-
-    const setGameState = useGameStore(state => state.setGameState)
-
-    const {
-        decreasePlayerScore,
-        increasePlayerScore,
-    } = useGameHelpers();
-
-    const { type, pickedUp } = obj;
-
-    // const setScore = useGameStore((state) => state.setScore);
-
-    const score = useGameStore((state) => state.score);
-    const ref = useRef();
-
+    const server = useSearchParams().get("server");
+    const socket = useSocketStore((state) => state.socket);
+    const status = useGameStore((state) => state.gameState.status);
+    const { increasePlayerScore } = useGameHelpers();
+    const bodyRef = useRef();
+    const despawnedRef = useRef(false);
     const [despawned, setDespawned] = useState(false);
 
-    // Color by type
-    function objTypeToColor(type) {
-        switch (type) {
-            case "Point":
-                return "green";
-            case "Penalty":
-                return "red";
-            case "PowerUp":
-                return "blue";
-            default:
-                return "gray";
+    function despawn() {
+        despawnedRef.current = true;
+        setDespawned(true);
+    }
+
+    function handleIntersection({ other }) {
+        if (despawnedRef.current || obj.pickedUp || useGameStore.getState().gameState.status !== "In Progress") return;
+        const data = other.rigidBodyObject?.userData;
+
+        if (data?.isPlayer) {
+            // Mark immediately so multiple intersections cannot award the same item twice.
+            despawn();
+            if (obj.type === "Penalty" && !data.onPenaltyHit?.()) return;
+
+            if (server) {
+                socket?.emit("game:catching-game:collision", {
+                    server,
+                    fallingItem_id: obj.id,
+                    type: obj.type,
+                });
+            } else {
+                if (obj.type === "Point") increasePlayerScore(1);
+            }
+        } else if (data?.isGround) {
+            despawn();
         }
     }
 
-    // Physics sphere
-    const [sphereRef, api] = useSphere(() => ({
-        mass: 1,
-        linearDamping: 0.5,
-        args: [1],
-        // args: [1, 1, 6],
-        position: [obj.x, 40, obj.z] || [0, 40, 0],
-        userData: {
-            isFallingItem: true,
-            type
-        },
-        onCollide: (e) => {
+    useFrame(() => {
+        const body = bodyRef.current;
+        if (!body || despawnedRef.current) return;
 
-            // console.log("Falling item collision detected with body:", e.body?.userData)
-
-            // Detect collision with player
-            if (e.body?.userData?.isPlayer) {
-
-                if (despawned || pickedUp) return;
-
-                console.log("Active falling item hit a player!")
-
-                if (server) {
-
-                    if (socket) {
-                        socket.emit('game:catching-game:collision', {
-                            server: server,
-                            fallingItem_id: obj.id,
-                            type: type,
-                        })
-                    }
-
-                } else {
-
-                    console.log("Single player type", type)
-
-                    if (type === "Point") increasePlayerScore(1, e.body.userData.playerId);
-
-                    if (type === "Penalty") decreasePlayerScore(1, e.body.userData.playerId);
-
-                    setDespawned(true);
-
-                }
-
-            }
-
-            if (e.body?.userData?.isGround) {
-                console.log("Falling item has hit the ground and will be despawned.")
-                setDespawned(true);
-            }
-
-        },
-    }));
-
-
-    // Disable collider if despawned or pickedUp
-    if (despawned || pickedUp) {
-        if (api) {
-            api.mass.set(0);
-            api.position.set(0, -9999, 0); // Move far away
-            api.collisionFilterMask.set(0); // Disable collisions
+        if (useGameStore.getState().gameState.status !== "In Progress") {
+            if (body.linvel().y !== 0) body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+            return;
         }
-        return null;
-    }
+
+        // Sensors fall through the ground; keep a height fallback for missed intersections.
+        if (body.translation().y <= 0.5) despawn();
+    });
+
+    if (despawned || obj.pickedUp) return null;
 
     return (
-        <mesh ref={sphereRef} castShadow>
-            <sphereGeometry args={[0.5, 6, 6]} />
-            <meshStandardMaterial attach="material" color={objTypeToColor(type)} />
-        </mesh>
+        <group>
+            <RigidBody
+                ref={bodyRef}
+                colliders={false}
+                position={[obj.x ?? 0, 40, obj.z ?? 0]}
+                gravityScale={status === "In Progress" ? (obj.type === "Penalty" ? 0.9 : 1) : 0}
+                linearDamping={0.5}
+                lockRotations
+                ccd
+                userData={{ isFallingItem: true, type: obj.type }}
+                onIntersectionEnter={handleIntersection}
+            >
+                <BallCollider args={[1]} sensor />
+                {obj.type === "Point" ? <Acorn /> : obj.type === "Penalty" ? <Anvil scale={0.7} /> : (
+                    <mesh>
+                        <sphereGeometry args={[0.5, 6, 6]} />
+                        <meshStandardMaterial color={itemColors[obj.type] || "gray"} />
+                    </mesh>
+                )}
+            </RigidBody>
+            <FallingItemShadow bodyRef={bodyRef} />
+        </group>
     );
 }

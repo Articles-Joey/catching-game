@@ -6,12 +6,15 @@ Files: models\rock_tallE.glb [5.19KB] > E:\Downloads\kenney_nature-kit\JSX\outpu
 
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import useModelShadows from '@/hooks/useModelShadows'
 const link = `${process.env.NEXT_PUBLIC_CDN}games/Assets/KennyNL/Nature/Models/rock_tallE-transformed.glb`;
 
 export function ModelKennyNLNatureRockTallE(props) {
+  const group = React.useRef()
+  useModelShadows(group)
   const { nodes, materials } = useGLTF(link)
   return (
-    <group {...props} dispose={null}>
+    <group ref={group} {...props} dispose={null}>
       <group position={[0, -0.05, 0]}>
         <mesh geometry={nodes.Mesh_rock_tallE.geometry} material={materials.dirt} />
         <mesh geometry={nodes.Mesh_rock_tallE_1.geometry} material={materials.grass} />

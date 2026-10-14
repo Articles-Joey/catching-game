@@ -1,20 +1,14 @@
-import { useFrame, useThree } from "@react-three/fiber"
-import { useSphere } from "@react-three/cannon"
-import { useGLTF, useAnimations, Text } from '@react-three/drei'
-import { memo, useEffect, useRef, useState } from "react"
+import { useFrame } from "@react-three/fiber"
+import { BallCollider, RigidBody } from "@react-three/rapier"
+import { Suspense, useEffect, useRef, useState } from "react"
 import { Vector3 } from "three"
 import * as THREE from 'three';
 import { useKeyboard } from "@/hooks/useKeyboard"
 
-import { useControllerStore } from '@/hooks/useControllerStore';
 import { useGameStore } from "@/hooks/useGameStore";
-// import { useTouchControlsStore } from "@/hooks/useTouchControlsStore";
-
-// import ClownfishModel from "./PlayerModels/Clownfish"
-// import BoneFishModel from "./PlayerModels/BoneFish"
-// import { useLocalStorageNew } from "@/hooks/useLocalStorageNew"
 
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
+import ModelToonCharacter from "@/components/Models/ModelToonCharacter";
 import { degToRad } from "three/src/math/MathUtils"
 import { useStore } from "@/hooks/useStore"
 import { useAudioStore } from "@/hooks/useAudioStore"
@@ -22,11 +16,12 @@ import { useSocketStore } from "@/hooks/useSocketStore"
 import { useSearchParams } from "next/navigation"
 import useTouchControlsStore from "@/hooks/useTouchControlsStore"
 import useGameFunctions from "@/hooks/useGameFunctions"
+import useGameHelpers from "@/hooks/useGameHelpers"
+import CharacterNickname from "./CharacterNickname";
+import MoveTargetIndicator from "./MoveTargetIndicator";
 
 const JUMP_FORCE = 0;
 const SPEED = 12;
-
-let lastLocation
 
 function myToFixed(i, digits) {
     var pow = Math.pow(10, digits);
@@ -34,112 +29,80 @@ function myToFixed(i, digits) {
     return Math.floor(i * pow) / pow;
 }
 
-function Player(props) {
+function Player() {
 
-    const playerModelRef = useRef()
+    const bodyRef = useRef()
+    const lastLocationRef = useRef()
+    const recoveryTimerRef = useRef()
+    const [action, setAction] = useState("Idle")
+    const [lastMove, setLastMove] = useState(0);
+    const [isDead, setIsDead] = useState(false);
+    const isDeadRef = useRef(false);
+    const socket = useSocketStore((state) => state.socket)
 
     const searchParams = useSearchParams()
     const params = Object.fromEntries(searchParams.entries());
     const { server } = params
 
     const {
-        addScore,
-        subtractScore,
         subtractHealth,
     } = useGameFunctions()
+    const { decreasePlayerScore } = useGameHelpers();
 
-    // const { setPlayerData, teleportPlayer, setTeleportPlayer } = props;
-
-    // const {
-    //     cameraMode, setCameraMode,
-    //     teleport, setTeleport,
-    //     setPlayerLocation,
-    //     maxHeight, setMaxHeight,
-    //     shift, setShift,
-    //     addDistance,
-    //     score, setScore,
-    //     debug
-    // } = useGameStore()
-    // const cameraMode = useGameStore((state) => state.cameraMode)
-    // const setCameraMode = useGameStore((state) => state.setCameraMode)
     const teleport = useGameStore((state) => state.teleport)
     const setTeleport = useGameStore((state) => state.setTeleport)
     const setPlayerLocation = useGameStore((state) => state.setPlayerLocation)
-    const health = useGameStore((state) => state.health)
+    const health = useGameStore((state) => state.gameState.players?.find((player) =>
+        server ? socket?.id && (player.id === socket.id || player.socketId === socket.id) : player.id === "local"
+    )?.health ?? state.health)
     const maxHeight = useGameStore((state) => state.maxHeight)
     const setMaxHeight = useGameStore((state) => state.setMaxHeight)
     const shift = useGameStore((state) => state.shift)
     const setShift = useGameStore((state) => state.setShift)
     const addDistance = useGameStore((state) => state.addDistance)
-    // const score = useGameStore((state) => state.score)
-    const setScore = useGameStore((state) => state.setScore)
     const debug = useStore((state) => state.debug);
-    // const subtractHealth = useGameStore((state) => state.subtractHealth)
+    const toontownMode = useStore((state) => state.toontownMode);
+    const nickname = useStore((state) => state.nickname);
 
     const touchControls = useTouchControlsStore((state) => state.touchControls)
     const setTouchControls = useTouchControlsStore((state) => state.setTouchControls)
     const targetLocation = useGameStore((state) => state.targetLocation)
     const setTargetLocation = useGameStore((state) => state.setTargetLocation)
 
-    // const audioSettings = useAudioStore((state) => state?.audioSettings);
-
     useEffect(() => {
         if (health <= 0) {
-            console.log("Player is dead")
+            clearTimeout(recoveryTimerRef.current);
+            recoveryTimerRef.current = null;
+            isDeadRef.current = true;
             setIsDead(true);
             setAction("Death");
 
             if (useAudioStore?.getState()?.audioSettings?.enabled) {
                 const audio = new Audio("/audio/Toontown_sad.ogg")
-                audio.play()
+                audio.play().catch(() => {})
             }
 
+        } else if (!recoveryTimerRef.current) {
+            isDeadRef.current = false;
+            setIsDead(false);
+            setAction("Idle");
         }
     }, [health]);
 
-    const { socket } = useSocketStore()
-
-    // const status = useGameStore(state => state.gameState.status)
-
-    const { controllerState, setControllerState } = useControllerStore()
-
-    // const [character, setCharacter] = useLocalStorageNew("game:ocean-rings:character", {
-    //     model: 'Clownfish',
-    //     color: '#000000'
-    // })
-
-    // Attach event listeners when the component mounts
     useEffect(() => {
 
-        // if (controllerState.axes && Math.abs(controllerState?.axes[0]) > 0.3) {
-
-        //     if (controllerState?.axes[0] > 0) {
-        //         api.position.set([-1, 5, 0]);
-        //     } else {
-        //         api.position.set([1, 5, 0]);
-        //     }
-
-        // }
-
-    }, [controllerState]);
-
-    useEffect(() => {
-
-        if (teleport) {
-
-            console.log("Teleport has been called!", teleport)
-            api.position.set(teleport[0], teleport[1], teleport[2]);
+        if (teleport && bodyRef.current) {
+            bodyRef.current.setTranslation({ x: teleport[0], y: teleport[1], z: teleport[2] }, true);
+            bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
             setTeleport(false)
 
         }
 
-    }, [teleport]);
+    }, [teleport, setTeleport]);
 
-    const { moveBackward, moveForward, moveRight, moveLeft, jump, shift: isShifting, crouch } = useKeyboard()
-    const [action, setAction] = useState("Idle")
-    const [lastMove, setLastMove] = useState(0);
-    const [isDead, setIsDead] = useState(false);
-    const isDeadRef = useRef(false);
+    useEffect(() => () => clearTimeout(recoveryTimerRef.current), []);
+
+    const { moveBackward, moveForward, moveRight, moveLeft, jump, shift: isShifting } = useKeyboard()
 
     useEffect(() => {
         isDeadRef.current = isDead;
@@ -155,9 +118,10 @@ function Player(props) {
     });
 
     useFrame(() => {
-        const gamepads = navigator.getGamepads();
+        const gamepads = navigator.getGamepads?.() || [];
         const gp = gamepads[0];
 
+        const input = { forward: false, backward: false, left: false, right: false, jump: false };
         if (gp) {
             const axes = gp.axes;
             const buttons = gp.buttons;
@@ -167,13 +131,13 @@ function Player(props) {
             let backward = false;
             let left = false;
             let right = false;
-            let jump = buttons[0].pressed; // A button
+            let jump = buttons[0]?.pressed || false; // A button
 
             // D-Pad
-            if (buttons[12].pressed) forward = true; // Up
-            if (buttons[13].pressed) backward = true; // Down
-            if (buttons[14].pressed) left = true; // Left
-            if (buttons[15].pressed) right = true; // Right
+            if (buttons[12]?.pressed) forward = true; // Up
+            if (buttons[13]?.pressed) backward = true; // Down
+            if (buttons[14]?.pressed) left = true; // Left
+            if (buttons[15]?.pressed) right = true; // Right
 
             // Left Stick
             if (axes[1] < -threshold) forward = true;
@@ -181,8 +145,9 @@ function Player(props) {
             if (axes[0] < -threshold) left = true;
             if (axes[0] > threshold) right = true;
 
-            setControllerInput({ forward, backward, left, right, jump });
+            Object.assign(input, { forward, backward, left, right, jump });
         }
+        setControllerInput((previous) => Object.keys(input).every((key) => input[key] === previous[key]) ? previous : input);
     });
 
     useEffect(() => {
@@ -225,121 +190,83 @@ function Player(props) {
 
     }, [moveBackward, moveForward, moveRight, moveLeft, controllerInput, isDead, touchControls])
 
-    const { camera } = useThree()
-
     const [startPosition] = useState(() => [
         (Math.random() * 29) - 14.5,
         1,
         (Math.random() * 29) - 14.5
     ])
 
-    const [ref, api] = useSphere(() => ({
-        mass: 10,
-        args: [1],
-        position: startPosition,
-        userData: {
-            isPlayer: true
-        },
-        onCollide: (e) => {
+    function beginHitReaction() {
+        if (isDeadRef.current || useGameStore.getState().gameState.status !== "In Progress") return false;
 
-            console.log("Player Collide", e)
+        isDeadRef.current = true;
+        setIsDead(true);
+        setAction("Death");
 
-            if (e.body.userData.isEnemy) {
+        const body = bodyRef.current;
+        if (body) body.setLinvel({ x: 0, y: body.linvel().y, z: 0 }, true);
 
-                const status = useGameStore.getState().gameState.status
-
-                if (status !== "In Progress") {
-                    api.velocity.set(0, 0, 0);
-                    return;
-                }
-
-                if (!isDeadRef.current) {
-
-                    // const currentScore = useGameStore.getState().score
-                    // setScore(currentScore - 1)
-
-                    subtractHealth(1)
-
-                    socket.emit('game:catching-game:hit', {
-                        server: server,
-                    })
-
-                    setIsDead(true);
-                    setAction("Death");
-
-                    setTimeout(() => {
-                        if (useGameStore.getState().health > 0) {
-                            setIsDead(false);
-                        }
-                    }, 1000);
-
-                    if (useAudioStore?.getState()?.audioSettings?.enabled) {
-                        const audio = new Audio("/audio/surprise.mp3")
-                        audio.play()
-                    }
-
-                }
+        recoveryTimerRef.current = setTimeout(() => {
+            recoveryTimerRef.current = null;
+            const state = useGameStore.getState();
+            const player = state.gameState.players?.find((player) =>
+                server ? socket?.id && (player.id === socket.id || player.socketId === socket.id) : player.id === "local"
+            );
+            if ((player?.health ?? state.health) > 0) {
+                isDeadRef.current = false;
+                setIsDead(false);
+                setAction("Idle");
             }
+        }, 1000);
 
-            // if (e.body.userData.isPositiveObject) {
-
-            //     const currentScore = useGameStore.getState().score
-            //     setScore(currentScore + 1)
-            //     incrementScore(1)
-
-            // }
-
+        if (useAudioStore.getState().audioSettings?.enabled) {
+            new Audio("/audio/surprise.mp3").play().catch(() => {});
         }
-    }))
 
-    const material = new THREE.MeshPhysicalMaterial({
-        color: 'blue',
-        opacity: debug ? 0.5 : 0,
-        transparent: true
-    });
+        return true;
+    }
+
+    function handleEnemyHit({ other }) {
+        if (!other.rigidBodyObject?.userData?.isEnemy || !beginHitReaction()) return;
+
+        if (server) socket?.emit("game:catching-game:hit", { server });
+        else subtractHealth(1);
+    }
+
+    function handlePenaltyHit() {
+        if (!beginHitReaction()) return false;
+
+        if (!server) {
+            decreasePlayerScore(1);
+            subtractHealth(1);
+        }
+
+        return true;
+    }
 
     const vel = useRef([0, 0, 0])
-    useEffect(() => {
-        api.velocity.subscribe((v) => vel.current = v)
-    }, [api.velocity])
-
-    const pos = useRef([0, 0, 0])
-    useEffect(() => {
-
-        api.position.subscribe((p) => {
-
-            pos.current = p
-
-            // setPlayerLocation(p)
-
-            if (playerModelRef.current) {
-                playerModelRef.current.position.set(...p);
-            }
-
-        })
-
-    }, [api.position])
+    const pos = useRef(startPosition)
 
     useEffect(() => {
-        console.log("Shift", isShifting)
         setShift(isShifting)
-    }, [isShifting])
+    }, [isShifting, setShift])
 
     useFrame(() => {
 
-        addDistance(0.1)
+        const body = bodyRef.current;
+        if (!body) return;
+        const position = body.translation();
+        const velocity = body.linvel();
+        pos.current = [position.x, position.y, position.z];
+        vel.current = [velocity.x, velocity.y, velocity.z];
 
-        // if (cameraMode == "Player") {
-        //     camera.position.copy(new Vector3(0, pos.current[1], (pos.current[2] + 10)))
-        //     camera.lookAt(new Vector3(0, pos.current[1], (pos.current[2] + 5)))
-        // }
+        addDistance(0.1)
 
         let posX = 0
         if (pos.current[0]) {
             posX = myToFixed(pos.current[0], 2)
         }
 
-        // console.log(pos.current[1])
         let posY = 0
         if (pos.current[1]) {
             posY = myToFixed(pos.current[1], 2)
@@ -350,35 +277,28 @@ function Player(props) {
             posZ = myToFixed(pos.current[2], 2)
         }
 
-        // console.log(posX)
-
         let newLocation = new Vector3(posX, posY, posZ)
 
-        if (JSON.stringify(lastLocation) !== JSON.stringify(newLocation)) {
-            // console.log(newLocation, lastLocation)
+        const movement = { position: newLocation, action, lastMove };
+        if (JSON.stringify(lastLocationRef.current) !== JSON.stringify(movement)) {
             setPlayerLocation(newLocation)
 
-            if (socket) {
+            if (socket && server) {
                 socket.emit(`game:${process.env.NEXT_PUBLIC_GAME_KEY}:move`, {
                     server: server,
                     x: newLocation.x,
-                    // y: newLocation.y,
                     z: newLocation.z,
                     action: action,
                     rotation: [0, degToRad(lastMove), 0]
                 })
             }
 
-            lastLocation = newLocation
+            lastLocationRef.current = movement
         }
-        // else {
-        if (isDeadRef.current) {
-            api.velocity.set(0, 0, 0);
+        if (isDeadRef.current || useGameStore.getState().gameState.status === "Game Over") {
+            body.setLinvel({ x: 0, y: velocity.y, z: 0 }, true);
             return;
         }
-
-        //     console.log("location unchanged")
-        // }
 
         if (pos.current[1] > maxHeight) {
             setMaxHeight(pos.current[1].toFixed(2))
@@ -402,7 +322,6 @@ function Player(props) {
             .subVectors(frontVector, sideVector)
             .normalize()
             .multiplyScalar(SPEED * (shift ? 2 : 1))
-        // .applyEuler(camera.rotation)
 
         if ((frontVector.z !== 0 || sideVector.x !== 0) && targetLocation) {
             setTargetLocation(null);
@@ -426,36 +345,28 @@ function Player(props) {
             }
         }
 
-        api.velocity.set(direction.x, 0, direction.z)
+        body.setLinvel({ x: direction.x, y: velocity.y, z: direction.z }, true)
 
         // Limit player movement to -15, -15 to 15, 15
         const LIMIT = 14.5
         if (Math.abs(pos.current[0]) > LIMIT || Math.abs(pos.current[2]) > LIMIT) {
-            api.position.set(
-                Math.max(-LIMIT, Math.min(LIMIT, pos.current[0])),
-                pos.current[1],
-                Math.max(-LIMIT, Math.min(LIMIT, pos.current[2]))
-            )
+            body.setTranslation({
+                x: Math.max(-LIMIT, Math.min(LIMIT, pos.current[0])),
+                y: pos.current[1],
+                z: Math.max(-LIMIT, Math.min(LIMIT, pos.current[2])),
+            }, true)
         }
 
         if ((jump || touchControls?.jump || controllerInput.jump) && Math.abs(vel.current[1]) < 0.05) {
 
-            console.log("Jump understood")
-
-            api.velocity.set(vel.current[0], JUMP_FORCE, vel.current[2])
+            body.setLinvel({ x: direction.x, y: JUMP_FORCE, z: direction.z }, true)
 
             if (
                 touchControls?.jump
-                // ||
-                // touchControls?.left
-                // ||
-                // touchControls?.right
             ) {
                 setTouchControls({
                     ...touchControls,
                     jump: false,
-                    // left: false,
-                    // right: false
                 })
             }
         }
@@ -465,42 +376,42 @@ function Player(props) {
     return (
         <group>
 
-            <group
-                ref={playerModelRef}
+            <RigidBody
+                ref={bodyRef}
+                position={startPosition}
+                colliders={false}
+                lockRotations
+                friction={0}
+                userData={{ isPlayer: true, playerId: server ? socket?.id : "local", onPenaltyHit: handlePenaltyHit }}
+                onIntersectionEnter={handleEnemyHit}
             >
+                <BallCollider args={[1]} mass={10} />
 
-                {/* TODO - Add player nickname to scene */}
+                <CharacterNickname nickname={nickname} position={[0, 2.8, 0]} />
                 {/* TODO - Add AMCOT Characters package */}
 
-                <SpacesuitModel
-                    scale={2}
-                    action={action}
-                    rotation={[0, degToRad(lastMove), 0]}
-                    position={[0, -0.5, 0]}
-                />
-            </group>
-
-            <mesh
-                ref={ref}
-                // {...props}
-                // position={position}
-                material={material}
-            >
-                <sphereGeometry args={[1, 32, 32]} />
-
-                {/* <Text
-                    color="black" position={[0, -0.7, 0]} scale={0.3} anchorX="center" anchorY="middle"
-                >
-                    Player ({character.model})
-                </Text> */}
-
-            </mesh>
+                <Suspense fallback={null}>
+                    {toontownMode ? <ModelToonCharacter
+                        action={action}
+                        isWalking={action === "Walk"}
+                        isSprinting={action === "Walk" && shift}
+                        rotation={[0, degToRad(lastMove), 0]}
+                        position={[0, -1, 0]}
+                    /> : <SpacesuitModel
+                        scale={2}
+                        action={action}
+                        rotation={[0, degToRad(lastMove), 0]}
+                        position={[0, -0.5, 0]}
+                    />}
+                </Suspense>
+                {debug && <mesh>
+                    <sphereGeometry args={[1, 32, 32]} />
+                    <meshBasicMaterial color="blue" wireframe opacity={0.5} transparent />
+                </mesh>}
+            </RigidBody>
 
             {targetLocation && (
-                <mesh position={targetLocation}>
-                    <sphereGeometry args={[0.5, 32, 32]} />
-                    <meshBasicMaterial color="green" opacity={1} transparent />
-                </mesh>
+                <MoveTargetIndicator position={[targetLocation[0], targetLocation[1] - 0.35, targetLocation[2]]} />
             )}
 
         </group>

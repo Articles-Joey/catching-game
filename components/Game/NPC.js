@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect } from "react";
-import { useSphere } from "@react-three/cannon";
+import { Suspense, useState, useRef } from "react";
+import { BallCollider, RigidBody } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
-import { Vector3, Quaternion, Matrix4 } from "three";
+import { Vector3 } from "three";
 import { Model as SpacesuitModel } from "@/components/Models/Spacesuit";
 import generateRandomInteger from "@/util/generateRandomInteger";
 import { useGameStore } from "@/hooks/useGameStore";
+import { useStore } from "@/hooks/useStore";
+import ModelToonCharacter from "@/components/Models/ModelToonCharacter";
 
 export default function NPC({ startPosition = [5, 1, 5] }) {
+    const toontownMode = useStore((state) => state.toontownMode);
 
     const [action, setAction] = useState("Idle");
     const [rotation, setRotation] = useState([0, 0, 0]);
@@ -15,24 +18,9 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
     
     // NPC state
     const destinationRef = useRef(null);
-    const isWaitingRef = useRef(false);
+    const waitRemainingRef = useRef(0);
     
-    const [ref, api] = useSphere(() => ({
-        mass: 2, // Slightly heavier to give a stable bump
-        args: [1],
-        position: startPosition,
-        fixedRotation: true, // Prevent rolling
-        linearDamping: 0.5, // Stop quickly when force is removed
-        onCollide: (e) => {
-            // console.log("NPC Collide", e.body.name)
-        }
-    }));
-
-    const pos = useRef([0, 0, 0]);
-    useEffect(() => {
-        const unsubscribe = api.position.subscribe((v) => pos.current = v);
-        return () => unsubscribe();
-    }, [api.position]);
+    const bodyRef = useRef();
 
     const pickNewDestination = () => {
         const limit = 14.5;
@@ -42,10 +30,13 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
     };
 
     useFrame((state, delta) => {
+        const body = bodyRef.current;
+        if (!body) return;
+        const velocityY = body.linvel().y;
         if (status !== "In Progress") {
+            body.setLinvel({ x: 0, y: velocityY, z: 0 }, true);
             if (action !== "Idle") {
                 setAction("Idle");
-                api.velocity.set(0, 0, 0);
             }
             return;
         }
@@ -54,12 +45,15 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
             destinationRef.current = pickNewDestination();
         }
 
-        if (isWaitingRef.current) {
-             api.velocity.set(0, 0, 0);
-             return;
+        if (waitRemainingRef.current > 0) {
+            waitRemainingRef.current -= delta;
+            body.setLinvel({ x: 0, y: velocityY, z: 0 }, true);
+            if (waitRemainingRef.current <= 0) destinationRef.current = pickNewDestination();
+            return;
         }
 
-        const currentPos = new Vector3(pos.current[0], pos.current[1], pos.current[2]);
+        const translation = body.translation();
+        const currentPos = new Vector3(translation.x, translation.y, translation.z);
         const dest = destinationRef.current;
         
         // Ignore Y axis for distance check to simpler 2D movement logic
@@ -67,26 +61,18 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
 
         if (dist < 1) {
             // Arrived
-            isWaitingRef.current = true;
+            waitRemainingRef.current = generateRandomInteger(1000, 4000) / 1000;
             setAction("Idle");
-            api.velocity.set(0, 0, 0);
-
-            const waitTime = generateRandomInteger(1000, 4000);
-            
-            setTimeout(() => {
-                destinationRef.current = pickNewDestination();
-                isWaitingRef.current = false;
-                setAction("Walk");
-            }, waitTime);
+            body.setLinvel({ x: 0, y: velocityY, z: 0 }, true);
 
         } else {
             // Move towards destination
             const direction = new Vector3()
-                .subVectors(dest, currentPos)
+                .set(dest.x - currentPos.x, 0, dest.z - currentPos.z)
                 .normalize();
                 
             const SPEED = 6;
-            api.velocity.set(direction.x * SPEED, 0, direction.z * SPEED);
+            body.setLinvel({ x: direction.x * SPEED, y: velocityY, z: direction.z * SPEED }, true);
             
             // Calculate rotation to face direction
             const angle = Math.atan2(direction.x, direction.z);
@@ -97,18 +83,26 @@ export default function NPC({ startPosition = [5, 1, 5] }) {
     });
 
     return (
-        <group ref={ref}>
-             <SpacesuitModel
-                scale={2}
-                action={action}
-                rotation={rotation} 
-                position={[0, -0.5, 0]}
-            />
+        <RigidBody ref={bodyRef} colliders={false} position={startPosition} lockRotations linearDamping={0.5}>
+            <BallCollider args={[1]} mass={2} />
+            <Suspense fallback={null}>
+                {toontownMode ? <ModelToonCharacter
+                    action={action}
+                    isWalking={action === "Walk"}
+                    rotation={rotation}
+                    position={[0, -1, 0]}
+                /> : <SpacesuitModel
+                    scale={2}
+                    action={action}
+                    rotation={rotation}
+                    position={[0, -0.5, 0]}
+                />}
+            </Suspense>
             {/* Debug visual for destination */}
             {/* <mesh position={[destinationRef.current?.x || 0, 0.5, destinationRef.current?.z || 0]}>
                 <boxGeometry args={[0.5, 0.5, 0.5]} />
                 <meshStandardMaterial color="green" />
             </mesh> */}
-        </group>
+        </RigidBody>
     );
 }

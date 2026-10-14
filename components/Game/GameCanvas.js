@@ -1,19 +1,13 @@
 "use client"
-import { memo, useEffect, useMemo } from "react";
+import { memo, Suspense } from "react";
 
 import { Canvas } from "@react-three/fiber"
-import { OrbitControls, Stats } from "@react-three/drei";
-
-import { NearestFilter, RepeatWrapping, TextureLoader, Vector3 } from "three";
-
-import { Debug, Physics, useBox, usePlane, useSphere } from "@react-three/cannon";
+import { Sky, Stats } from "@react-three/drei";
+import { Physics } from "@react-three/rapier";
 import { degToRad } from "three/src/math/MathUtils";
 
-// import { Model as SpacesuitModel } from "@/components/Games/Assets/Quaternius/men/Spacesuit";
 import Player from "./Player";
-import generateRandomInteger from "@/util/generateRandomInteger";
 
-import Tree from "@/components/Models/Tree";
 import WaterPlane from "./WaterPlane";
 import { ModelQuaterniusAnimalsDeer } from "@/components/Models/Deer";
 import { ModelQuaterniusAnimalsCow } from "@/components/Models/Cow";
@@ -23,35 +17,27 @@ import { ModelKennyNLNatureRockTallE } from "@/components/Models/rock_tallE";
 import { Enemy } from "./Enemy";
 import { useGameStore } from "@/hooks/useGameStore";
 import { useStore } from "@/hooks/useStore";
-import TimeHandler from "./TimeHandler";
-import SquareOfTrees from "./SquareOfTrees";
+import TreeArea from "./TreeArea";
+import SceneryArea from "./SceneryArea";
+import GrassArea from "./GrassArea";
+import FenceSquare from "./FenceSquare";
+import FenceImageRing from "./FenceImageRing";
+import HillsImageRing, {
+    HILL_RING_RADII,
+    TOONTOWN_HILL_RADIUS,
+} from "./HillsImageRing";
+import { ModelToontownBetterSkybox } from "./ToontownBetterSkybox";
+import { DEFAULT_TERRAIN as TERRAIN } from "./terrainGeometry";
 import CameraManager from "./CameraManager";
-import NPC from "./NPC";
-import Ground from "./Ground";
+import Terrain from "./Terrain";
 import SocketPlayers from "./SocketPlayers";
 import FallingItems from "./FallingItems";
 
-const textureOther = new TextureLoader().load(`img/grass.webp`)
-
-// const GrassPlane = () => {
-
-//     const width = 100; // Set the width of the plane
-//     const height = 100; // Set the height of the plane
-
-//     texture.magFilter = NearestFilter;
-//     texture.wrapS = RepeatWrapping
-//     texture.wrapT = RepeatWrapping
-//     texture.repeat.set(5, 5)
-
-//     return (
-//         <>
-//             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
-//                 <planeGeometry attach="geometry" args={[width, height]} />
-//                 <meshStandardMaterial attach="material" map={texture} />
-//             </mesh>
-//         </>
-//     );
-// };
+const FENCE_BOUNDS = { minX: -30, maxX: 30, minZ: -30, maxZ: 30 };
+const GRASS_OUTER_BOUNDS = { minX: -90, maxX: 90, minZ: -90, maxZ: 90 };
+const OUTER_FENCE_RADIUS = 100;
+// Keep the sky and clouds behind the outermost hill ring in either visual mode.
+const SKY_RING_GAP = 25;
 
 function GameCanvas({
     landingAnimationMode = false,
@@ -60,76 +46,85 @@ function GameCanvas({
     const debug = useStore((state) => state.debug);
 
     const darkMode = useStore((state) => state.darkMode)
-    const toggleDarkMode = useStore((state) => state.toggleDarkMode)
 
     const graphicsQuality = useStore((state) => state.graphicsQuality)
+    const toontownMode = useStore((state) => state.toontownMode);
+    const outerHillRadius = toontownMode
+        ? TOONTOWN_HILL_RADIUS
+        : Math.max(...Object.values(HILL_RING_RADII));
+    const skyRingRadius = outerHillRadius + SKY_RING_GAP;
 
     const timer = useGameStore((state) => state.gameState.timer)
-    // const timer = useGameStore((state) => state.timer)
-
-    // const controlType = useStore(state => state.controlType);
+    const status = useGameStore((state) => state.gameState.status);
     const showStats = useStore((state) => state?.debugConfig?.showStats);
+    const shadowMapSize = graphicsQuality === "High" ? 4096 : graphicsQuality === "Low" ? 1024 : 2048;
 
     return (
-        <Canvas shadows camera={{ position: [0, 30, 30], fov: 50 }}>
-            aww
+        <Canvas
+            shadows="soft"
+            camera={{
+                position: [0, 30, 30],
+                fov: 50,
+                far: Math.max(1000, skyRingRadius * 4),
+            }}
+        >
             {showStats && <>
                 <Stats className="stats-overlay" />
             </>}
 
-            {landingAnimationMode &&
-                <OrbitControls
-                    autoRotate
+            <CameraManager landingAnimationMode={landingAnimationMode} />
+            <Sky sunPosition={darkMode ? [0, -10, 0] : [-45, 90, 40]} />
+
+            <ambientLight intensity={darkMode ? 0.12 : 0.3} />
+            <hemisphereLight args={[darkMode ? "#718bb9" : "#d9efff", "#42502c", darkMode ? 0.3 : 0.65]} />
+            <directionalLight
+                castShadow
+                position={[-45, 90, 40]}
+                color={darkMode ? "#a9c5ff" : "#fff3d6"}
+                intensity={darkMode ? 0.8 : 2.4}
+                shadow-mapSize-width={shadowMapSize}
+                shadow-mapSize-height={shadowMapSize}
+                shadow-camera-left={-200}
+                shadow-camera-right={200}
+                shadow-camera-top={200}
+                shadow-camera-bottom={-200}
+                shadow-camera-near={1}
+                shadow-camera-far={350}
+                shadow-bias={-0.00015}
+                shadow-normalBias={0.04}
+            />
+
+            <Suspense fallback={null}>
+
+            <group position={[0, TERRAIN.groundHeight, 0]}>
+                <HillsImageRing
+                    imageHeight={50}
+                    layerHeightGrowth={0.08}
+                    autoRotate={true}
                 />
-            }
-
-            {!landingAnimationMode &&
-                <CameraManager />
-            }
-
-            <TimeHandler />
-
-            <ambientLight intensity={0.2} />
-
-            {/* <spotLight distance={500} castShadow intensity={10000} position={[0, 100, 0]} angle={1} penumbra={1} /> */}
-
-            {darkMode ?
-                <directionalLight
-                    castShadow
-                    position={[0, 100, 0]}
-                    intensity={0.2}
-                // shadow-camera-left={-20}
-                // shadow-camera-right={20}
-                // shadow-camera-top={20}
-                // shadow-camera-bottom={-20}
+                <ModelToontownBetterSkybox
+                    radius={skyRingRadius}
+                    cloudsHeight={175}
+                    skyDomeHeight={125}
+                    followCamera={false}
                 />
-                :
-                <directionalLight
-                    castShadow
-                    position={[0, 100, 0]}
-                    intensity={10}
-                    shadow-camera-left={-20}
-                    shadow-camera-right={20}
-                    shadow-camera-top={20}
-                    shadow-camera-bottom={-20}
-                />
-            }
+            </group>
 
             <WaterPlane
-                position={[0, 0, 0]}
+                position={[0, TERRAIN.waterHeight, 0]}
             />
 
             {graphicsQuality !== "Low" &&
                 <>
                     <ModelQuaterniusAnimalsDeer
-                        position={[5, 0, -25]}
+                        position={[5, TERRAIN.groundHeight, -TERRAIN.outerBank - 3]}
                         scale={[1, 1, 1]}
                         rotation={[0, degToRad(45), 0]}
                         action={"Eating"}
                     />
 
                     <ModelQuaterniusAnimalsDeer
-                        position={[5, 0, -28]}
+                        position={[5, TERRAIN.groundHeight, -TERRAIN.outerBank - 6]}
                         scale={1.2}
                         rotation={[0, degToRad(45), 0]}
                         action={"Idle"}
@@ -137,17 +132,18 @@ function GameCanvas({
 
                     <ModelJToastieGrassPlatform
                         scale={50}
-                        position={[-35, 10, -25]}
+                        position={[-35, 10, -35]}
                         rotation={[degToRad(180), 0, 0]}
                     />
 
                     <ModelKennyNLNatureRockTallE
                         scale={20}
-                        position={[30, 0, -25]}
+                        position={[30, 0, -35]}
+                        rotation={[0, degToRad(45), 0]}
                     />
 
                     <ModelQuaterniusAnimalsCow
-                        position={[-23, 5, -23]}
+                        position={[-31, 8.6, -31]}
                         scale={1.2}
                         rotation={[0, degToRad(20), 0]}
                         action={"Attack_Headbutt"}
@@ -155,199 +151,49 @@ function GameCanvas({
                 </>
             }
 
-            <Tree
-                position={[-15, 0, -25]}
+            <TreeArea
+                minSafeArea={11}
+                getTerrainHeight={TERRAIN.getHeight}
             />
-            <Tree
-                position={[0, 0, -25]}
-                scale={[1, 5, 1]}
+            <FenceSquare
+                size={60}
+                getTerrainHeight={TERRAIN.getHeight}
             />
-            <Tree
-                position={[15, 0, -25]}
+            <FenceImageRing
+                radius={OUTER_FENCE_RADIUS}
+                getTerrainHeight={TERRAIN.getHeight}
             />
-
-            <Tree
-                position={[25, 0, -0]}
+            <SceneryArea
+                seed="catching-forest-1"
+                innerBounds={FENCE_BOUNDS}
+                outerRadius={OUTER_FENCE_RADIUS}
+                getTerrainHeight={TERRAIN.getHeight}
             />
-            <Tree
-                position={[-25, 0, -0]}
-            />
-
-            <Grass
-                position={[0, 0, -120]}
-                args={[200, 200]}
-            />
-            <Grass
-                position={[0, 0, 120]}
-                args={[200, 200]}
-            />
-            <Grass
-                position={[-120, 0, 0]}
-                args={[200, 200]}
-            />
-            <Grass
-                position={[120, 0, 0]}
-                args={[200, 200]}
+            <GrassArea
+                innerBounds={FENCE_BOUNDS}
+                outerBounds={GRASS_OUTER_BOUNDS}
+                groundHeight={TERRAIN.groundHeight}
+                getTerrainHeight={TERRAIN.getHeight}
             />
 
-            <SquareOfTrees
-                count={20}
-                areaSize={100}
-                position={[0, 0, -100]}
-                seed={42}
-            />
-
-            <Physics>
-
-                <Debug
-                    scale={
-                        debug ? 1 : 0
-                    }
-                >
-
-                    <>
-                        {!landingAnimationMode &&
-                            <Player />
-                        }
-
-                        <SocketPlayers />
-
-                        <FallingItems />
-
-                        <Ground
-                            args={[30, 30]}
-                        // args={[30, 0.5, 30]}
-                        />
-
-                        {/* Old Single player */}
-                        {/* <FallingObjects
-                        /> */}
-
-                        <Enemy
-
-                            // Sphere
-                            args={[1, 6, 6]}
-
-                            // Box
-                            // args={[2, 2, 2]}
-
-                            position={[0, 1.2, 0]}
-                        />
-
-                        {timer >= 40 &&
-                            <Enemy
-
-                                // Sphere
-                                args={[1, 6, 6]}
-
-                                // Box
-                                // args={[2, 2, 2]}
-
-                                position={[0, 1.2, 0]}
-                            />
-                        }
-
-                        {timer >= 20 &&
-                            <Enemy
-
-                                // Sphere
-                                args={[1, 6, 6]}
-
-                                // Box
-                                // args={[2, 2, 2]}
-
-                                position={[0, 1.2, 0]}
-                            />
-                        }
-
-                        {/* <NPC />
-            
-            {timer <= 40 && <NPC />}
-            {timer <= 20 && <NPC />} */}
-
-                    </>
-
-                </Debug>
-
+            <Physics debug={debug} gravity={[0, -9.81, 0]}>
+                <Terrain terrain={TERRAIN} interactive={!landingAnimationMode} />
+                {!landingAnimationMode && <>
+                    <Player />
+                    <SocketPlayers />
+                    <FallingItems />
+                    {status === "In Progress" && <>
+                        <Enemy args={[1, 6, 6]} />
+                        {timer >= 20 && <Enemy args={[1, 6, 6]} />}
+                        {timer >= 40 && <Enemy args={[1, 6, 6]} />}
+                    </>}
+                </>}
             </Physics>
+            </Suspense>
 
         </Canvas>
     )
 }
 
 export default memo(GameCanvas)
-
-function FallingObjects() {
-    return (
-        <FallingObject
-            args={[1, 6, 6]}
-            position={[0, 40, 0]}
-        />
-    )
-}
-
-function FallingObject({ args, position, rotation }) {
-
-    const [ref, api] = useSphere(() => ({
-        mass: 1,
-        // type: 'Dynamic',
-        isTrigger: true,
-        args: args,
-        position: position,
-        rotation: rotation,
-        userData: {
-            isPositiveObject: true,
-        },
-        onCollide: (e) => {
-            console.log("FallingObject Collide")
-        }
-    }))
-
-    useEffect(() => {
-
-        api.position.subscribe((p) => {
-
-            if (p[1] < 1.2) {
-
-                api.position.set(
-                    generateRandomInteger(-14, 14),
-                    position[1],
-                    generateRandomInteger(-14, 14),
-                );
-
-                api.velocity.set(0, 0, 0);
-
-            }
-
-        })
-
-    }, [api.position])
-
-    return (
-        <mesh ref={ref} castShadow>
-            <sphereGeometry args={args} />
-            <meshStandardMaterial color="green" />
-        </mesh>
-    )
-
-}
-
-function Grass({ args, position }) {
-
-    textureOther.magFilter = NearestFilter;
-    textureOther.wrapS = RepeatWrapping
-    textureOther.wrapT = RepeatWrapping
-    textureOther.repeat.set(20, 20)
-
-    return (
-        <mesh position={position} rotation={[-Math.PI / 2, 0, 0]}>
-
-            <boxGeometry args={args} />
-
-            <meshStandardMaterial attach="material" map={textureOther} />
-
-        </mesh>
-    )
-
-}
 
