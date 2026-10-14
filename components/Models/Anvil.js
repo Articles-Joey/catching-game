@@ -25,7 +25,7 @@ function Anvil(props) {
                         <RoundedBoxGeometry args={[1.6, 0.28, 0.84]} radius={0.04} smoothness={2} bevelSegments={2} />
                     </Addition>
                     <Addition position={[-0.99, 0.42, 0]} rotation={[0, 0, Math.PI / 2]} scale={[0.7, 1, 1]}>
-                        <coneGeometry args={[0.32, 1, 20]} />
+                        <coneGeometry args={[0.20, 1, 20]} />
                     </Addition>
                     <Subtraction position={[-1.12, 0.96, 0]}>
                         <boxGeometry args={[1.1, 0.8, 1]} />

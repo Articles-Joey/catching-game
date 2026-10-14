@@ -117,7 +117,7 @@ function GameCanvas({
             {graphicsQuality !== "Low" &&
                 <>
                     <ModelQuaterniusAnimalsDeer
-                        position={[5, TERRAIN.groundHeight, -TERRAIN.outerBank - 3]}
+                        position={[3, TERRAIN.groundHeight, -TERRAIN.outerBank - 4]}
                         scale={[1, 1, 1]}
                         rotation={[0, degToRad(45), 0]}
                         action={"Eating"}
